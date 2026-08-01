@@ -6,8 +6,142 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F9F3C61D301E409F00464555 /* Assets 3.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5DE301E409F00464555 /* Assets 3.xcassets */; };
+		F9F3C61E301E409F00464555 /* score_increase.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C606301E409F00464555 /* score_increase.caf */; };
+		F9F3C61F301E409F00464555 /* music_background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5F7301E409F00464555 /* music_background.mp3 */; };
+		F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C619301E409F00464555 /* sfx_wrong.caf */; };
+		F9F3C621301E409F00464555 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C600301E409F00464555 /* Products.storekit */; };
+		F9F3C622301E409F00464555 /* sfx_double_card.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60E301E409F00464555 /* sfx_double_card.caf */; };
+		F9F3C623301E409F00464555 /* sfx_half_life.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C611301E409F00464555 /* sfx_half_life.wav */; };
+		F9F3C624301E409F00464555 /* sfx_card_flight.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C609301E409F00464555 /* sfx_card_flight.caf */; };
+		F9F3C625301E409F00464555 /* sfx_switch_off.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C617301E409F00464555 /* sfx_switch_off.caf */; };
+		F9F3C626301E409F00464555 /* sfx_switch_on.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C618301E409F00464555 /* sfx_switch_on.caf */; };
+		F9F3C627301E409F00464555 /* sfx_session_start.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C616301E409F00464555 /* sfx_session_start.caf */; };
+		F9F3C628301E409F00464555 /* sfx_select.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C615301E409F00464555 /* sfx_select.wav */; };
+		F9F3C629301E409F00464555 /* sfx_card_flip.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60A301E409F00464555 /* sfx_card_flip.wav */; };
+		F9F3C62A301E409F00464555 /* sfx_life_lost.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C614301E409F00464555 /* sfx_life_lost.caf */; };
+		F9F3C62B301E409F00464555 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5F3301E409F00464555 /* Info.plist */; };
+		F9F3C62C301E409F00464555 /* sfx_card_reveal.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60B301E409F00464555 /* sfx_card_reveal.caf */; };
+		F9F3C62D301E409F00464555 /* sfx_high_score.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C612301E409F00464555 /* sfx_high_score.caf */; };
+		F9F3C62E301E409F00464555 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5DD301E409F00464555 /* Assets.xcassets */; };
+		F9F3C62F301E409F00464555 /* sfx_flamethrower.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C610301E409F00464555 /* sfx_flamethrower.caf */; };
+		F9F3C630301E409F00464555 /* sfx_character_unlock.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60C301E409F00464555 /* sfx_character_unlock.caf */; };
+		F9F3C631301E409F00464555 /* sfx_card_count.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C608301E409F00464555 /* sfx_card_count.caf */; };
+		F9F3C632301E409F00464555 /* sfx_double_score.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60F301E409F00464555 /* sfx_double_score.caf */; };
+		F9F3C633301E409F00464555 /* sfx_level_complete.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C613301E409F00464555 /* sfx_level_complete.caf */; };
+		F9F3C634301E409F00464555 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5F5301E409F00464555 /* Localizable.xcstrings */; };
+		F9F3C635301E409F00464555 /* sfx_correct.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60D301E409F00464555 /* sfx_correct.caf */; };
+		F9F3C636301E409F00464555 /* PlaytimeTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FD301E409F00464555 /* PlaytimeTracker.swift */; };
+		F9F3C637301E409F00464555 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F8301E409F00464555 /* Notifications.swift */; };
+		F9F3C638301E409F00464555 /* DecimalAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */; };
+		F9F3C639301E409F00464555 /* ParentApprovalGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FC301E409F00464555 /* ParentApprovalGate.swift */; };
+		F9F3C63A301E409F00464555 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DF301E409F00464555 /* ContentView.swift */; };
+		F9F3C63B301E409F00464555 /* HomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F1301E409F00464555 /* HomeComponents.swift */; };
+		F9F3C63C301E409F00464555 /* PracticeMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E7301E409F00464555 /* PracticeMode.swift */; };
+		F9F3C63D301E409F00464555 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F2301E409F00464555 /* HomeView.swift */; };
+		F9F3C63E301E409F00464555 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C604301E409F00464555 /* ResultView.swift */; };
+		F9F3C63F301E409F00464555 /* PremiumStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FE301E409F00464555 /* PremiumStore.swift */; };
+		F9F3C640301E409F00464555 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F6301E409F00464555 /* Localization.swift */; };
+		F9F3C641301E409F00464555 /* SpinComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C61A301E409F00464555 /* SpinComponent.swift */; };
+		F9F3C642301E409F00464555 /* PromotedPurchaseCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */; };
+		F9F3C643301E409F00464555 /* LevelIntroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */; };
+		F9F3C644301E409F00464555 /* EmphasizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EE301E409F00464555 /* EmphasizedText.swift */; };
+		F9F3C645301E409F00464555 /* SeededGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EB301E409F00464555 /* SeededGenerator.swift */; };
+		F9F3C646301E409F00464555 /* SpokenMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C61B301E409F00464555 /* SpokenMath.swift */; };
+		F9F3C647301E409F00464555 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DC301E409F00464555 /* AppSettings.swift */; };
+		F9F3C648301E409F00464555 /* ReviewRequestCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */; };
+		F9F3C649301E409F00464555 /* AppAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DB301E409F00464555 /* AppAudio.swift */; };
+		F9F3C64A301E409F00464555 /* ReefGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C603301E409F00464555 /* ReefGame.swift */; };
+		F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FF301E409F00464555 /* PremiumView.swift */; };
+		F9F3C64C301E409F00464555 /* AmbientReefBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */; };
+		F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E6301E409F00464555 /* PausedSessionStore.swift */; };
+		F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C601301E409F00464555 /* ProgressSync.swift */; };
+		F9F3C64F301E409F00464555 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EF301E409F00464555 /* GameView.swift */; };
+		F9F3C650301E409F00464555 /* CharacterUnlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */; };
+		F9F3C651301E409F00464555 /* MemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E5301E409F00464555 /* MemoryGame.swift */; };
+		F9F3C652301E409F00464555 /* MathTopic.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E4301E409F00464555 /* MathTopic.swift */; };
+		F9F3C653301E409F00464555 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C607301E409F00464555 /* SettingsView.swift */; };
+		F9F3C654301E409F00464555 /* MathQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E3301E409F00464555 /* MathQuestion.swift */; };
+		F9F3C655301E409F00464555 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F0301E409F00464555 /* GameViewModel.swift */; };
+		F9F3C656301E409F00464555 /* ElephantChallengeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5ED301E409F00464555 /* ElephantChallengeApp.swift */; };
+		F9F3C657301E409F00464555 /* QuestionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E9301E409F00464555 /* QuestionGenerator.swift */; };
+		F9F3C658301E409F00464555 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C61C301E409F00464555 /* Theme.swift */; };
+		F9F3C659301E409F00464555 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FB301E409F00464555 /* OnboardingView.swift */; };
+		F9F3C65A301E409F00464555 /* RoundFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EA301E409F00464555 /* RoundFactory.swift */; };
+		F9F3C65B301E409F00464555 /* Number_ReefApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */; };
+		F9F3C65C301E409F00464555 /* GameConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E2301E409F00464555 /* GameConfig.swift */; };
+		F9F3C65D301E409F00464555 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E8301E409F00464555 /* ProgressStore.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F9F3C5CA301E405E00464555 /* Hungry Frog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hungry Frog.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientReefBackground.swift; sourceTree = "<group>"; };
+		F9F3C5DB301E409F00464555 /* AppAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAudio.swift; sourceTree = "<group>"; };
+		F9F3C5DC301E409F00464555 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		F9F3C5DD301E409F00464555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F9F3C5DE301E409F00464555 /* Assets 3.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets 3.xcassets"; sourceTree = "<group>"; };
+		F9F3C5DF301E409F00464555 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterUnlocks.swift; sourceTree = "<group>"; };
+		F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecimalAnswer.swift; sourceTree = "<group>"; };
+		F9F3C5E2301E409F00464555 /* GameConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfig.swift; sourceTree = "<group>"; };
+		F9F3C5E3301E409F00464555 /* MathQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathQuestion.swift; sourceTree = "<group>"; };
+		F9F3C5E4301E409F00464555 /* MathTopic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathTopic.swift; sourceTree = "<group>"; };
+		F9F3C5E5301E409F00464555 /* MemoryGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryGame.swift; sourceTree = "<group>"; };
+		F9F3C5E6301E409F00464555 /* PausedSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PausedSessionStore.swift; sourceTree = "<group>"; };
+		F9F3C5E7301E409F00464555 /* PracticeMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeMode.swift; sourceTree = "<group>"; };
+		F9F3C5E8301E409F00464555 /* ProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStore.swift; sourceTree = "<group>"; };
+		F9F3C5E9301E409F00464555 /* QuestionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionGenerator.swift; sourceTree = "<group>"; };
+		F9F3C5EA301E409F00464555 /* RoundFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundFactory.swift; sourceTree = "<group>"; };
+		F9F3C5EB301E409F00464555 /* SeededGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededGenerator.swift; sourceTree = "<group>"; };
+		F9F3C5ED301E409F00464555 /* ElephantChallengeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElephantChallengeApp.swift; sourceTree = "<group>"; };
+		F9F3C5EE301E409F00464555 /* EmphasizedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmphasizedText.swift; sourceTree = "<group>"; };
+		F9F3C5EF301E409F00464555 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		F9F3C5F0301E409F00464555 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
+		F9F3C5F1301E409F00464555 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
+		F9F3C5F2301E409F00464555 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		F9F3C5F3301E409F00464555 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelIntroCard.swift; sourceTree = "<group>"; };
+		F9F3C5F5301E409F00464555 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		F9F3C5F6301E409F00464555 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		F9F3C5F7301E409F00464555 /* music_background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = music_background.mp3; sourceTree = "<group>"; };
+		F9F3C5F8301E409F00464555 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		F9F3C5F9301E409F00464555 /* Number Reef.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Number Reef.entitlements"; sourceTree = "<group>"; };
+		F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Number_ReefApp.swift; sourceTree = "<group>"; };
+		F9F3C5FB301E409F00464555 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		F9F3C5FC301E409F00464555 /* ParentApprovalGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentApprovalGate.swift; sourceTree = "<group>"; };
+		F9F3C5FD301E409F00464555 /* PlaytimeTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaytimeTracker.swift; sourceTree = "<group>"; };
+		F9F3C5FE301E409F00464555 /* PremiumStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumStore.swift; sourceTree = "<group>"; };
+		F9F3C5FF301E409F00464555 /* PremiumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumView.swift; sourceTree = "<group>"; };
+		F9F3C600301E409F00464555 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
+		F9F3C601301E409F00464555 /* ProgressSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSync.swift; sourceTree = "<group>"; };
+		F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotedPurchaseCoordinator.swift; sourceTree = "<group>"; };
+		F9F3C603301E409F00464555 /* ReefGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReefGame.swift; sourceTree = "<group>"; };
+		F9F3C604301E409F00464555 /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
+		F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRequestCoordinator.swift; sourceTree = "<group>"; };
+		F9F3C606301E409F00464555 /* score_increase.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = score_increase.caf; sourceTree = "<group>"; };
+		F9F3C607301E409F00464555 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F9F3C608301E409F00464555 /* sfx_card_count.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_card_count.caf; sourceTree = "<group>"; };
+		F9F3C609301E409F00464555 /* sfx_card_flight.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_card_flight.caf; sourceTree = "<group>"; };
+		F9F3C60A301E409F00464555 /* sfx_card_flip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sfx_card_flip.wav; sourceTree = "<group>"; };
+		F9F3C60B301E409F00464555 /* sfx_card_reveal.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_card_reveal.caf; sourceTree = "<group>"; };
+		F9F3C60C301E409F00464555 /* sfx_character_unlock.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_character_unlock.caf; sourceTree = "<group>"; };
+		F9F3C60D301E409F00464555 /* sfx_correct.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_correct.caf; sourceTree = "<group>"; };
+		F9F3C60E301E409F00464555 /* sfx_double_card.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_double_card.caf; sourceTree = "<group>"; };
+		F9F3C60F301E409F00464555 /* sfx_double_score.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_double_score.caf; sourceTree = "<group>"; };
+		F9F3C610301E409F00464555 /* sfx_flamethrower.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_flamethrower.caf; sourceTree = "<group>"; };
+		F9F3C611301E409F00464555 /* sfx_half_life.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sfx_half_life.wav; sourceTree = "<group>"; };
+		F9F3C612301E409F00464555 /* sfx_high_score.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_high_score.caf; sourceTree = "<group>"; };
+		F9F3C613301E409F00464555 /* sfx_level_complete.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_level_complete.caf; sourceTree = "<group>"; };
+		F9F3C614301E409F00464555 /* sfx_life_lost.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_life_lost.caf; sourceTree = "<group>"; };
+		F9F3C615301E409F00464555 /* sfx_select.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sfx_select.wav; sourceTree = "<group>"; };
+		F9F3C616301E409F00464555 /* sfx_session_start.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_session_start.caf; sourceTree = "<group>"; };
+		F9F3C617301E409F00464555 /* sfx_switch_off.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_off.caf; sourceTree = "<group>"; };
+		F9F3C618301E409F00464555 /* sfx_switch_on.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_on.caf; sourceTree = "<group>"; };
+		F9F3C619301E409F00464555 /* sfx_wrong.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_wrong.caf; sourceTree = "<group>"; };
+		F9F3C61A301E409F00464555 /* SpinComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinComponent.swift; sourceTree = "<group>"; };
+		F9F3C61B301E409F00464555 /* SpokenMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenMath.swift; sourceTree = "<group>"; };
+		F9F3C61C301E409F00464555 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +166,61 @@
 		F9F3C5C1301E405E00464555 = {
 			isa = PBXGroup;
 			children = (
+				F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */,
+				F9F3C5DB301E409F00464555 /* AppAudio.swift */,
+				F9F3C5DC301E409F00464555 /* AppSettings.swift */,
+				F9F3C5DD301E409F00464555 /* Assets.xcassets */,
+				F9F3C5DE301E409F00464555 /* Assets 3.xcassets */,
+				F9F3C5DF301E409F00464555 /* ContentView.swift */,
+				F9F3C5EC301E409F00464555 /* Core */,
+				F9F3C5ED301E409F00464555 /* ElephantChallengeApp.swift */,
+				F9F3C5EE301E409F00464555 /* EmphasizedText.swift */,
+				F9F3C5EF301E409F00464555 /* GameView.swift */,
+				F9F3C5F0301E409F00464555 /* GameViewModel.swift */,
+				F9F3C5F1301E409F00464555 /* HomeComponents.swift */,
+				F9F3C5F2301E409F00464555 /* HomeView.swift */,
+				F9F3C5F3301E409F00464555 /* Info.plist */,
+				F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */,
+				F9F3C5F5301E409F00464555 /* Localizable.xcstrings */,
+				F9F3C5F6301E409F00464555 /* Localization.swift */,
+				F9F3C5F7301E409F00464555 /* music_background.mp3 */,
+				F9F3C5F8301E409F00464555 /* Notifications.swift */,
+				F9F3C5F9301E409F00464555 /* Number Reef.entitlements */,
+				F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */,
+				F9F3C5FB301E409F00464555 /* OnboardingView.swift */,
+				F9F3C5FC301E409F00464555 /* ParentApprovalGate.swift */,
+				F9F3C5FD301E409F00464555 /* PlaytimeTracker.swift */,
+				F9F3C5FE301E409F00464555 /* PremiumStore.swift */,
+				F9F3C5FF301E409F00464555 /* PremiumView.swift */,
+				F9F3C600301E409F00464555 /* Products.storekit */,
+				F9F3C601301E409F00464555 /* ProgressSync.swift */,
+				F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */,
+				F9F3C603301E409F00464555 /* ReefGame.swift */,
+				F9F3C604301E409F00464555 /* ResultView.swift */,
+				F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */,
+				F9F3C606301E409F00464555 /* score_increase.caf */,
+				F9F3C607301E409F00464555 /* SettingsView.swift */,
+				F9F3C608301E409F00464555 /* sfx_card_count.caf */,
+				F9F3C609301E409F00464555 /* sfx_card_flight.caf */,
+				F9F3C60A301E409F00464555 /* sfx_card_flip.wav */,
+				F9F3C60B301E409F00464555 /* sfx_card_reveal.caf */,
+				F9F3C60C301E409F00464555 /* sfx_character_unlock.caf */,
+				F9F3C60D301E409F00464555 /* sfx_correct.caf */,
+				F9F3C60E301E409F00464555 /* sfx_double_card.caf */,
+				F9F3C60F301E409F00464555 /* sfx_double_score.caf */,
+				F9F3C610301E409F00464555 /* sfx_flamethrower.caf */,
+				F9F3C611301E409F00464555 /* sfx_half_life.wav */,
+				F9F3C612301E409F00464555 /* sfx_high_score.caf */,
+				F9F3C613301E409F00464555 /* sfx_level_complete.caf */,
+				F9F3C614301E409F00464555 /* sfx_life_lost.caf */,
+				F9F3C615301E409F00464555 /* sfx_select.wav */,
+				F9F3C616301E409F00464555 /* sfx_session_start.caf */,
+				F9F3C617301E409F00464555 /* sfx_switch_off.caf */,
+				F9F3C618301E409F00464555 /* sfx_switch_on.caf */,
+				F9F3C619301E409F00464555 /* sfx_wrong.caf */,
+				F9F3C61A301E409F00464555 /* SpinComponent.swift */,
+				F9F3C61B301E409F00464555 /* SpokenMath.swift */,
+				F9F3C61C301E409F00464555 /* Theme.swift */,
 				F9F3C5CC301E405E00464555 /* Hungry Frog */,
 				F9F3C5CB301E405E00464555 /* Products */,
 			);
@@ -43,6 +232,25 @@
 				F9F3C5CA301E405E00464555 /* Hungry Frog.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F9F3C5EC301E409F00464555 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */,
+				F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */,
+				F9F3C5E2301E409F00464555 /* GameConfig.swift */,
+				F9F3C5E3301E409F00464555 /* MathQuestion.swift */,
+				F9F3C5E4301E409F00464555 /* MathTopic.swift */,
+				F9F3C5E5301E409F00464555 /* MemoryGame.swift */,
+				F9F3C5E6301E409F00464555 /* PausedSessionStore.swift */,
+				F9F3C5E7301E409F00464555 /* PracticeMode.swift */,
+				F9F3C5E8301E409F00464555 /* ProgressStore.swift */,
+				F9F3C5E9301E409F00464555 /* QuestionGenerator.swift */,
+				F9F3C5EA301E409F00464555 /* RoundFactory.swift */,
+				F9F3C5EB301E409F00464555 /* SeededGenerator.swift */,
+			);
+			path = Core;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -109,6 +317,31 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9F3C61D301E409F00464555 /* Assets 3.xcassets in Resources */,
+				F9F3C61E301E409F00464555 /* score_increase.caf in Resources */,
+				F9F3C61F301E409F00464555 /* music_background.mp3 in Resources */,
+				F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */,
+				F9F3C621301E409F00464555 /* Products.storekit in Resources */,
+				F9F3C622301E409F00464555 /* sfx_double_card.caf in Resources */,
+				F9F3C623301E409F00464555 /* sfx_half_life.wav in Resources */,
+				F9F3C624301E409F00464555 /* sfx_card_flight.caf in Resources */,
+				F9F3C625301E409F00464555 /* sfx_switch_off.caf in Resources */,
+				F9F3C626301E409F00464555 /* sfx_switch_on.caf in Resources */,
+				F9F3C627301E409F00464555 /* sfx_session_start.caf in Resources */,
+				F9F3C628301E409F00464555 /* sfx_select.wav in Resources */,
+				F9F3C629301E409F00464555 /* sfx_card_flip.wav in Resources */,
+				F9F3C62A301E409F00464555 /* sfx_life_lost.caf in Resources */,
+				F9F3C62B301E409F00464555 /* Info.plist in Resources */,
+				F9F3C62C301E409F00464555 /* sfx_card_reveal.caf in Resources */,
+				F9F3C62D301E409F00464555 /* sfx_high_score.caf in Resources */,
+				F9F3C62E301E409F00464555 /* Assets.xcassets in Resources */,
+				F9F3C62F301E409F00464555 /* sfx_flamethrower.caf in Resources */,
+				F9F3C630301E409F00464555 /* sfx_character_unlock.caf in Resources */,
+				F9F3C631301E409F00464555 /* sfx_card_count.caf in Resources */,
+				F9F3C632301E409F00464555 /* sfx_double_score.caf in Resources */,
+				F9F3C633301E409F00464555 /* sfx_level_complete.caf in Resources */,
+				F9F3C634301E409F00464555 /* Localizable.xcstrings in Resources */,
+				F9F3C635301E409F00464555 /* sfx_correct.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +352,46 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9F3C636301E409F00464555 /* PlaytimeTracker.swift in Sources */,
+				F9F3C637301E409F00464555 /* Notifications.swift in Sources */,
+				F9F3C638301E409F00464555 /* DecimalAnswer.swift in Sources */,
+				F9F3C639301E409F00464555 /* ParentApprovalGate.swift in Sources */,
+				F9F3C63A301E409F00464555 /* ContentView.swift in Sources */,
+				F9F3C63B301E409F00464555 /* HomeComponents.swift in Sources */,
+				F9F3C63C301E409F00464555 /* PracticeMode.swift in Sources */,
+				F9F3C63D301E409F00464555 /* HomeView.swift in Sources */,
+				F9F3C63E301E409F00464555 /* ResultView.swift in Sources */,
+				F9F3C63F301E409F00464555 /* PremiumStore.swift in Sources */,
+				F9F3C640301E409F00464555 /* Localization.swift in Sources */,
+				F9F3C641301E409F00464555 /* SpinComponent.swift in Sources */,
+				F9F3C642301E409F00464555 /* PromotedPurchaseCoordinator.swift in Sources */,
+				F9F3C643301E409F00464555 /* LevelIntroCard.swift in Sources */,
+				F9F3C644301E409F00464555 /* EmphasizedText.swift in Sources */,
+				F9F3C645301E409F00464555 /* SeededGenerator.swift in Sources */,
+				F9F3C646301E409F00464555 /* SpokenMath.swift in Sources */,
+				F9F3C647301E409F00464555 /* AppSettings.swift in Sources */,
+				F9F3C648301E409F00464555 /* ReviewRequestCoordinator.swift in Sources */,
+				F9F3C649301E409F00464555 /* AppAudio.swift in Sources */,
+				F9F3C64A301E409F00464555 /* ReefGame.swift in Sources */,
+				F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */,
+				F9F3C64C301E409F00464555 /* AmbientReefBackground.swift in Sources */,
+				F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */,
+				F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */,
+				F9F3C64F301E409F00464555 /* GameView.swift in Sources */,
+				F9F3C650301E409F00464555 /* CharacterUnlocks.swift in Sources */,
+				F9F3C651301E409F00464555 /* MemoryGame.swift in Sources */,
+				F9F3C652301E409F00464555 /* MathTopic.swift in Sources */,
+				F9F3C653301E409F00464555 /* SettingsView.swift in Sources */,
+				F9F3C654301E409F00464555 /* MathQuestion.swift in Sources */,
+				F9F3C655301E409F00464555 /* GameViewModel.swift in Sources */,
+				F9F3C656301E409F00464555 /* ElephantChallengeApp.swift in Sources */,
+				F9F3C657301E409F00464555 /* QuestionGenerator.swift in Sources */,
+				F9F3C658301E409F00464555 /* Theme.swift in Sources */,
+				F9F3C659301E409F00464555 /* OnboardingView.swift in Sources */,
+				F9F3C65A301E409F00464555 /* RoundFactory.swift in Sources */,
+				F9F3C65B301E409F00464555 /* Number_ReefApp.swift in Sources */,
+				F9F3C65C301E409F00464555 /* GameConfig.swift in Sources */,
+				F9F3C65D301E409F00464555 /* ProgressStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
