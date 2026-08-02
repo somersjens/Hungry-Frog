@@ -61,8 +61,8 @@ struct ResultView: View {
             GeometryReader { proxy in
                 ScrollView {
                     card
-                        .padding(26 * scale)
-                        .frame(maxWidth: 400 * scale)
+                        .padding(22 * scale)
+                        .frame(maxWidth: isPad ? 820 : 700)
                         .background(
                             LinearGradient(colors: [character.skyColor, .white, character.tintColor],
                                            startPoint: .top, endPoint: .bottom),
@@ -114,70 +114,45 @@ struct ResultView: View {
     }
 
     private var card: some View {
-        VStack(spacing: 0) {
-            resultIllustration
-                .accessibilityHidden(true)
-                .padding(.bottom, 18 * scale)
+        HStack(alignment: .center, spacing: 28 * scale) {
+            VStack(spacing: 0) {
+                if isCompleted {
+                    completionTitle.frame(maxWidth: .infinity)
+                } else {
+                    Text(titleKey)
+                        .font(.system(size: 29 * textScale, weight: .heavy, design: .rounded))
+                        .foregroundStyle(character.deepColor)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                        .frame(maxWidth: .infinity)
+                }
 
-            if isCompleted {
-                completionTitle
-                    .frame(maxWidth: .infinity)
-            } else {
-                Text(titleKey)
-                    .font(.system(size: 29 * textScale, weight: .heavy, design: .rounded))
-                    .foregroundStyle(character.deepColor)
+                Text(verbatim: encouragement)
+                    .font(.system(size: (isCompleted ? 17 : 20) * textScale,
+                                  weight: isCompleted ? .medium : .semibold))
+                    .foregroundStyle(character.deepColor.opacity(0.64))
                     .multilineTextAlignment(.center)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-                    .frame(maxWidth: .infinity)
-            }
+                    .padding(.top, 10 * scale)
+                    .frame(minHeight: 30 * scale)
 
-            Text(verbatim: encouragement)
-                .font(.system(size: (isCompleted ? 17 : 20) * textScale,
-                              weight: isCompleted ? .medium : .semibold))
-                .foregroundStyle(character.deepColor.opacity(0.64))
-                .multilineTextAlignment(.center)
-                .padding(.top, 10 * scale)
-                .frame(minHeight: 30 * scale)
-
-            scoreCapsule
-                .padding(.top, 22 * scale)
-
-            if !result.unlockedCharacterIDs.isEmpty {
-                unlockedRow
+                scoreCapsule
                     .padding(.top, 20 * scale)
-            }
 
+                if !result.unlockedCharacterIDs.isEmpty {
+                    unlockedRow.padding(.top, 14 * scale)
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            Rectangle()
+                .fill(character.deepColor.opacity(0.14))
+                .frame(width: 1, height: isPad ? 240 : 200)
+
+            // The action side contains actions only. Result, explanation and
+            // score form one uninterrupted reading column on the left.
             buttons
-                .padding(.top, 24 * scale)
-        }
-    }
-
-    @ViewBuilder
-    private var resultIllustration: some View {
-        if isCompleted {
-            ZStack {
-                Text(verbatim: "✦")
-                    .font(.system(size: 25 * scale, weight: .bold))
-                    .foregroundStyle(character.color.opacity(0.68))
-                    .offset(x: -54 * scale, y: -20 * scale)
-                Text(verbatim: "✦")
-                    .font(.system(size: 20 * scale, weight: .bold))
-                    .foregroundStyle(character.color.opacity(0.68))
-                    .offset(x: 53 * scale, y: -8 * scale)
-                Text(verbatim: "🏆")
-                    .font(.system(size: 70 * scale))
-                    .scaleEffect(isPresented ? 1 : 0.4)
-                    .rotationEffect(.degrees(isPresented ? 0 : -25))
-                    .animation(.spring(response: 0.55, dampingFraction: 0.5),
-                               value: isPresented)
-            }
-            .frame(height: 92 * scale)
-        } else {
-            character.artwork
-                .resizable()
-                .scaledToFit()
-                .frame(width: 130 * scale, height: 92 * scale)
+                .frame(width: isPad ? 330 : 280)
         }
     }
 
@@ -331,7 +306,7 @@ struct ResultView: View {
     }
 
     private var buttons: some View {
-        VStack(spacing: 12 * scale) {
+        VStack(spacing: 10 * scale) {
             Button(action: onPlayAgain) {
                 Label("game.end.playAgain", systemImage: "arrow.counterclockwise")
                     .font(isPad ? .title3.weight(.bold) : .headline.weight(.bold))

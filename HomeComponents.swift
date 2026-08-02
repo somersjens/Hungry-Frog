@@ -289,9 +289,18 @@ struct AdaptiveLevelGrid: Layout {
     }
 
     private func metrics(for width: CGFloat, itemCount: Int) -> (columns: Int, cardWidth: CGFloat) {
-        let possibleColumns = max(1, Int((width + spacing) / (minimumCardWidth + spacing)))
+        // SwiftUI may probe a custom Layout with an infinite width before the
+        // surrounding landscape HStack has settled. Converting that probe to
+        // Int traps at runtime, so calculate against a finite intrinsic width.
+        let fallbackColumns = min(max(1, itemCount), maximumColumns)
+        let fallbackWidth = minimumCardWidth * CGFloat(fallbackColumns)
+            + spacing * CGFloat(max(0, fallbackColumns - 1))
+        let safeWidth = width.isFinite && width > 0 ? width : fallbackWidth
+        let rawColumns = (safeWidth + spacing) / max(1, minimumCardWidth + spacing)
+        let cappedColumns = min(CGFloat(max(1, itemCount)), max(1, rawColumns))
+        let possibleColumns = Int(cappedColumns.rounded(.down))
         let columns = min(max(1, itemCount), possibleColumns, maximumColumns)
-        let cardWidth = (width - CGFloat(columns - 1) * spacing) / CGFloat(columns)
+        let cardWidth = max(1, (safeWidth - CGFloat(columns - 1) * spacing) / CGFloat(columns))
         return (columns, cardWidth)
     }
 
@@ -302,7 +311,8 @@ struct AdaptiveLevelGrid: Layout {
         let fallbackColumns = min(subviews.count, maximumColumns)
         let fallbackWidth = minimumCardWidth * CGFloat(fallbackColumns)
             + spacing * CGFloat(fallbackColumns - 1)
-        let width = proposal.width ?? fallbackWidth
+        let proposedWidth = proposal.width ?? fallbackWidth
+        let width = proposedWidth.isFinite && proposedWidth > 0 ? proposedWidth : fallbackWidth
         let columns = metrics(for: width, itemCount: subviews.count).columns
         let rows = Int(ceil(Double(subviews.count) / Double(columns)))
         return CGSize(width: width, height: CGFloat(rows) * cardHeight + CGFloat(rows - 1) * spacing)
@@ -556,7 +566,7 @@ struct LevelCardView: View {
             VStack(spacing: 4) {
                 Spacer(minLength: 2)
                 Text(level.cardNumber)
-                    .font(.system(size: 34 * cardScale, weight: .heavy, design: .rounded))
+                    .font(.system(size: 36 * cardScale, weight: .heavy, design: .rounded))
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
                     .foregroundStyle(theme.deepColor)
@@ -598,7 +608,7 @@ struct LevelCardView: View {
     private var centerLine: some View {
         if status == .recommended && best == 0 {
             Text("menu.startHere")
-                .font(.system(size: 10 * cardScale * 1.2, weight: .bold))
+                .font(.system(size: 13 * cardScale, weight: .bold))
                 .foregroundStyle(theme.deepColor)
                 // Longer translations shrink to fit rather than truncating.
                 .lineLimit(1)
@@ -620,7 +630,7 @@ struct LevelCardView: View {
                     Image(systemName: "pause.fill")
                         .font(.system(size: 8 * cardScale))
                     Text(verbatim: "\(pausedCards)")
-                        .font(.system(size: 11 * cardScale, weight: .bold))
+                        .font(.system(size: 12 * cardScale, weight: .bold))
                         .monospacedDigit()
                 }
                 .foregroundStyle(theme.deepColor.opacity(0.7))
@@ -641,7 +651,7 @@ struct LevelCardView: View {
                            startedAt: celebrationStartedAt,
                            delay: Self.scoreCountDelay,
                            duration: Self.scoreCountDuration)
-                .font(.system(size: 12 * cardScale, weight: .bold))
+                .font(.system(size: 13 * cardScale, weight: .bold))
             CurrencyIcon(size: 9 * cardScale)
                 // The launch anchor is read from the unscaled layout frame, so
                 // the flying card starts exactly overlapping this glyph.
@@ -739,7 +749,7 @@ struct LevelCardView: View {
             VStack(spacing: 3) {
                 Spacer(minLength: 8)
                 Text(level.cardNumber)
-                    .font(.system(size: 34 * cardScale, weight: .heavy, design: .rounded))
+                    .font(.system(size: 36 * cardScale, weight: .heavy, design: .rounded))
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
                     .foregroundStyle(hero)
@@ -749,7 +759,7 @@ struct LevelCardView: View {
                                    startedAt: celebrationStartedAt,
                                    delay: Self.scoreCountDelay,
                                    duration: Self.scoreCountDuration)
-                        .font(.system(size: 12 * cardScale, weight: .bold))
+                        .font(.system(size: 13 * cardScale, weight: .bold))
                     CurrencyIcon(size: 9 * cardScale)
                         // Once the max card has been revealed, the flight must
                         // still start on this exact bubble. Without an anchor
@@ -813,7 +823,7 @@ struct LevelCardView: View {
             CompletionFern(color: highlight, revealStartedAt: fernRevealStartedAt)
                 .frame(width: 25 * cardScale, height: 52 * cardScale)
                 .rotationEffect(.degrees(-3), anchor: .bottom)
-                .offset(x: 9 * cardScale, y: 3 * cardScale)
+                .offset(x: 13 * cardScale, y: 3 * cardScale)
 
             Spacer(minLength: 0)
 
@@ -821,7 +831,7 @@ struct LevelCardView: View {
                 .frame(width: 25 * cardScale, height: 52 * cardScale)
                 .scaleEffect(x: -1, y: 1)
                 .rotationEffect(.degrees(3), anchor: .bottom)
-                .offset(x: -9 * cardScale, y: 3 * cardScale)
+                .offset(x: -13 * cardScale, y: 3 * cardScale)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
@@ -858,7 +868,7 @@ struct LevelCardView: View {
         let cornerRadius = 3.5 * cardScale
         return Text(verbatim: label)
             .fixedSize()
-            .font(.system(size: 5.6 * cardScale, weight: .heavy, design: .rounded))
+            .font(.system(size: 6.4 * cardScale, weight: .heavy, design: .rounded))
             .foregroundStyle(fill)
             .lineLimit(1)
             .minimumScaleFactor(0.5)

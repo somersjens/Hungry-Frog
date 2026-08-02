@@ -171,6 +171,9 @@
         }
       }
     },
+    "Combo! +1" : {
+
+    },
     "common.back" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -313,47 +316,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbles collected"
+            "value" : "%lld flies collected"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbels verzameld"
-          }
-        }
-      }
-    },
-    "game.streakBoost.subtitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2× bubbles • 1.5× speed"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2× bubbels • 1,5× snelheid"
-          }
-        }
-      }
-    },
-    "game.streakBoost.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Streak boost!"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Streakboost!"
+            "value" : "%lld vliegen verzameld"
           }
         }
       }
@@ -545,36 +514,19 @@
         }
       }
     },
-    "game.end.gameOverTitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Game over"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Game over"
-          }
-        }
-      }
-    },
     "game.end.completionSubtitle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You collected all the bubbles."
+            "value" : "You collected all the flies."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je hebt alle bubbels verzameld."
+            "value" : "Je hebt alle vliegen verzameld."
           }
         }
       }
@@ -592,6 +544,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "afgerond!"
+          }
+        }
+      }
+    },
+    "game.end.gameOverTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game over"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game over"
           }
         }
       }
@@ -687,13 +656,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paused with %lld bubbles."
+            "value" : "Paused with %lld flies."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gepauzeerd met %lld bubbels."
+            "value" : "Gepauzeerd met %lld vliegen."
           }
         }
       }
@@ -779,6 +748,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vraag: %@"
+          }
+        }
+      }
+    },
+    "game.streakBoost.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2× flies • 1.5× speed"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2× vliegen • 1,5× snelheid"
+          }
+        }
+      }
+    },
+    "game.streakBoost.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streak boost!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streakboost!"
           }
         }
       }
@@ -908,13 +911,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bubbles"
+            "value" : "flies"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bubbels"
+            "value" : "vliegen"
           }
         }
       }
@@ -942,13 +945,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbles collected"
+            "value" : "%lld flies collected"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbels verzameld"
+            "value" : "%lld vliegen verzameld"
+          }
+        }
+      }
+    },
+    "home.totalLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Totaal"
           }
         }
       }
@@ -959,13 +979,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Octopus"
+            "value" : "Frog"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inktvis"
+            "value" : "Kikker"
           }
         }
       }
@@ -1010,13 +1030,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld more bubbles to unlock %2$@"
+            "value" : "%1$lld more flies to unlock %2$@"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nog %1$lld bubbels tot %2$@"
+            "value" : "Nog %1$lld vliegen tot %2$@"
           }
         }
       }
@@ -1027,13 +1047,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbles paused"
+            "value" : "%lld flies paused"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbels gepauzeerd"
+            "value" : "%lld vliegen gepauzeerd"
           }
         }
       }
@@ -1418,13 +1438,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can collect up to |%lld bubbles| in this level."
+            "value" : "You can collect up to |%lld flies| in this level."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je kunt in dit level maximaal |%lld bubbels| verzamelen."
+            "value" : "Je kunt in dit level maximaal |%lld vliegen| verzamelen."
           }
         }
       }
@@ -1486,13 +1506,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questions up to |level %1$lld|, from |%2$lld bubbles|."
+            "value" : "Questions up to |level %1$lld|, from |%2$lld flies|."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vragen t/m |level %1$lld|, uit |%2$lld bubbels|."
+            "value" : "Vragen t/m |level %1$lld|, uit |%2$lld vliegen|."
           }
         }
       }
@@ -1752,7 +1772,9 @@
         }
       }
     },
-    "locked" : {},
+    "locked" : {
+
+    },
     "menu.maximumCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2065,13 +2087,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbles collected! 🫧"
+            "value" : "%lld flies collected! 🪰"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbels verzameld! 🫧"
+            "value" : "%lld vliegen verzameld! 🪰"
           }
         }
       }
@@ -2252,13 +2274,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You have %lld bubbles in total. Ready for a few more?"
+            "value" : "You have %lld flies in total. Ready for a few more?"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je hebt in totaal %lld bubbels. Klaar voor nog een paar?"
+            "value" : "Je hebt in totaal %lld vliegen. Klaar voor nog een paar?"
           }
         }
       }
@@ -2269,19 +2291,23 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbles this week! 🎉"
+            "value" : "%lld flies this week! 🎉"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld bubbels deze week! 🎉"
+            "value" : "%lld vliegen deze week! 🎉"
           }
         }
       }
     },
-    "off" : {},
-    "on" : {},
+    "off" : {
+
+    },
+    "on" : {
+
+    },
     "onboarding.level.advanced.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2764,13 +2790,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Available from %lld bubbles"
+            "value" : "Available from %lld flies"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschikbaar vanaf %lld bubbels"
+            "value" : "Beschikbaar vanaf %lld vliegen"
           }
         }
       }
@@ -2832,13 +2858,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You’ve earned %lld bubbles"
+            "value" : "You’ve earned %lld flies"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je hebt %lld bubbels verdiend"
+            "value" : "Je hebt %lld vliegen verdiend"
           }
         }
       }
@@ -2917,13 +2943,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No waiting for bubbles — every character is yours from the start."
+            "value" : "No waiting for flies — every character is yours from the start."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Niet wachten op bubbels — elk karakter is meteen van jou."
+            "value" : "Niet wachten op vliegen — elk karakter is meteen van jou."
           }
         }
       }
@@ -3098,19 +3124,36 @@
         }
       }
     },
+    "premium.unlockedWithPremium" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlocked with Premium"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vrijgespeeld met Premium"
+          }
+        }
+      }
+    },
     "premium.unlockWithCards" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unlock with bubbles"
+            "value" : "Unlock with flies"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vrijspelen met bubbels"
+            "value" : "Vrijspelen met vliegen"
           }
         }
       }
@@ -3128,23 +3171,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premium ontgrendelen · %@"
-          }
-        }
-      }
-    },
-    "premium.unlockedWithPremium" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlocked with Premium"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vrijgespeeld met Premium"
           }
         }
       }
@@ -3206,13 +3232,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bonus bubbles"
+            "value" : "Bonus flies"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bonusbubbels"
+            "value" : "Bonusvliegen"
           }
         }
       }
@@ -3223,13 +3249,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bubbles"
+            "value" : "flies"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bubbels"
+            "value" : "vliegen"
           }
         }
       }
@@ -3274,13 +3300,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2× fish bonuses"
+            "value" : "2× fly bonuses"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2×-visbonussen"
+            "value" : "2×-vliegenbonussen"
           }
         }
       }
@@ -3880,7 +3906,9 @@
         }
       }
     },
-    "unlocked" : {}
+    "unlocked" : {
+
+    }
   },
   "version" : "1.0"
 }

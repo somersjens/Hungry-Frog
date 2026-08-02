@@ -88,7 +88,14 @@ public final class MemoryGame {
     public private(set) var round: GameRound?
     /// The round after this one, built ahead of time so a transition never
     /// waits on generation.
-    private var preparedRound: GameRound?
+    private var preparedRounds: [GameRound] = []
+
+    /// The active sum followed by the two sums already generated for the fly
+    /// game's preview column. They are the exact rounds `advance()` will use;
+    /// previewing them never creates a second question stream.
+    public var visibleRounds: [GameRound] {
+        ([round].compactMap { $0 } + preparedRounds).prefix(3).map { $0 }
+    }
 
     public private(set) var roundNumber = 0
     public private(set) var cards = 0
@@ -162,7 +169,8 @@ public final class MemoryGame {
         guard state == .intro else { return false }
         roundNumber = 1
         round = factory.makeRound(number: 1)
-        preparedRound = factory.makeRound(number: 2)
+        preparedRounds = [factory.makeRound(number: 2),
+                          factory.makeRound(number: 3)]
         state = .memorising
         return true
     }
@@ -185,7 +193,8 @@ public final class MemoryGame {
         heartFishTarget = session.heartFishTarget ?? GameConfig.heartFishCorrectAnswers
         isHeartFishAvailable = session.isHeartFishAvailable ?? false
         round = factory.makeRound(number: roundNumber)
-        preparedRound = factory.makeRound(number: roundNumber + 1)
+        preparedRounds = [factory.makeRound(number: roundNumber + 1),
+                          factory.makeRound(number: roundNumber + 2)]
         state = .memorising
         return true
     }
@@ -302,6 +311,17 @@ public final class MemoryGame {
         return lifeHalves - previous
     }
 
+    /// Adds the fly game's one-point speed bonus without bypassing the normal
+    /// result and persistence totals. The caller has already established that
+    /// this was a second correct catch inside the combo window.
+    public func awardFlyComboBonus() {
+        guard state == .resolving,
+              case .correct? = lastOutcome else { return }
+        cards += 1
+        result.cardsEarned += 1
+        result.bonusCards += 1
+    }
+
     /// A missed heart fish returns after four more correct answers, rather than
     /// making the player repeat the full eight-answer charge.
     public func missHeartFish() {
@@ -351,9 +371,13 @@ public final class MemoryGame {
         }
 
         roundNumber += 1
-        round = preparedRound ?? factory.makeRound(number: roundNumber)
-        // Build the round after next while the player is looking at this one.
-        preparedRound = factory.makeRound(number: roundNumber + 1)
+        round = preparedRounds.isEmpty
+            ? factory.makeRound(number: roundNumber)
+            : preparedRounds.removeFirst()
+        // Keep two exact future sums ready for the fly game's preview column.
+        while preparedRounds.count < 2 {
+            preparedRounds.append(factory.makeRound(number: roundNumber + preparedRounds.count + 1))
+        }
         selectedOptionID = nil
         lastOutcome = nil
         state = .memorising

@@ -176,10 +176,12 @@ final class AppAudio: NSObject, ObservableObject {
     private var sessionActive = false
     /// The music loops continuously: softly in the background on the menus and
     /// cards, a little louder during play, and briefly ducked while a sum is
-    /// read so the words stay clearly audible over it.
-    private let menuMusicVolume: Float = 0.10
-    private let gameMusicVolume: Float = 0.30
-    private let duckedMusicVolume: Float = 0.05
+    /// read so the words stay clearly audible over it. Keep these values in dB
+    /// so the intended perceived loudness is explicit; AVAudioPlayer itself
+    /// expects a linear gain.
+    private let menuMusicVolume: Float = pow(10, -26.0 / 20.0)
+    private let gameMusicVolume: Float = pow(10, -16.0 / 20.0)
+    private let duckedMusicVolume: Float = pow(10, -31.0 / 20.0)
 
     /// The volume the music should currently sit at, given where the player is.
     private var currentMusicTarget: Float { isGameplayActive ? gameMusicVolume : menuMusicVolume }
@@ -246,7 +248,9 @@ final class AppAudio: NSObject, ObservableObject {
         preparationStarted = true
         prepareQueue.async { [weak self] in
             guard let self else { return }
-            let music = Self.makePlayer(named: "music_background", loops: -1, volume: 0)
+            // AVAudioPlayer's endless loop keeps this single compressed music
+            // asset in memory without repeatedly loading or creating players.
+            let music = Self.makePlayer(named: "frog_music", loops: -1, volume: 0)
             // Decode + lead-trim every effect into a ready-to-schedule PCM buffer
             // here, off the main thread, so play time does no file work at all.
             var buffers: [String: AVAudioPCMBuffer] = [:]
@@ -432,7 +436,7 @@ final class AppAudio: NSObject, ObservableObject {
         let wasActive = isGameplayActive
         isGameplayActive = active
         if active {
-            if gameSoundsEnabled {
+            if musicEnabled {
                 startMusic()
                 setMusicVolume(gameMusicVolume)
             } else if spokenSumsEnabled {
@@ -469,13 +473,15 @@ final class AppAudio: NSObject, ObservableObject {
         if !player.isPlaying {
             player.volume = 0
             player.play()
-            player.setVolume(currentMusicTarget, fadeDuration: 0.6) // gentle fade-in
+            // A longer cold-start fade is especially important on the home
+            // screen: the mastered track must never arrive as a sudden hit.
+            player.setVolume(currentMusicTarget, fadeDuration: 2.0)
         } else {
             setMusicVolume(currentMusicTarget)
         }
     }
 
-    private func setMusicVolume(_ volume: Float, fade: TimeInterval = 0.4) {
+    private func setMusicVolume(_ volume: Float, fade: TimeInterval = 0.7) {
         musicPlayer?.setVolume(volume, fadeDuration: fade)
     }
 

@@ -36,18 +36,28 @@ struct ParentApprovalGate: View {
                            startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
 
-            VStack(spacing: 18) {
-                header
-                approvalCard
-                if failures > 0 {
-                    failureIndicator
-                        .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            GeometryReader { proxy in
+                ScrollView {
+                    HStack(alignment: .center, spacing: AppLayout.isPad ? 48 : 28) {
+                        VStack(spacing: 18) {
+                            header
+                            if failures > 0 {
+                                failureIndicator
+                                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                            }
+                        }
+                        .frame(width: AppLayout.isPad ? 300 : 220)
+
+                        approvalCard
+                            .frame(maxWidth: 620)
+                    }
+                    .padding(.horizontal, AppLayout.landscapeGutter * 2)
+                    .padding(.vertical, AppLayout.isPad ? 36 : 20)
+                    .frame(maxWidth: AppLayout.landscapeContentWidth)
+                    .frame(maxWidth: .infinity, minHeight: proxy.size.height)
                 }
+                .scrollBounceBehavior(.basedOnSize)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 28)
-            .padding(.bottom, 40)
-            .frame(maxWidth: 620)
 
             if isShowingSuccess {
                 successOverlay
@@ -128,18 +138,20 @@ struct ParentApprovalGate: View {
                 shapeButton(shape)
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 140)
+        .frame(maxWidth: .infinity, minHeight: AppLayout.isPad ? 140 : 104)
     }
 
     private func shapeButton(_ shape: GateShape) -> some View {
         let isHeld = heldShape == shape
         return shape.symbol
             .fill(accent)
-            .frame(width: 76, height: 76)
+            .frame(width: AppLayout.isPad ? 76 : 62,
+                   height: AppLayout.isPad ? 76 : 62)
             .shadow(color: deepColor.opacity(isHeld ? 0.32 : 0.12), radius: isHeld ? 14 : 5, y: 4)
             .scaleEffect(isHeld ? 1.13 : 1)
             .animation(.spring(response: 0.25, dampingFraction: 0.62), value: isHeld)
-            .frame(width: 84, height: 100)
+            .frame(width: AppLayout.isPad ? 84 : 72,
+                   height: AppLayout.isPad ? 100 : 78)
             .contentShape(Rectangle())
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { _ in touchBegan(on: shape) }

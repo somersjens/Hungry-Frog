@@ -9,14 +9,14 @@ import UIKit
 #endif
 
 #if canImport(UIKit)
-/// The game is portrait-only. iPad has to *declare* every orientation, so the
-/// lock is applied here at runtime instead — `UIRequiresFullScreen`, the old
-/// way of saying this, is deprecated and will stop being honoured.
+/// The complete app is played in landscape. Keeping the runtime mask aligned
+/// with the generated Info.plist prevents sheets and full-screen covers from
+/// briefly rotating through portrait during presentation.
 final class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      supportedInterfaceOrientationsFor window: UIWindow?)
     -> UIInterfaceOrientationMask {
-        .portrait
+        .landscape
     }
 }
 #endif
@@ -27,6 +27,7 @@ struct ElephantChallengeApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 #endif
     @AppStorage(GameSettings.onboardingCompleteKey) private var onboardingComplete = false
+    @State private var showsOnboardingReplay = false
     @StateObject private var language = LanguageManager.shared
     @StateObject private var promotedPurchase = PromotedPurchaseCoordinator.shared
 
@@ -56,18 +57,27 @@ struct ElephantChallengeApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                if onboardingComplete {
-                    HomeView()
+                if onboardingComplete && !showsOnboardingReplay {
+                    HomeView {
+                        withAnimation(.easeInOut(duration: 0.35)) {
+                            showsOnboardingReplay = true
+                        }
+                    }
                         // Both screens fade through each other rather than one
                         // replacing the other, so the hand-over reads as a
                         // single settling motion instead of a cut.
                         .transition(.opacity.combined(with: .scale(scale: 1.015)))
                 } else {
-                    OnboardingView()
+                    OnboardingView {
+                        withAnimation(.easeInOut(duration: 0.35)) {
+                            showsOnboardingReplay = false
+                        }
+                    }
                         .transition(.opacity.combined(with: .scale(scale: 0.99)))
                 }
             }
             .animation(.easeInOut(duration: 0.42), value: onboardingComplete)
+            .animation(.easeInOut(duration: 0.42), value: showsOnboardingReplay)
             // Re-renders every `Text` (and formats numbers) when the language
             // changes; combined with the bundle redirection this makes the
             // switch instant, no restart required.
@@ -102,4 +112,10 @@ enum AppLayout {
         false
 #endif
     }
+
+
+    /// Shared landscape canvas widths. iPad uses the extra room without
+    /// stretching controls into long, hard-to-scan rows.
+    static var landscapeContentWidth: CGFloat { isPad ? 1180 : 980 }
+    static var landscapeGutter: CGFloat { isPad ? 28 : 16 }
 }

@@ -19,20 +19,28 @@ struct SettingsView: View {
     @State private var showPremium = false
 
     private var character: AnimalCharacter { CharacterCatalog.current(isPremium: premium.isPremium) }
+    private var isPad: Bool { AppLayout.isPad }
 
     private let characterColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 5)
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
-                    soundCard
-                    goalsCard
-                    characterCard
-                    premiumCard
+                LazyVGrid(columns: [
+                    GridItem(.flexible(), spacing: isPad ? 24 : 16),
+                    GridItem(.flexible(), spacing: isPad ? 24 : 16)
+                ], alignment: .leading, spacing: isPad ? 24 : 16) {
+                    VStack(spacing: isPad ? 24 : 16) {
+                        soundCard
+                        premiumCard
+                    }
+                    VStack(spacing: isPad ? 24 : 16) {
+                        goalsCard
+                        characterCard
+                    }
                 }
-                .padding()
-                .frame(maxWidth: 620)
+                .padding(AppLayout.landscapeGutter)
+                .frame(maxWidth: AppLayout.landscapeContentWidth)
                 .frame(maxWidth: .infinity)
             }
             .background(character.skyColor.ignoresSafeArea())

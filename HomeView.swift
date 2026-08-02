@@ -2,9 +2,8 @@
 //  HomeView.swift
 //  Math Memory
 //
-//  Home screen: one menu card holding the player, the streak, the topic
-//  selector and the card-count choice, with the level grid underneath.
-//  Portrait only.
+//  Home screen: a wide landscape toolbar with the player and streak on the
+//  left, the session choices on the right, and a four-column level grid below.
 //
 
 import SwiftUI
@@ -35,6 +34,8 @@ private struct ScoreCelebration: Identifiable {
 }
 
 struct HomeView: View {
+    var onRestartOnboarding: (() -> Void)?
+
     @AppStorage(GameSettings.characterKey) private var characterID = CharacterCatalog.freeCharacterID
     @AppStorage(GameSettings.playerNameKey) private var playerName = ""
     @AppStorage(GameSettings.onboardingCompleteKey) private var onboardingComplete = false
@@ -99,41 +100,43 @@ struct HomeView: View {
     // MARK: - Metrics
 
     private var menuScale: CGFloat { isPad ? 1.4 : 1 }
-    private var menuCardSectionSpacing: CGFloat { isPad ? 18 : 12 }
     private var menuControlSpacing: CGFloat { isPad ? 14 : 10 }
-    private var topicButtonDiameter: CGFloat { isPad ? 62 : 44 }
+    private var topicButtonDiameter: CGFloat { isPad ? 58 : 38 }
     private var levelGridSpacing: CGFloat { isPad ? 16 : 10 }
-    private var levelCardHeight: CGFloat { isPad ? 132 : 96 }
+    private var levelCardHeight: CGFloat { isPad ? 124 : 88 }
 
     var body: some View {
         // Reading the revision redraws the personal bests when iCloud updates.
         let _ = progressSync.revision
 
         ZStack {
-            AmbientReefBackground(character: character)
+            MenuMeadowBackground(accent: character.color)
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: isPad ? 22 : 16) {
-                    menuCard
-                    levelGrid
+            GeometryReader { proxy in
+                ScrollView {
+                    let available = min(AppLayout.landscapeContentWidth,
+                                        proxy.size.width - AppLayout.landscapeGutter * 2)
+
+                    VStack(alignment: .leading, spacing: isPad ? 22 : 14) {
+                        menuCard
+                            .zIndex(1)
+                        levelGrid
+                            .frame(maxWidth: .infinity, alignment: .topLeading)
+                            .zIndex(0)
+                    }
+                    .padding(AppLayout.landscapeGutter)
+                    .frame(width: available + AppLayout.landscapeGutter * 2)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(isPad ? 26 : 16)
-                .frame(maxWidth: isPad ? 760 : 640)
-                .frame(maxWidth: .infinity)
-            }
-            .background(
-                GeometryReader { proxy in
-                    Color.clear
-                        .onAppear { viewportWidth = proxy.size.width }
-                        .onChange(of: proxy.size.width) { _, width in viewportWidth = width }
-                }
-            )
-            .onPreferenceChange(ControlAnchorKey.self) { controlAnchors = $0 }
-            .onPreferenceChange(CardGlyphAnchorKey.self) { cardGlyphAnchors = $0 }
-            .overlay(alignment: .topLeading) { infoPopoutOverlay }
-            .overlay {
-                ForEach(flights) { flight in
-                    CardFlightView(flight: flight)
+                .onAppear { viewportWidth = proxy.size.width }
+                .onChange(of: proxy.size.width) { _, width in viewportWidth = width }
+                .onPreferenceChange(ControlAnchorKey.self) { controlAnchors = $0 }
+                .onPreferenceChange(CardGlyphAnchorKey.self) { cardGlyphAnchors = $0 }
+                .overlay(alignment: .topLeading) { infoPopoutOverlay }
+                .overlay {
+                    ForEach(flights) { flight in
+                        CardFlightView(flight: flight)
+                    }
                 }
             }
         }
@@ -158,7 +161,7 @@ struct HomeView: View {
         .sheet(isPresented: $showNameEditor) {
             NameEditorSheet(theme: character, name: $nameDraft) {
                 let trimmed = nameDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmed.isEmpty { playerName = trimmed }
+                playerName = trimmed
             }
             // A short sheet that rises over the menu, tinted to the character.
             .presentationDetents([.height(300)])
@@ -195,57 +198,19 @@ struct HomeView: View {
     /// Everything above the level grid lives in one card, so the boundary
     /// between "settings for the next run" and "pick a level" stays obvious.
     private var menuCard: some View {
-        VStack(spacing: menuCardSectionSpacing) {
-            HStack(alignment: .center, spacing: isPad ? 20 : 12) {
-                characterButton
+        HStack(alignment: .top, spacing: isPad ? 24 : 14) {
+            playerPanel
+                .frame(width: isPad ? 500 : 350)
 
-                VStack(alignment: .leading, spacing: isPad ? 7 : 4) {
-                    Button {
-                        nameDraft = playerName
-                        showNameEditor = true
-                    } label: {
-                        Text(verbatim: displayName)
-                            .font(.system(size: isPad ? 30 : 20, weight: .heavy, design: .rounded))
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-                            .minimumScaleFactor(0.6)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .buttonStyle(.plain)
+            Rectangle()
+                .fill(character.deepColor.opacity(0.2))
+                .frame(width: 1)
+                .padding(.vertical, 2)
 
-                    cardSummary
-                }
-                .foregroundStyle(character.deepColor)
-                // Claim every point up to the fixed streak module: the summary
-                // line alternates with a much wider phrase than the bare total,
-                // which a flexible gap here would leave no room for.
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .layoutPriority(1)
-
-                CompactStreakView(accent: character.deepColor) {
-                    // The first tap on the streak is a natural, low-pressure
-                    // moment to ask about reminders. The goal picker opens only
-                    // after the prompt is answered, so they never fight for the
-                    // screen; every later tap opens it immediately.
-                    NotificationManager.shared.requestAuthorizationOnStreakTap {
-                        showGoalPicker = true
-                    }
-                }
-                .frame(width: isPad ? 150 : 106)
-                .popover(isPresented: $showGoalPicker, arrowEdge: .top) {
-                    DailyGoalPicker(theme: character)
-                        .padding()
-                        .presentationCompactAdaptation(.popover)
-                }
-            }
-
-            Divider().overlay(character.deepColor.opacity(0.22))
-
-            // The circles, then either the three order buttons or — on the
-            // star, which has no order to choose — the 2×2 grid that replaces
-            // them.
+            // The session choices form one long control block beside the
+            // player. In landscape this is faster to scan than a tall sidebar
+            // and leaves the entire next row available to the levels.
             VStack(spacing: menuControlSpacing) {
-                topicHeader
                 topicPicker
                 if topic.usesSupermixGrid {
                     supermixPicker
@@ -253,8 +218,9 @@ struct HomeView: View {
                     modePicker
                 }
             }
+            .frame(maxWidth: .infinity)
         }
-        .padding(isPad ? 22 : 14)
+        .padding(isPad ? 20 : 13)
         .background {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(.white.opacity(0.76))
@@ -266,10 +232,47 @@ struct HomeView: View {
         .shadow(color: character.deepColor.opacity(0.12), radius: 14, y: 7)
     }
 
+    private var playerPanel: some View {
+        VStack(alignment: .leading, spacing: isPad ? 10 : 7) {
+            HStack(alignment: .center, spacing: isPad ? 16 : 10) {
+                characterButton
+
+                Button {
+                    nameDraft = playerName
+                    showNameEditor = true
+                } label: {
+                    Text(verbatim: displayName)
+                        .font(.system(size: isPad ? 28 : 18, weight: .heavy, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.58)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(character.deepColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                CompactStreakView(accent: character.deepColor) {
+                    NotificationManager.shared.requestAuthorizationOnStreakTap {
+                        showGoalPicker = true
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .popover(isPresented: $showGoalPicker, arrowEdge: .top) {
+                    DailyGoalPicker(theme: character)
+                        .padding()
+                        .presentationCompactAdaptation(.popover)
+                }
+                .frame(width: isPad ? 142 : 96)
+            }
+
+            totalCounter
+            topicHeader
+        }
+    }
+
     // MARK: Character
 
     private var characterButton: some View {
-        let box: CGFloat = isPad ? 118 : 68
+        let box: CGFloat = isPad ? 96 : 62
         return ZStack {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(LinearGradient(colors: [character.skyColor, character.tintColor],
@@ -317,28 +320,25 @@ struct HomeView: View {
         openCharacterCollection()
     }
 
-    /// The running card total, with the next animal to earn taking its place
-    /// for a few seconds at a time. Deliberately plain — no pill behind it — so
-    /// it reads as a quiet subtitle under the player's name.
-    private var cardSummary: some View {
+    /// Grand total and selected-category total intentionally share the exact
+    /// same icon-number-label grammar and typography.
+    private var totalCounter: some View {
         let total = headerCount(start: celebration?.totalStart,
                                 heldStart: lastPlayedTotal,
                                 current: totalCards)
-        return AlternatingCardSummary(totalFrom: total.from,
-                               totalTo: total.to,
-                               celebrationStartedAt: total.at,
-                               countDelay: 0,
-                               countDuration: Self.headerCountDuration,
-                               prompt: unlockPrompt,
-                               immediatePreviewID: unlockPreviewTrigger,
-                               isCelebrationActive: celebration != nil || !flights.isEmpty,
-                               isHighlighted: highlightsHeaderCards,
-                               accent: character.deepColor,
-                               isPad: isPad) {
-            guard let unlockPrompt else { return }
-            AppAudio.shared.playMenuTap()
-            openCharacterCollection(initialCharacterID: unlockPrompt.characterID)
+        return HStack(spacing: isPad ? 7 : 5) {
+            CurrencyIcon(size: isPad ? 20 : 14)
+                .scaleEffect(highlightsHeaderCards ? 1.32 : 1)
+                .rotationEffect(.degrees(highlightsHeaderCards ? -10 : 0))
+            CountingNumber(from: total.from,
+                           to: total.to,
+                           startedAt: total.at,
+                           duration: Self.headerCountDuration)
+            Text("home.totalLabel")
         }
+        .font(.system(size: isPad ? 20 : 14, weight: .bold, design: .rounded))
+        .foregroundStyle(character.deepColor)
+        .lineLimit(1)
         .animation(.spring(response: 0.35, dampingFraction: 0.75), value: totalCards)
     }
 
@@ -371,28 +371,22 @@ struct HomeView: View {
         let count = headerCount(start: celebration?.topicStart,
                                 heldStart: lastPlayedTopic,
                                 current: topicCards)
-        return HStack(alignment: .center, spacing: 8) {
+        return HStack(spacing: isPad ? 7 : 5) {
+            // The card that flies up from the level card aims here, so the
+            // reward visibly joins this topic before the totals move.
+            CurrencyIcon(size: isPad ? 20 : 14)
+                .scaleEffect(highlightsHeaderCards ? 1.32 : 1)
+                .rotationEffect(.degrees(highlightsHeaderCards ? -10 : 0))
+                .reportAnchor("topicTotal")
+            CountingNumber(from: count.from,
+                           to: count.to,
+                           startedAt: count.at,
+                           duration: Self.headerCountDuration)
             Text(verbatim: L(key: topic.titleKey))
-                .font(.system(size: isPad ? 30 : 20, weight: .heavy, design: .rounded))
-                .lineLimit(1)
-                .minimumScaleFactor(0.62)
-            Label {
-                CountingNumber(from: count.from,
-                               to: count.to,
-                               startedAt: count.at,
-                               duration: Self.headerCountDuration)
-            } icon: {
-                // The card that flies up from the level card aims here, so the
-                // reward visibly joins this topic before the totals move.
-                CurrencyIcon(size: isPad ? 20 : 14)
-                    .scaleEffect(highlightsHeaderCards ? 1.32 : 1)
-                    .rotationEffect(.degrees(highlightsHeaderCards ? -10 : 0))
-                    .reportAnchor("topicTotal")
-            }
-            .font(.system(size: isPad ? 22 : 15, weight: .bold))
-            Spacer(minLength: 0)
         }
+        .font(.system(size: isPad ? 20 : 14, weight: .bold, design: .rounded))
         .foregroundStyle(character.deepColor)
+        .lineLimit(1)
     }
 
     /// Cards earned across every level of the selected topic.
@@ -667,8 +661,8 @@ struct HomeView: View {
 
         return VStack(alignment: .leading, spacing: 14) {
             AdaptiveLevelGrid(spacing: levelGridSpacing,
-                              minimumCardWidth: isPad ? 180 : 104,
-                              maximumColumns: 3,
+                              minimumCardWidth: isPad ? 210 : 118,
+                              maximumColumns: 4,
                               cardHeight: levelCardHeight) {
                 ForEach(regular) { level in
                     levelCard(level, recommendedID: recommendedID)
@@ -739,8 +733,8 @@ struct HomeView: View {
                 }
 
                 AdaptiveLevelGrid(spacing: levelGridSpacing,
-                                  minimumCardWidth: isPad ? 180 : 104,
-                                  maximumColumns: 3,
+                                  minimumCardWidth: isPad ? 210 : 118,
+                                  maximumColumns: 4,
                                   cardHeight: levelCardHeight) {
                     ForEach(levels) { level in
                         levelCard(level, recommendedID: nil)
@@ -803,8 +797,12 @@ struct HomeView: View {
 
     private func restartOnboarding() {
         AppAudio.shared.playMenuTap()
-        withAnimation(.easeInOut(duration: 0.35)) {
-            onboardingComplete = false
+        if let onRestartOnboarding {
+            onRestartOnboarding()
+        } else {
+            withAnimation(.easeInOut(duration: 0.35)) {
+                onboardingComplete = false
+            }
         }
     }
 

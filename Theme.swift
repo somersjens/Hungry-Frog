@@ -9,15 +9,14 @@
 
 import SwiftUI
 
-/// The game's currency. A player collects bubbles: in the reef, on the menu
-/// totals, on the level cards and in the shop. One glyph, used everywhere, so
-/// the same thing is never drawn two ways.
+/// The game's currency. Players collect flies throughout the game. Keep the
+/// asset name in one place so every counter and reward uses the same artwork.
 enum Currency {
-    static let icon = "bubble"
+    static let icon = "fly_currency"
 }
 
-/// The artwork used anywhere a bubble count is shown. The source PNG is
-/// rendered as a template so it keeps following each character's theme color.
+/// The artwork used anywhere a currency count is shown. It is rendered as a
+/// template so existing character-theme colors continue to apply.
 struct CurrencyIcon: View {
     let size: CGFloat
 
@@ -27,6 +26,7 @@ struct CurrencyIcon: View {
             .resizable()
             .scaledToFit()
             .frame(width: size, height: size)
+            .accessibilityHidden(true)
     }
 }
 
@@ -72,10 +72,10 @@ enum CharacterCatalog {
     static let freeCharacterID = CharacterUnlocks.starterCharacterID
 
     /// The localized fallback used when the player leaves their name empty.
-    /// Resolve it through the character catalog so it can never drift from the
-    /// name shown for Octopus in the active language.
+    /// The current game character is Frog, so this resolves to Frog/Kikker and
+    /// automatically follows every language added to the string catalog.
     static var defaultPlayerName: String {
-        character(id: "octopus").localizedName
+        character(id: "frog").localizedName
     }
 
     /// Order must match `CharacterUnlocks.orderedCharacterIDs`; a test asserts it.

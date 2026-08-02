@@ -38,6 +38,8 @@ final class GameViewModel: ObservableObject {
     /// Changes each time the streak boost starts, allowing the view to replay
     /// its bubble-style announcement even after an earlier streak was broken.
     @Published private(set) var streakAnnouncementID = 0
+    @Published private(set) var comboAnnouncementID = 0
+    @Published private(set) var visibleRounds: [GameRound] = []
 
     /// Invalidates pending timed work when a round is superseded (restart, or
     /// leaving the screen), so a late callback can never touch a newer round.
@@ -47,6 +49,7 @@ final class GameViewModel: ObservableObject {
     /// A round-resolution callback that became due while the pause card was
     /// covering the reef. It runs once on continue instead of behind the card.
     private var pendingScheduledWork: (() -> Void)?
+    private var lastCorrectCatchTime: TimeInterval?
 
     var maximumRounds: Int { engine.maximumRounds }
     var acceptsInput: Bool { state == .answering && !isPaused }
@@ -99,6 +102,7 @@ final class GameViewModel: ObservableObject {
         AppAudio.shared.setGameplayRate(1)
         generation &+= 1
         pendingScheduledWork = nil
+        lastCorrectCatchTime = nil
     }
 
     /// Temporarily stops an active run without ending it. The snapshot also
@@ -111,6 +115,7 @@ final class GameViewModel: ObservableObject {
         PlaytimeTracker.shared.challengeEnded()
         AppAudio.shared.setGameplayActive(false, questionText: nil)
         AppAudio.shared.setGameplayRate(1)
+        lastCorrectCatchTime = nil
     }
 
     /// Continues the in-memory run after its pause card. No round is rebuilt,
@@ -167,6 +172,8 @@ final class GameViewModel: ObservableObject {
         engine.start()
         hasBonusFishPower = false
         streakAnnouncementID = 0
+        comboAnnouncementID = 0
+        lastCorrectCatchTime = nil
         AppAudio.shared.playSessionStart()
         openRound()
         announceRound()
@@ -195,6 +202,13 @@ final class GameViewModel: ObservableObject {
         let delay: Double
         switch outcome {
         case .correct(_, let usedBonusFish, let startedStreak):
+            let now = ProcessInfo.processInfo.systemUptime
+            if let previous = lastCorrectCatchTime, now - previous <= 1 {
+                engine.awardFlyComboBonus()
+                comboAnnouncementID &+= 1
+                sync()
+            }
+            lastCorrectCatchTime = now
             AppAudio.shared.playCorrect()
             if usedBonusFish {
                 hasBonusFishPower = false
@@ -207,6 +221,7 @@ final class GameViewModel: ObservableObject {
             haptic(.success)
             delay = GameConfig.nextRoundDelay.correct
         case .wrong(_, let lostHalfLife):
+            lastCorrectCatchTime = nil
             AppAudio.shared.playWrong()
             if lostHalfLife {
                 AppAudio.shared.playHalfLife()
@@ -334,6 +349,7 @@ final class GameViewModel: ObservableObject {
         correctStreak = engine.correctStreak
         isStreakBoostActive = engine.isStreakBoostActive
         isHeartFishAvailable = engine.isHeartFishAvailable
+        visibleRounds = engine.visibleRounds
         AppAudio.shared.setGameplayRate(isStreakBoostActive
                                         ? Float(GameConfig.streakSpeedMultiplier) : 1)
     }

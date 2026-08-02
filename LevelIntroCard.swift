@@ -137,78 +137,86 @@ struct LevelIntroCard: View {
 
             GeometryReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack(alignment: .top, spacing: 14) {
-                            characterPortrait
-                            // Title on top, its two audio switches directly
-                            // beneath it, side by side.
-                            VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .top, spacing: 0) {
+                        // Stable action column: the title, audio and navigation
+                        // stay together on both the start and pause versions.
+                        VStack(alignment: .leading, spacing: 14 * scale) {
+                            HStack(alignment: .center, spacing: 12 * scale) {
+                                characterPortrait
+                                audioControlStack
                                 Text(info.title)
-                                    .font(.system(size: 33 * textScale * titleScale,
+                                    .font(.system(size: 29 * textScale * titleScale,
                                                   weight: .heavy, design: .rounded))
                                     .foregroundStyle(theme.deepColor)
-                                    .lineLimit(1)
+                                    .lineLimit(2)
                                     .minimumScaleFactor(0.5)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                Spacer(minLength: 0)
-                                audioControlRow
                             }
-                            .frame(height: portraitSize)
+
+                            actionButtons
+
+                            if isContinuation { pausedMessage }
                         }
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .padding(.trailing, 22 * scale)
 
-                        DashedDivider(color: theme.color.opacity(0.45))
-                            .padding(.vertical, 4)
+                        Rectangle()
+                            .fill(theme.deepColor.opacity(0.14))
+                            .frame(width: 1, height: isPad ? 310 : 260)
 
-                        ForEach(features) { feature in
-                            featureCard(feature)
-                        }
-
-                        VStack(spacing: 10) {
-                            Button(action: onStart) {
-                                Text(isContinuation ? "game.intro.continue" : "game.intro.start")
-                                    .font(.system(size: 17 * actionScale, weight: .heavy))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 15 * actionScale)
-                                    .foregroundStyle(.white)
-                                    .background(theme.deepColor,
-                                                in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        // The information side deliberately contains only the
+                        // three descriptions and their icons.
+                        VStack(spacing: 12 * scale) {
+                            ForEach(features) { feature in
+                                featureCard(feature)
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("intro-start")
-
-                            Button(action: onExit) {
-                                Text("game.intro.backToMainMenu")
-                                    .font(.system(size: 17 * actionScale, weight: .heavy))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 15 * actionScale)
-                                    .foregroundStyle(theme.deepColor)
-                                    .background(.white.opacity(0.7),
-                                                in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                                    .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                        .stroke(theme.deepColor.opacity(0.14), lineWidth: 1))
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("intro-back")
                         }
-
-                        if isContinuation {
-                            pausedMessage
-                        }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.leading, 22 * scale)
                     }
-                    .padding(28 * scale)
-                    .padding(.top, 4)
-                    .frame(maxWidth: 420 * scale)
+                    .padding(24 * scale)
+                    .frame(maxWidth: isPad ? 900 : 760)
                     .background(.background, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
                     .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous)
                         .stroke(theme.deepColor.opacity(0.14), lineWidth: 1))
                     .shadow(color: theme.deepColor.opacity(0.28), radius: 18, y: 8)
-                    .padding()
+                    .padding(AppLayout.landscapeGutter)
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: proxy.size.height, alignment: .center)
                 }
                 .scrollBounceBehavior(.basedOnSize)
             }
+        }
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 10) {
+            Button(action: onStart) {
+                Text(isContinuation ? "game.intro.continue" : "game.intro.start")
+                    .font(.system(size: 17 * actionScale, weight: .heavy))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14 * actionScale)
+                    .foregroundStyle(.white)
+                    .background(theme.deepColor,
+                                in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("intro-start")
+
+            Button(action: onExit) {
+                Text("game.intro.backToMainMenu")
+                    .font(.system(size: 17 * actionScale, weight: .heavy))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14 * actionScale)
+                    .foregroundStyle(theme.deepColor)
+                    .background(.white.opacity(0.7),
+                                in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(theme.deepColor.opacity(0.14), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("intro-back")
         }
     }
 
@@ -240,20 +248,29 @@ struct LevelIntroCard: View {
 
     /// Music and sound effects are controlled separately, so a player can keep
     /// the feedback sounds while silencing the background track.
-    private var audioControlRow: some View {
-        HStack(spacing: 7 * scale) {
+    private var audioControlStack: some View {
+        VStack(spacing: 0) {
             audioButton(icon: "music.note",
                         isOn: audio.musicEnabled,
                         accessibilityLabel: L("settings.music")) {
                 withAnimation(.snappy(duration: 0.2)) { audio.toggleMusic() }
             }
+
+            Rectangle()
+                .fill(theme.deepColor.opacity(0.14))
+                .frame(height: 1)
+
             audioButton(icon: "speaker.wave.2.fill",
                         isOn: audio.gameSoundsEnabled,
                         accessibilityLabel: L("settings.soundEffects")) {
                 withAnimation(.snappy(duration: 0.2)) { audio.toggleGameSounds() }
             }
-            Spacer(minLength: 0)
         }
+        .frame(width: 42 * scale, height: portraitSize)
+        .background(theme.skyColor)
+        .clipShape(RoundedRectangle(cornerRadius: 14 * scale, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14 * scale, style: .continuous)
+            .stroke(theme.deepColor.opacity(0.15), lineWidth: 1))
     }
 
     private func audioButton(icon: String,
@@ -273,10 +290,8 @@ struct LevelIntroCard: View {
                 }
             }
             .foregroundStyle(theme.deepColor.opacity(isOn ? 1 : 0.55))
-            .frame(width: 40 * scale, height: 32 * scale)
-            .background(theme.skyColor, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .stroke(theme.deepColor.opacity(0.15), lineWidth: 1))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(verbatim: accessibilityLabel))

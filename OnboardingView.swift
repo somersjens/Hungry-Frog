@@ -15,6 +15,8 @@ import SwiftUI
 import UIKit
 
 struct OnboardingView: View {
+    var onFinished: (() -> Void)?
+
     @AppStorage(GameSettings.playerNameKey) private var playerName = ""
     @AppStorage(GameSettings.onboardingCompleteKey) private var isComplete = false
     @AppStorage(GameSettings.topicKey) private var topicRaw = MathTopic.allCases[0].rawValue
@@ -25,7 +27,7 @@ struct OnboardingView: View {
     @FocusState private var isNameFieldFocused: Bool
 
     private var isPad: Bool { AppLayout.isPad }
-    private var contentWidth: CGFloat { isPad ? 640 : 500 }
+    private var contentWidth: CGFloat { isPad ? 680 : 560 }
 
     var body: some View {
         ZStack {
@@ -33,35 +35,38 @@ struct OnboardingView: View {
 
             GeometryReader { proxy in
                 ScrollView {
-                    VStack(spacing: 0) {
+                    let horizontalPadding: CGFloat = isPad ? 48 : 24
+                    let columnSpacing: CGFloat = isPad ? 48 : 24
+                    let artworkSide = min(isPad ? 230 : 170,
+                                          max(isPad ? 170 : 110, proxy.size.height * 0.42))
+                    let stepWidth = min(contentWidth,
+                        max(300, proxy.size.width - horizontalPadding * 2
+                            - artworkSide - columnSpacing))
+
+                    HStack(alignment: .center, spacing: columnSpacing) {
                         Image("no_background")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: isPad ? (step == 1 ? 160 : 210) : (step == 1 ? 112 : 150),
-                                   height: isPad ? (step == 1 ? 160 : 210) : (step == 1 ? 112 : 150))
-                            .padding(.bottom, isPad ? (step == 1 ? 20 : 30) : (step == 1 ? 14 : 22))
+                            .frame(width: artworkSide, height: artworkSide)
                             .animation(.spring(response: 0.42, dampingFraction: 0.82), value: step)
 
                         Group {
-                            let availableWidth = min(
-                                contentWidth,
-                                max(0, proxy.size.width - (isPad ? 72 : 48))
-                            )
                             switch step {
                             case 0: nameStep
                             case 1: subjectStep
-                            default: practiceModeStep(availableWidth: availableWidth)
+                            default: practiceModeStep(availableWidth: stepWidth)
                             }
                         }
                         .id(step)
                         .transition(.opacity.combined(with: .move(edge: .trailing)))
-                        .frame(maxWidth: contentWidth)
-                        .padding(.horizontal, isPad ? 36 : 24)
+                        .frame(width: stepWidth)
                     }
-                    .padding(.vertical, isPad ? 40 : 28)
-                    // On normal-height screens this fills the viewport and
-                    // centres the welcome content. On smaller screens the
-                    // content simply grows taller and remains scrollable.
+                    .padding(.horizontal, horizontalPadding)
+                    // Reserve the complete flag/back-button band. Long titles
+                    // can wrap without ever sliding underneath either control.
+                    .padding(.top, isPad ? 76 : 60)
+                    .padding(.bottom, isPad ? 28 : 18)
+                    .frame(maxWidth: AppLayout.landscapeContentWidth)
                     .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: .center)
                 }
                 .scrollBounceBehavior(.basedOnSize)
@@ -102,10 +107,7 @@ struct OnboardingView: View {
     }
 
     private var onboardingBackground: some View {
-        AmbientReefBackground(
-            character: CharacterCatalog.character(id: CharacterCatalog.freeCharacterID),
-            showsSeaFloor: true
-        )
+        MenuMeadowBackground(accent: Color.orange)
     }
 
     private var nameStep: some View {
@@ -142,7 +144,7 @@ struct OnboardingView: View {
 
             Button("common.continue") { goToSubjects() }
                 .buttonStyle(OnboardingButtonStyle(isPad: isPad))
-                .frame(maxWidth: isPad ? 360 : .infinity)
+                .frame(width: isPad ? 260 : 210)
         }
     }
 
@@ -160,7 +162,10 @@ struct OnboardingView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 4)
 
-            VStack(spacing: 8) {
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: isPad ? 12 : 9),
+                GridItem(.flexible(), spacing: isPad ? 12 : 9)
+            ], spacing: isPad ? 12 : 9) {
                 ForEach(MathTopic.allCases) { option in
                     Button {
                         topicRaw = option.rawValue
@@ -172,13 +177,13 @@ struct OnboardingView: View {
                                 .frame(width: isPad ? 44 : 30)
                             Text(verbatim: L(key: option.titleKey))
                                 .font(isPad ? .title3.weight(.semibold) : .title3.weight(.semibold))
-                            Spacer()
+                            Spacer(minLength: 4)
                             Image(systemName: "chevron.forward")
                                 .font(.footnote.weight(.bold))
                                 .foregroundStyle(.secondary)
                         }
                         .padding(.horizontal, isPad ? 26 : 16)
-                        .frame(maxWidth: .infinity, minHeight: isPad ? 72 : 54)
+                        .frame(maxWidth: .infinity, minHeight: isPad ? 68 : 52)
                         .background(.white.opacity(0.78), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(OnboardingOptionStyle())
@@ -208,19 +213,11 @@ struct OnboardingView: View {
             subtitles: Self.modeChoices.map { L(key: $0.subtitleKey) },
             availableWidth: availableWidth
         )
-        let topicName = L(key: topic.titleKey)
-
-        return VStack(spacing: 14) {
+        return VStack(spacing: isPad ? 14 : 10) {
             OnboardingTitle(
                 text: L("onboarding.level.title"),
                 fontSize: isPad ? 42 : 32
             )
-
-            Text(verbatim: String(format: L("onboarding.level.subtitle %@"), topicName))
-                .font(isPad ? .title3 : .body)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-                .padding(.bottom, 6)
 
             ForEach(Self.modeChoices, id: \.mode) { choice in
                 Button { select(choice.mode) } label: {
@@ -258,6 +255,7 @@ struct OnboardingView: View {
         AppAudio.shared.playMenuTap()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
             isComplete = true
+            onFinished?()
         }
     }
 
@@ -299,14 +297,16 @@ struct OnboardingView: View {
         let scale = max(requiredScale, minimumComfortableScale)
         let rowHeight: CGFloat = isPad
             ? (allowsTwoLines ? 120 : 94)
-            : (allowsTwoLines ? 96 : 70)
+            : (allowsTwoLines ? 88 : 62)
 
         return (scale, allowsTwoLines, rowHeight)
     }
 
     private func goToSubjects() {
         let trimmedName = playerName.trimmingCharacters(in: .whitespacesAndNewlines)
-        playerName = trimmedName.isEmpty ? CharacterCatalog.defaultPlayerName : trimmedName
+        // Keep an omitted name empty in storage. The displayed fallback is
+        // resolved live, so changing the app language also changes Frog/Kikker.
+        playerName = trimmedName
         isNameFieldFocused = false
         advance(to: 1)
     }

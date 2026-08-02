@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		F9F3C61D301E409F00464555 /* Assets 3.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5DE301E409F00464555 /* Assets 3.xcassets */; };
 		F9F3C61E301E409F00464555 /* score_increase.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C606301E409F00464555 /* score_increase.caf */; };
-		F9F3C61F301E409F00464555 /* music_background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5F7301E409F00464555 /* music_background.mp3 */; };
 		F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C619301E409F00464555 /* sfx_wrong.caf */; };
 		F9F3C621301E409F00464555 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C600301E409F00464555 /* Products.storekit */; };
 		F9F3C622301E409F00464555 /* sfx_double_card.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60E301E409F00464555 /* sfx_double_card.caf */; };
@@ -21,7 +20,6 @@
 		F9F3C628301E409F00464555 /* sfx_select.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C615301E409F00464555 /* sfx_select.wav */; };
 		F9F3C629301E409F00464555 /* sfx_card_flip.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60A301E409F00464555 /* sfx_card_flip.wav */; };
 		F9F3C62A301E409F00464555 /* sfx_life_lost.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C614301E409F00464555 /* sfx_life_lost.caf */; };
-		F9F3C62B301E409F00464555 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5F3301E409F00464555 /* Info.plist */; };
 		F9F3C62C301E409F00464555 /* sfx_card_reveal.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60B301E409F00464555 /* sfx_card_reveal.caf */; };
 		F9F3C62D301E409F00464555 /* sfx_high_score.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C612301E409F00464555 /* sfx_high_score.caf */; };
 		F9F3C62E301E409F00464555 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5DD301E409F00464555 /* Assets.xcassets */; };
@@ -36,14 +34,12 @@
 		F9F3C637301E409F00464555 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F8301E409F00464555 /* Notifications.swift */; };
 		F9F3C638301E409F00464555 /* DecimalAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */; };
 		F9F3C639301E409F00464555 /* ParentApprovalGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FC301E409F00464555 /* ParentApprovalGate.swift */; };
-		F9F3C63A301E409F00464555 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DF301E409F00464555 /* ContentView.swift */; };
 		F9F3C63B301E409F00464555 /* HomeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F1301E409F00464555 /* HomeComponents.swift */; };
 		F9F3C63C301E409F00464555 /* PracticeMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E7301E409F00464555 /* PracticeMode.swift */; };
 		F9F3C63D301E409F00464555 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F2301E409F00464555 /* HomeView.swift */; };
 		F9F3C63E301E409F00464555 /* ResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C604301E409F00464555 /* ResultView.swift */; };
 		F9F3C63F301E409F00464555 /* PremiumStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FE301E409F00464555 /* PremiumStore.swift */; };
 		F9F3C640301E409F00464555 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F6301E409F00464555 /* Localization.swift */; };
-		F9F3C641301E409F00464555 /* SpinComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C61A301E409F00464555 /* SpinComponent.swift */; };
 		F9F3C642301E409F00464555 /* PromotedPurchaseCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */; };
 		F9F3C643301E409F00464555 /* LevelIntroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */; };
 		F9F3C644301E409F00464555 /* EmphasizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EE301E409F00464555 /* EmphasizedText.swift */; };
@@ -69,9 +65,10 @@
 		F9F3C658301E409F00464555 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C61C301E409F00464555 /* Theme.swift */; };
 		F9F3C659301E409F00464555 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FB301E409F00464555 /* OnboardingView.swift */; };
 		F9F3C65A301E409F00464555 /* RoundFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EA301E409F00464555 /* RoundFactory.swift */; };
-		F9F3C65B301E409F00464555 /* Number_ReefApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */; };
 		F9F3C65C301E409F00464555 /* GameConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E2301E409F00464555 /* GameConfig.swift */; };
 		F9F3C65D301E409F00464555 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E8301E409F00464555 /* ProgressStore.swift */; };
+		F9F3C9AD301F3CBE00464555 /* frog_music.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C9AC301F3CBE00464555 /* frog_music.mp3 */; };
+		FA11F00131A1000000000001 /* FlyGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00231A1000000000001 /* FlyGame.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -104,7 +101,6 @@
 		F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelIntroCard.swift; sourceTree = "<group>"; };
 		F9F3C5F5301E409F00464555 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F9F3C5F6301E409F00464555 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
-		F9F3C5F7301E409F00464555 /* music_background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = music_background.mp3; sourceTree = "<group>"; };
 		F9F3C5F8301E409F00464555 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		F9F3C5F9301E409F00464555 /* Number Reef.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Number Reef.entitlements"; sourceTree = "<group>"; };
 		F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Number_ReefApp.swift; sourceTree = "<group>"; };
@@ -142,6 +138,8 @@
 		F9F3C61A301E409F00464555 /* SpinComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinComponent.swift; sourceTree = "<group>"; };
 		F9F3C61B301E409F00464555 /* SpokenMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenMath.swift; sourceTree = "<group>"; };
 		F9F3C61C301E409F00464555 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		F9F3C9AC301F3CBE00464555 /* frog_music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = frog_music.mp3; sourceTree = "<group>"; };
+		FA11F00231A1000000000001 /* FlyGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGame.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -166,6 +164,7 @@
 		F9F3C5C1301E405E00464555 = {
 			isa = PBXGroup;
 			children = (
+				F9F3C9AC301F3CBE00464555 /* frog_music.mp3 */,
 				F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */,
 				F9F3C5DB301E409F00464555 /* AppAudio.swift */,
 				F9F3C5DC301E409F00464555 /* AppSettings.swift */,
@@ -183,7 +182,6 @@
 				F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */,
 				F9F3C5F5301E409F00464555 /* Localizable.xcstrings */,
 				F9F3C5F6301E409F00464555 /* Localization.swift */,
-				F9F3C5F7301E409F00464555 /* music_background.mp3 */,
 				F9F3C5F8301E409F00464555 /* Notifications.swift */,
 				F9F3C5F9301E409F00464555 /* Number Reef.entitlements */,
 				F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */,
@@ -196,6 +194,7 @@
 				F9F3C601301E409F00464555 /* ProgressSync.swift */,
 				F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */,
 				F9F3C603301E409F00464555 /* ReefGame.swift */,
+				FA11F00231A1000000000001 /* FlyGame.swift */,
 				F9F3C604301E409F00464555 /* ResultView.swift */,
 				F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */,
 				F9F3C606301E409F00464555 /* score_increase.caf */,
@@ -268,9 +267,6 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				F9F3C5CC301E405E00464555 /* Hungry Frog */,
-			);
 			name = "Hungry Frog";
 			packageProductDependencies = (
 			);
@@ -290,6 +286,11 @@
 				TargetAttributes = {
 					F9F3C5C9301E405E00464555 = {
 						CreatedOnToolsVersion = 26.6;
+						SystemCapabilities = {
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -319,7 +320,6 @@
 			files = (
 				F9F3C61D301E409F00464555 /* Assets 3.xcassets in Resources */,
 				F9F3C61E301E409F00464555 /* score_increase.caf in Resources */,
-				F9F3C61F301E409F00464555 /* music_background.mp3 in Resources */,
 				F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */,
 				F9F3C621301E409F00464555 /* Products.storekit in Resources */,
 				F9F3C622301E409F00464555 /* sfx_double_card.caf in Resources */,
@@ -328,10 +328,10 @@
 				F9F3C625301E409F00464555 /* sfx_switch_off.caf in Resources */,
 				F9F3C626301E409F00464555 /* sfx_switch_on.caf in Resources */,
 				F9F3C627301E409F00464555 /* sfx_session_start.caf in Resources */,
+				F9F3C9AD301F3CBE00464555 /* frog_music.mp3 in Resources */,
 				F9F3C628301E409F00464555 /* sfx_select.wav in Resources */,
 				F9F3C629301E409F00464555 /* sfx_card_flip.wav in Resources */,
 				F9F3C62A301E409F00464555 /* sfx_life_lost.caf in Resources */,
-				F9F3C62B301E409F00464555 /* Info.plist in Resources */,
 				F9F3C62C301E409F00464555 /* sfx_card_reveal.caf in Resources */,
 				F9F3C62D301E409F00464555 /* sfx_high_score.caf in Resources */,
 				F9F3C62E301E409F00464555 /* Assets.xcassets in Resources */,
@@ -356,14 +356,12 @@
 				F9F3C637301E409F00464555 /* Notifications.swift in Sources */,
 				F9F3C638301E409F00464555 /* DecimalAnswer.swift in Sources */,
 				F9F3C639301E409F00464555 /* ParentApprovalGate.swift in Sources */,
-				F9F3C63A301E409F00464555 /* ContentView.swift in Sources */,
 				F9F3C63B301E409F00464555 /* HomeComponents.swift in Sources */,
 				F9F3C63C301E409F00464555 /* PracticeMode.swift in Sources */,
 				F9F3C63D301E409F00464555 /* HomeView.swift in Sources */,
 				F9F3C63E301E409F00464555 /* ResultView.swift in Sources */,
 				F9F3C63F301E409F00464555 /* PremiumStore.swift in Sources */,
 				F9F3C640301E409F00464555 /* Localization.swift in Sources */,
-				F9F3C641301E409F00464555 /* SpinComponent.swift in Sources */,
 				F9F3C642301E409F00464555 /* PromotedPurchaseCoordinator.swift in Sources */,
 				F9F3C643301E409F00464555 /* LevelIntroCard.swift in Sources */,
 				F9F3C644301E409F00464555 /* EmphasizedText.swift in Sources */,
@@ -373,6 +371,7 @@
 				F9F3C648301E409F00464555 /* ReviewRequestCoordinator.swift in Sources */,
 				F9F3C649301E409F00464555 /* AppAudio.swift in Sources */,
 				F9F3C64A301E409F00464555 /* ReefGame.swift in Sources */,
+				FA11F00131A1000000000001 /* FlyGame.swift in Sources */,
 				F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */,
 				F9F3C64C301E409F00464555 /* AmbientReefBackground.swift in Sources */,
 				F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */,
@@ -389,7 +388,6 @@
 				F9F3C658301E409F00464555 /* Theme.swift in Sources */,
 				F9F3C659301E409F00464555 /* OnboardingView.swift in Sources */,
 				F9F3C65A301E409F00464555 /* RoundFactory.swift in Sources */,
-				F9F3C65B301E409F00464555 /* Number_ReefApp.swift in Sources */,
 				F9F3C65C301E409F00464555 /* GameConfig.swift in Sources */,
 				F9F3C65D301E409F00464555 /* ProgressStore.swift in Sources */,
 			);
@@ -519,7 +517,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = "Number Reef.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4283ACUG4Y;
@@ -538,8 +536,8 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
@@ -566,7 +564,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = "Number Reef.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4283ACUG4Y;
@@ -585,8 +583,8 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;

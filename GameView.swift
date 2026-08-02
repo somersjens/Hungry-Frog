@@ -160,24 +160,18 @@ struct GameView: View {
         let topInset = max(screenInsets.top, isPad ? 24 : 16)
 
         return ZStack(alignment: .top) {
-            ReefPlayfield(round: model.round,
+            FlyPlayfield(rounds: model.visibleRounds,
                           maximumRounds: model.maximumRounds,
                           character: character,
                           isPad: isPad,
                           isLive: model.acceptsInput,
                           isRunning: isReefRunning,
                           playsFishEntrance: playsFishEntrance,
-                          hasBonusFishPower: model.hasBonusFishPower,
-                          isHeartFishAvailable: model.isHeartFishAvailable,
-                          isStreakBoostActive: model.isStreakBoostActive,
                           playsLevelCompletion: playsLevelCompletion,
                           reduceMotion: reduceMotion,
                           topReserve: topInset + (isPad ? 54 : 42),
                           bottomReserve: screenInsets.bottom,
                           onHit: { model.select(optionID: $0) },
-                          onBonusFishCaught: model.catchBonusFish,
-                          onHeartFishCaught: model.catchHeartFish,
-                          onHeartFishMissed: model.missHeartFish,
                           onFishEntranceComplete: finishFishEntrance,
                           onLevelCompletionFinished: finishLevelCompletion)
 
@@ -192,6 +186,14 @@ struct GameView: View {
                 StreakBoostBanner(character: character, isPad: isPad)
                     .padding(.top, topInset + (isPad ? 70 : 52))
                     .transition(.scale(scale: 0.65).combined(with: .opacity))
+                    .allowsHitTesting(false)
+            }
+
+            if model.comboAnnouncementID > 0 {
+                ComboFlyBanner(token: model.comboAnnouncementID,
+                               character: character,
+                               isPad: isPad)
+                    .padding(.top, topInset + (isPad ? 116 : 88))
                     .allowsHitTesting(false)
             }
         }
@@ -230,18 +232,18 @@ struct GameView: View {
     // MARK: - HUD
 
     private var hud: some View {
-        ZStack {
+        HStack(spacing: isPad ? 10 : 8) {
+            pauseButton
             progressCounter
-
-            HStack(spacing: 10) {
-                pauseButton
-                Spacer(minLength: 0)
-                LivesView(lives: model.livesRemaining,
-                          character: character,
-                          isPad: isPad,
-                          glyphSize: hudSymbolSize,
-                          rowHeight: hudControlSize)
-            }
+            LivesView(lives: model.livesRemaining,
+                      character: character,
+                      isPad: isPad,
+                      glyphSize: hudHeartSize,
+                      rowHeight: hudControlSize)
+                .padding(.horizontal, isPad ? 12 : 10)
+                .background(.white.opacity(0.88), in: Capsule())
+                .shadow(color: character.deepColor.opacity(0.12), radius: 5, y: 3)
+            Spacer(minLength: 0)
         }
     }
 
@@ -272,12 +274,13 @@ struct GameView: View {
         .accessibilityLabel(Text("game.pause"))
     }
 
-    /// The bubble and hearts nearly fill the pause button's height, like the
-    /// reference HUD, while the pause bars keep the breathing room of the disc.
-    private var hudControlSize: CGFloat { isPad ? 44 : 34 }
+    /// Every status capsule shares one comfortable touch height, while the
+    /// symbols retain enough breathing room to stay legible over the pond.
+    private var hudControlSize: CGFloat { isPad ? 52 : 44 }
     private var hudSymbolSize: CGFloat { isPad ? 34 : 26 }
-    private var pauseGlyphSize: CGFloat { isPad ? 22 : 16 }
-    private var hudNumberSize: CGFloat { isPad ? 32 : 24 }
+    private var hudHeartSize: CGFloat { isPad ? 30 : 24 }
+    private var pauseGlyphSize: CGFloat { isPad ? 24 : 20 }
+    private var hudNumberSize: CGFloat { isPad ? 30 : 23 }
 
     /// Just the bubbles banked this session. What the board holds is quoted on
     /// the start card and again on the result card, so the playing field does
@@ -289,13 +292,16 @@ struct GameView: View {
                 .monospacedDigit()
                 .lineLimit(1)
                 .contentTransition(.numericText(value: Double(model.cards)))
-            CurrencyIcon(size: hudSymbolSize)
+            FlyCurrencyIcon(size: hudSymbolSize)
         }
+        .padding(.horizontal, isPad ? 13 : 11)
         .frame(height: hudControlSize, alignment: .center)
+        .background(.white.opacity(0.88), in: Capsule())
+        .shadow(color: character.deepColor.opacity(0.12), radius: 5, y: 3)
         .foregroundStyle(character.deepColor)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: model.cards)
         .accessibilityIdentifier("progress")
-        .accessibilityLabel(Text(L("game.bubblesCollected \(model.cards)")))
+        .accessibilityLabel(Text(verbatim: "\(model.cards) vliegen"))
     }
 
     /// The reef only ticks while the level is actually being played: never
@@ -303,6 +309,34 @@ struct GameView: View {
     /// the background.
     private var isReefRunning: Bool {
         !showsIntro && (!model.isGameOver || playsLevelCompletion) && scenePhase == .active
+    }
+}
+
+private struct ComboFlyBanner: View {
+    let token: Int
+    let character: AnimalCharacter
+    let isPad: Bool
+    @State private var visible = false
+
+    var body: some View {
+        Text("Combo! +1")
+            .font(.system(size: isPad ? 22 : 17, weight: .black, design: .rounded))
+            .foregroundStyle(character.deepColor)
+            .padding(.horizontal, isPad ? 18 : 14)
+            .padding(.vertical, isPad ? 9 : 7)
+            .background(.white.opacity(0.92), in: Capsule())
+            .scaleEffect(visible ? 1 : 0.65)
+            .opacity(visible ? 1 : 0)
+            .onAppear { animate() }
+            .onChange(of: token) { _, _ in animate() }
+    }
+
+    private func animate() {
+        visible = false
+        withAnimation(.spring(response: 0.25, dampingFraction: 0.65)) { visible = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+            withAnimation(.easeOut(duration: 0.2)) { visible = false }
+        }
     }
 }
 
