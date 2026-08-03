@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F9F3C61D301E409F00464555 /* Assets 3.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C5DE301E409F00464555 /* Assets 3.xcassets */; };
 		F9F3C61E301E409F00464555 /* score_increase.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C606301E409F00464555 /* score_increase.caf */; };
 		F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C619301E409F00464555 /* sfx_wrong.caf */; };
 		F9F3C621301E409F00464555 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C600301E409F00464555 /* Products.storekit */; };
@@ -77,8 +76,6 @@
 		F9F3C5DB301E409F00464555 /* AppAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAudio.swift; sourceTree = "<group>"; };
 		F9F3C5DC301E409F00464555 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		F9F3C5DD301E409F00464555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		F9F3C5DE301E409F00464555 /* Assets 3.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets 3.xcassets"; sourceTree = "<group>"; };
-		F9F3C5DF301E409F00464555 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterUnlocks.swift; sourceTree = "<group>"; };
 		F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecimalAnswer.swift; sourceTree = "<group>"; };
 		F9F3C5E2301E409F00464555 /* GameConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfig.swift; sourceTree = "<group>"; };
@@ -97,13 +94,11 @@
 		F9F3C5F0301E409F00464555 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 		F9F3C5F1301E409F00464555 /* HomeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeComponents.swift; sourceTree = "<group>"; };
 		F9F3C5F2301E409F00464555 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		F9F3C5F3301E409F00464555 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelIntroCard.swift; sourceTree = "<group>"; };
 		F9F3C5F5301E409F00464555 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F9F3C5F6301E409F00464555 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		F9F3C5F8301E409F00464555 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		F9F3C5F9301E409F00464555 /* Number Reef.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Number Reef.entitlements"; sourceTree = "<group>"; };
-		F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Number_ReefApp.swift; sourceTree = "<group>"; };
 		F9F3C5FB301E409F00464555 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		F9F3C5FC301E409F00464555 /* ParentApprovalGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentApprovalGate.swift; sourceTree = "<group>"; };
 		F9F3C5FD301E409F00464555 /* PlaytimeTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaytimeTracker.swift; sourceTree = "<group>"; };
@@ -135,20 +130,11 @@
 		F9F3C617301E409F00464555 /* sfx_switch_off.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_off.caf; sourceTree = "<group>"; };
 		F9F3C618301E409F00464555 /* sfx_switch_on.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_on.caf; sourceTree = "<group>"; };
 		F9F3C619301E409F00464555 /* sfx_wrong.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_wrong.caf; sourceTree = "<group>"; };
-		F9F3C61A301E409F00464555 /* SpinComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinComponent.swift; sourceTree = "<group>"; };
 		F9F3C61B301E409F00464555 /* SpokenMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenMath.swift; sourceTree = "<group>"; };
 		F9F3C61C301E409F00464555 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		F9F3C9AC301F3CBE00464555 /* frog_music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = frog_music.mp3; sourceTree = "<group>"; };
 		FA11F00231A1000000000001 /* FlyGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGame.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		F9F3C5CC301E405E00464555 /* Hungry Frog */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Hungry Frog";
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		F9F3C5C7301E405E00464555 /* Frameworks */ = {
@@ -169,8 +155,6 @@
 				F9F3C5DB301E409F00464555 /* AppAudio.swift */,
 				F9F3C5DC301E409F00464555 /* AppSettings.swift */,
 				F9F3C5DD301E409F00464555 /* Assets.xcassets */,
-				F9F3C5DE301E409F00464555 /* Assets 3.xcassets */,
-				F9F3C5DF301E409F00464555 /* ContentView.swift */,
 				F9F3C5EC301E409F00464555 /* Core */,
 				F9F3C5ED301E409F00464555 /* ElephantChallengeApp.swift */,
 				F9F3C5EE301E409F00464555 /* EmphasizedText.swift */,
@@ -178,13 +162,11 @@
 				F9F3C5F0301E409F00464555 /* GameViewModel.swift */,
 				F9F3C5F1301E409F00464555 /* HomeComponents.swift */,
 				F9F3C5F2301E409F00464555 /* HomeView.swift */,
-				F9F3C5F3301E409F00464555 /* Info.plist */,
 				F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */,
 				F9F3C5F5301E409F00464555 /* Localizable.xcstrings */,
 				F9F3C5F6301E409F00464555 /* Localization.swift */,
 				F9F3C5F8301E409F00464555 /* Notifications.swift */,
 				F9F3C5F9301E409F00464555 /* Number Reef.entitlements */,
-				F9F3C5FA301E409F00464555 /* Number_ReefApp.swift */,
 				F9F3C5FB301E409F00464555 /* OnboardingView.swift */,
 				F9F3C5FC301E409F00464555 /* ParentApprovalGate.swift */,
 				F9F3C5FD301E409F00464555 /* PlaytimeTracker.swift */,
@@ -217,10 +199,8 @@
 				F9F3C617301E409F00464555 /* sfx_switch_off.caf */,
 				F9F3C618301E409F00464555 /* sfx_switch_on.caf */,
 				F9F3C619301E409F00464555 /* sfx_wrong.caf */,
-				F9F3C61A301E409F00464555 /* SpinComponent.swift */,
 				F9F3C61B301E409F00464555 /* SpokenMath.swift */,
 				F9F3C61C301E409F00464555 /* Theme.swift */,
-				F9F3C5CC301E405E00464555 /* Hungry Frog */,
 				F9F3C5CB301E405E00464555 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -318,7 +298,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9F3C61D301E409F00464555 /* Assets 3.xcassets in Resources */,
 				F9F3C61E301E409F00464555 /* score_increase.caf in Resources */,
 				F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */,
 				F9F3C621301E409F00464555 /* Products.storekit in Resources */,
