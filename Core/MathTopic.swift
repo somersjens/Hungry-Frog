@@ -137,20 +137,6 @@ public enum MixedVariant: String, CaseIterable, Identifiable, Codable, Sendable 
     /// Glyphs that read optically heavier than the rest at the same point size,
     /// with the factor their own size and slot are scaled by.
     public static let heavyOperatorGlyphs: [String: CGFloat] = ["%": 0.8]
-
-    /// How many operator slots the column containing this variant reserves: as
-    /// many as its longest button needs. The four buttons fill a 2×2 grid left
-    /// to right, so this is four on the left and five on the right — computed
-    /// rather than hardcoded, so changing the ladder keeps the columns aligned.
-    public static func slotCount(forColumnOf variant: MixedVariant) -> Int {
-        let all = allCases
-        guard let index = all.firstIndex(of: variant) else { return variant.operationCount }
-        let column = index % 2
-        return all.enumerated()
-            .filter { $0.offset % 2 == column }
-            .map { $0.element.operationCount }
-            .max() ?? variant.operationCount
-    }
 }
 
 public enum MathScaling {

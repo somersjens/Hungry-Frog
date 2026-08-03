@@ -13,6 +13,51 @@ import StoreKit
 import UIKit
 #endif
 
+/// Every size on the sheet is derived from the height the device actually
+/// offers, so the hero, the offer and the whole cast fit on one screen instead
+/// of pushing the buy button below the fold. The base numbers are tuned for an
+/// iPhone in landscape; `unit` stretches them for the taller iPads.
+private struct PremiumMetrics {
+    let unit: CGFloat
+
+    init(height: CGFloat, isPad: Bool) {
+        let designHeight: CGFloat = isPad ? 515 : 455
+        let raw = height / designHeight
+        unit = min(isPad ? 1.75 : 1.2, max(0.72, raw))
+    }
+
+    private func s(_ value: CGFloat) -> CGFloat { value * unit }
+
+    // Frame
+    var cardPadding: CGFloat { s(13) }
+    var stackSpacing: CGFloat { s(11) }
+    var columnSpacing: CGFloat { s(14) }
+
+    // Hero
+    var heroSize: CGFloat { s(148) }
+    var nameSize: CGFloat { s(27) }
+    var badgeSize: CGFloat { s(12) }
+
+    // Offer
+    var panelPadding: CGFloat { s(14) }
+    var panelSpacing: CGFloat { s(9) }
+    var headerSize: CGFloat { s(18) }
+    var featureSpacing: CGFloat { s(10) }
+    var featureIcon: CGFloat { s(20) }
+    var featureTitle: CGFloat { s(15) }
+    var featureSubtitle: CGFloat { s(12.5) }
+    var buttonFont: CGFloat { s(17) }
+    var buttonPadding: CGFloat { s(11) }
+    var footnote: CGFloat { s(12) }
+
+    // Character strip
+    var stripPadding: CGFloat { s(8) }
+    var tileSpacing: CGFloat { s(5) }
+    var tileArt: CGFloat { s(42) }
+    var tilePadding: CGFloat { s(6) }
+    var tileBadge: CGFloat { s(10.5) }
+}
+
 struct PremiumView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var premium = PremiumStore.shared
@@ -59,26 +104,40 @@ struct PremiumView: View {
                 .ignoresSafeArea()
 
             GeometryReader { proxy in
-                ScrollView {
-                    let available = min(AppLayout.landscapeContentWidth,
-                                        proxy.size.width - AppLayout.landscapeGutter * 2)
-                    HStack(alignment: .top, spacing: isPad ? 24 : 12) {
-                        VStack(spacing: isPad ? 18 : 10) {
-                            hero
-                            purchaseSection
-                        }
-                        .frame(width: isPad ? 310 : 218)
+                let available = min(AppLayout.landscapeContentWidth,
+                                    proxy.size.width - AppLayout.landscapeGutter * 2)
+                // Side-by-side only when there is genuinely room for two
+                // columns; portrait stacks the hero above the offer.
+                let isSplit = available >= 620
+                let metrics = PremiumMetrics(height: proxy.size.height, isPad: isPad)
 
-                        collectionPanel
-                            .frame(maxWidth: .infinity)
+                ScrollView {
+                    VStack(spacing: metrics.stackSpacing) {
+                        if isSplit {
+                            HStack(alignment: .top, spacing: metrics.columnSpacing) {
+                                heroPanel(metrics)
+                                    .frame(width: available * 0.42)
+                                offerPanel(metrics)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(maxHeight: .infinity)
+                            }
+                        } else {
+                            heroPanel(metrics)
+                            offerPanel(metrics)
+                        }
+
+                        characterStrip(metrics,
+                                       columns: isSplit ? CharacterCatalog.all.count : 5)
                     }
-                    .padding(isPad ? 20 : 12)
+                    .padding(metrics.cardPadding)
                     .background(.white.opacity(0.52),
                                 in: RoundedRectangle(cornerRadius: 28, style: .continuous))
                     .shadow(color: character.deepColor.opacity(0.1), radius: 16, y: 7)
                     .padding(AppLayout.landscapeGutter)
                     .frame(width: available + AppLayout.landscapeGutter * 2)
                     .frame(maxWidth: .infinity)
+                    // Centre the card when it fits, scroll only when it cannot.
+                    .frame(minHeight: proxy.size.height)
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollIndicators(.visible)
@@ -129,42 +188,23 @@ struct PremiumView: View {
         }
     }
 
-    @ViewBuilder
-    private var collectionPanel: some View {
-        HStack(alignment: .top, spacing: isPad ? 18 : 8) {
-            characterList(
-                title: L(key: "premium.unlockWithCards"),
-                icon: Currency.icon,
-                animals: CharacterCatalog.cardCharacters
-            )
-                .padding(.vertical, isPad ? 12 : 8)
-                .frame(width: isPad ? 205 : 145)
-            premiumBlock
-                .frame(maxWidth: .infinity)
-                .layoutPriority(1)
-        }
-    }
-
-    private var hero: some View {
-        VStack(spacing: isPad ? 6 : 3) {
+    /// Left half: the character the player is previewing, shown as large as the
+    /// panel allows, with the close button tucked into its top corner.
+    private func heroPanel(_ metrics: PremiumMetrics) -> some View {
+        VStack(spacing: metrics.stackSpacing * 0.5) {
             HStack(alignment: .center) {
                 if activeUnlockCharacterID == nil { closeButton }
                 Spacer()
-                if activeUnlockCharacterID == nil {
-                    LanguagePicker(
-                        tint: character.deepColor.opacity(0.7),
-                        scale: isPad ? 1.12 : 0.9
-                    )
-                }
             }
-            .padding(.bottom, isPad ? 14 : 10)
 
-            let heroSize: CGFloat = isPad ? 195 : 118
+            Spacer(minLength: 0)
+
+            let heroSize = metrics.heroSize
             ZStack {
                 Circle()
                     .fill(RadialGradient(
                         colors: [character.color.opacity(0.35), character.color.opacity(0.05)],
-                        center: .center, startRadius: 6, endRadius: 150
+                        center: .center, startRadius: 6, endRadius: heroSize * 0.8
                     ))
                     .frame(width: heroSize, height: heroSize)
                 Circle()
@@ -173,156 +213,186 @@ struct PremiumView: View {
                 character.artwork
                     .resizable()
                     .scaledToFit()
-                    .frame(width: heroSize * 0.88, height: heroSize * 0.88)
-                    .shadow(color: character.deepColor.opacity(0.25), radius: 14, y: 8)
+                    .frame(width: heroSize * 0.86, height: heroSize * 0.86)
+                    .shadow(color: character.deepColor.opacity(0.25), radius: 16, y: 9)
                     .id(previewCharacterID)
                     .transition(.scale.combined(with: .opacity))
             }
             .frame(maxWidth: .infinity)
 
             Text(character.localizedName)
-                .font(.system(size: (isPad ? 28 : 26) * scale, weight: .heavy, design: .rounded))
+                .font(.system(size: metrics.nameSize, weight: .heavy, design: .rounded))
                 .foregroundStyle(character.deepColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
 
-            availabilityBadge(for: character)
+            availabilityBadge(for: character, metrics: metrics)
+
+            Spacer(minLength: 0)
         }
+        .padding(.horizontal, metrics.cardPadding * 0.5)
+        .padding(.vertical, metrics.cardPadding * 0.4)
+    }
+
+    /// Right half: what Premium gives you, and the button that buys it. The
+    /// language picker rides in the header row so it sits in the far corner of
+    /// the sheet, opposite the close button.
+    private func offerPanel(_ metrics: PremiumMetrics) -> some View {
+        VStack(alignment: .center, spacing: metrics.panelSpacing) {
+            ZStack {
+                HStack(spacing: 8) {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: metrics.headerSize * 0.9, weight: .bold))
+                    Text(premium.isPremium ? "premium.youHavePremium" : "premium.advantages")
+                        .font(.system(size: metrics.headerSize, weight: .heavy, design: .rounded))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                }
+                .foregroundStyle(character.deepColor)
+                .frame(maxWidth: .infinity)
+
+                if activeUnlockCharacterID == nil {
+                    HStack {
+                        Spacer(minLength: 0)
+                        LanguagePicker(
+                            tint: character.deepColor.opacity(0.7),
+                            scale: isPad ? 1.12 : 0.8
+                        )
+                    }
+                }
+            }
+
+            // Two spacers keep the leftover height split above and below the
+            // list instead of piling it all up over the buy button.
+            Spacer(minLength: 0)
+
+            featureList(metrics)
+
+            Spacer(minLength: 0)
+
+            purchaseSection(metrics)
+        }
+        .padding(metrics.panelPadding)
+        .frame(maxWidth: .infinity)
+        .background(.white.opacity(0.42),
+                    in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     @ViewBuilder
-    private func availabilityBadge(for animal: AnimalCharacter) -> some View {
+    private func availabilityBadge(for animal: AnimalCharacter,
+                                   metrics: PremiumMetrics) -> some View {
         if animal.id == CharacterCatalog.freeCharacterID {
-            badge(text: L(key: "premium.availableFromStart"), icon: nil)
+            badge(text: L(key: "premium.availableFromStart"), icon: nil, metrics: metrics)
         } else if let cards = CharacterUnlockStore.requirement(for: animal.id) {
             if totalCards >= cards {
                 badge(text: localizedInteger("premium.earnedCards %lld", cards),
-                      icon: "checkmark.circle.fill")
+                      icon: "checkmark.circle.fill", metrics: metrics)
             } else if premium.isPremium {
-                badge(text: L(key: "premium.unlockedWithPremium"), icon: "crown.fill")
+                badge(text: L(key: "premium.unlockedWithPremium"),
+                      icon: "crown.fill", metrics: metrics)
             } else {
                 badge(text: localizedInteger("premium.availableAt %lld", cards),
-                      icon: Currency.icon)
+                      icon: Currency.icon, metrics: metrics)
             }
         } else {
             badge(
                 text: L(key: premium.isPremium ? "premium.unlockedWithPremium" : "premium.exclusiveBadge"),
-                icon: "crown.fill"
+                icon: "crown.fill", metrics: metrics
             )
         }
     }
 
-    private func badge(text: String, icon: String?) -> some View {
+    private func badge(text: String, icon: String?, metrics: PremiumMetrics) -> some View {
         HStack(spacing: 6) {
             if let icon {
                 if icon == Currency.icon {
-                    CurrencyIcon(size: 13 * scale)
+                    CurrencyIcon(size: metrics.badgeSize)
                 } else {
                     Image(systemName: icon)
                 }
             }
             Text(text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
-        .font(.system(size: 13 * scale, weight: .bold, design: .rounded))
+        .font(.system(size: metrics.badgeSize, weight: .bold, design: .rounded))
         .foregroundStyle(character.deepColor)
-        .padding(.horizontal, 12 * scale)
-        .padding(.vertical, 6 * scale)
+        .padding(.horizontal, metrics.badgeSize)
+        .padding(.vertical, metrics.badgeSize * 0.5)
         .background(.white.opacity(0.58), in: Capsule())
         .overlay(Capsule().stroke(character.color.opacity(0.38), lineWidth: 1))
     }
 
-    private var featureList: some View {
-        VStack(alignment: .leading, spacing: isPad ? 16 : 12) {
-            featureRow(icon: "square.grid.3x3.fill",
-                       title: L("premium.feature.levels.title"),
-                       subtitle: L("premium.feature.levels.subtitle"))
-            featureRow(icon: "pawprint.fill",
-                       title: L("premium.feature.animals.title"),
-                       subtitle: L("premium.feature.animals.subtitle"))
-            featureRow(icon: "nosign",
-                       title: L("premium.feature.noAds.title"),
-                       subtitle: L("premium.feature.noAds.subtitle"))
+    private func featureList(_ metrics: PremiumMetrics) -> some View {
+        VStack(alignment: .center, spacing: metrics.featureSpacing) {
+            featureRow(title: L("premium.feature.levels.title"),
+                       subtitle: L("premium.feature.levels.subtitle"),
+                       metrics: metrics)
+            featureRow(title: L("premium.feature.animals.title"),
+                       subtitle: L("premium.feature.animals.subtitle"),
+                       metrics: metrics)
+            featureRow(title: L("premium.feature.noAds.title"),
+                       subtitle: L("premium.feature.noAds.subtitle"),
+                       metrics: metrics)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
     }
 
-    private var premiumBlock: some View {
-        VStack(alignment: .leading, spacing: isPad ? 9 : 6) {
-            sectionHeader(title: L(key: "premium.exclusiveWithPremium"), icon: "crown.fill")
-            HStack(alignment: .top, spacing: isPad ? 18 : 10) {
-                characterRows(CharacterCatalog.premiumCharacters, showsAccessory: false)
-                    .frame(width: isPad ? 100 : 66)
-                featureList
-                    .padding(.top, isPad ? 6 : 4)
-                    .layoutPriority(1)
+    /// The whole cast in one row along the bottom, each animal captioned with
+    /// what it costs: free, a fly total, or Premium.
+    private func characterStrip(_ metrics: PremiumMetrics, columns: Int) -> some View {
+        let animals = CharacterCatalog.all
+        let rows = stride(from: 0, to: animals.count, by: columns).map { start in
+            Array(animals[start..<min(start + columns, animals.count)])
+        }
+        return VStack(spacing: metrics.tileSpacing) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                HStack(spacing: metrics.tileSpacing) {
+                    ForEach(row) { animal in
+                        characterTile(for: animal, metrics: metrics)
+                    }
+                    // Keep a short final row aligned with the one above it.
+                    if row.count < columns {
+                        ForEach(0..<(columns - row.count), id: \.self) { _ in
+                            Color.clear.frame(maxWidth: .infinity)
+                        }
+                    }
+                }
             }
         }
-        .padding(isPad ? 12 : 8)
-        .background(.white.opacity(0.3),
-                    in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .padding(metrics.stripPadding)
+        .background(.white.opacity(0.34),
+                    in: RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
-    private func characterList(title: String, icon: String,
-                               animals: [AnimalCharacter]) -> some View {
-        VStack(spacing: isPad ? 9 : 6) {
-            sectionHeader(title: title, icon: icon)
-            characterRows(animals, showsAccessory: true)
-        }
-    }
-
-    private func characterRows(_ animals: [AnimalCharacter],
-                               showsAccessory: Bool) -> some View {
-        VStack(spacing: isPad ? 9 : 6) {
-            ForEach(animals) { animal in
-                characterRow(for: animal, showsAccessory: showsAccessory)
-            }
-        }
-    }
-
-    private func sectionHeader(title: String, icon: String) -> some View {
-        HStack(spacing: 6) {
-            if icon == Currency.icon {
-                CurrencyIcon(size: 15 * scale)
-            } else {
-                Image(systemName: icon)
-            }
-            Text(title)
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-            Spacer(minLength: 0)
-        }
-        .font(.system(size: 14 * scale, weight: .heavy, design: .rounded))
-        .foregroundStyle(character.deepColor)
-        .frame(height: 24 * scale, alignment: .leading)
-    }
-
-    private func characterRow(for animal: AnimalCharacter,
-                              showsAccessory: Bool) -> some View {
+    private func characterTile(for animal: AnimalCharacter,
+                               metrics: PremiumMetrics) -> some View {
         let isSelected = previewCharacterID == animal.id
         let isAccessible = canUse(animal)
+        let artSide = metrics.tileArt
         return Button {
             AppAudio.shared.playMenuTap()
             previewCharacterID = animal.id
             if isAccessible { characterID = animal.id }
         } label: {
-            HStack(spacing: isPad ? 10 : 6) {
-                if !showsAccessory { Spacer(minLength: 0) }
+            VStack(spacing: metrics.tileSpacing) {
                 animal.artwork
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 38 * scale * animal.selectorArtworkScale,
-                           height: 38 * scale * animal.selectorArtworkScale)
-                    .frame(width: 44 * scale, height: 44 * scale)
+                    .frame(width: artSide * animal.selectorArtworkScale,
+                           height: artSide * animal.selectorArtworkScale)
+                    .frame(height: artSide * 1.1)
+                    .opacity(isAccessible ? 1 : 0.9)
 
-                Spacer(minLength: 2)
-                if showsAccessory {
-                    characterRowAccessory(for: animal)
-                }
+                characterTileBadge(for: animal, metrics: metrics)
             }
-            .padding(.horizontal, 8 * scale)
-            .frame(minHeight: 50 * scale)
-            .background(isSelected ? character.color.opacity(0.18) : .white.opacity(0.34),
-                        in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, metrics.tilePadding * 0.7)
+            .padding(.vertical, metrics.tilePadding)
+            .background(isSelected ? character.color.opacity(0.20) : .white.opacity(0.42),
+                        in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .stroke(isSelected ? character.color : .clear,
                             lineWidth: isSelected ? 2 : 0)
             }
@@ -334,23 +404,44 @@ struct PremiumView: View {
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 
+    /// The caption under an animal: its requirement, ticked once it is earned.
+    /// The caption under an animal. Earned animals drop their price for a solid
+    /// tick; the starter keeps its "Start" label only until the player has
+    /// earned a second animal, so the row never mixes the two ideas.
     @ViewBuilder
-    private func characterRowAccessory(for animal: AnimalCharacter) -> some View {
-        if animal.id == CharacterCatalog.freeCharacterID {
+    private func characterTileBadge(for animal: AnimalCharacter,
+                                    metrics: PremiumMetrics) -> some View {
+        let isStarter = animal.id == CharacterCatalog.freeCharacterID
+        let showsTick = canUse(animal) && (!isStarter || hasEarnedBeyondStarter)
+
+        if showsTick {
+            Image(systemName: "checkmark")
+                .characterTileBadgeStyle(character: character,
+                                         isUnlocked: true,
+                                         isFilled: true,
+                                         size: metrics.tileBadge)
+        } else if isStarter {
             Text(verbatim: L(key: "premium.start"))
-                .characterRowBadgeStyle(character: character)
-        } else if canUse(animal) {
-            Image(systemName: "checkmark.circle.fill")
-                .characterRowBadgeStyle(character: character)
+                .characterTileBadgeStyle(character: character,
+                                         isUnlocked: true,
+                                         size: metrics.tileBadge)
         } else if let cards = CharacterUnlockStore.requirement(for: animal.id) {
-            HStack(spacing: 3) {
-                Text(verbatim: "\(cards)")
-                CurrencyIcon(size: 11 * scale)
-            }
-            .characterRowBadgeStyle(character: character)
+            Text(verbatim: "\(cards)")
+                .characterTileBadgeStyle(character: character,
+                                         isUnlocked: false,
+                                         size: metrics.tileBadge)
         } else {
             Image(systemName: "crown.fill")
-                .characterRowBadgeStyle(character: character)
+                .characterTileBadgeStyle(character: character,
+                                         isUnlocked: false,
+                                         size: metrics.tileBadge)
+        }
+    }
+
+    /// True once any animal beyond the starter is available.
+    private var hasEarnedBeyondStarter: Bool {
+        CharacterCatalog.all.contains {
+            $0.id != CharacterCatalog.freeCharacterID && canUse($0)
         }
     }
 
@@ -359,34 +450,38 @@ struct PremiumView: View {
     }
 
     @ViewBuilder
-    private var purchaseSection: some View {
+    private func purchaseSection(_ metrics: PremiumMetrics) -> some View {
         if premium.isPremium {
             Button { dismiss() } label: {
                 Text("common.done")
-                    .font(isPad ? .system(size: 24, weight: .bold) : .headline)
+                    .font(.system(size: metrics.buttonFont, weight: .bold))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14 * scale)
-                    .background(character.color, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .padding(.vertical, metrics.buttonPadding)
+                    .background(character.color, in: Capsule())
                     .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
         } else {
-            VStack(spacing: isPad ? 12 : 8) {
+            VStack(spacing: metrics.panelSpacing * 0.55) {
                 Button { showsParentApproval = true } label: {
-                    HStack {
+                    HStack(spacing: 10) {
                         if premium.isPurchasing {
                             ProgressView().tint(.white)
                         } else {
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: metrics.buttonFont, weight: .bold))
                             Text(purchaseButtonTitle)
-                                .font(isPad ? .system(size: 24, weight: .bold) : .headline)
+                                .font(.system(size: metrics.buttonFont, weight: .bold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, (isPad ? 16 : 12) * scale)
+                    .padding(.vertical, metrics.buttonPadding)
                     .background(
                         LinearGradient(colors: [character.color, character.deepColor],
                                        startPoint: .top, endPoint: .bottom),
-                        in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        in: Capsule()
                     )
                     .foregroundStyle(.white)
                     .shadow(color: character.deepColor.opacity(0.3), radius: 10, y: 5)
@@ -395,20 +490,24 @@ struct PremiumView: View {
                 .disabled(premium.isPurchasing)
 
                 Text("premium.oneTime")
-                    .font(isPad ? .system(size: 20) : .subheadline)
+                    .font(.system(size: metrics.footnote))
                     .foregroundStyle(character.deepColor.opacity(0.7))
+                    .frame(maxWidth: .infinity)
+                    .multilineTextAlignment(.center)
 
                 Button("premium.restore") {
                     Task { await premium.restorePurchases() }
                 }
-                .font(isPad ? .system(size: 18) : .footnote)
+                .font(.system(size: metrics.footnote * 0.92))
                 .foregroundStyle(character.deepColor.opacity(0.7))
+                .frame(maxWidth: .infinity)
 
                 if let error = premium.lastError {
                     Text(error)
-                        .font(isPad ? .system(size: 18) : .footnote)
+                        .font(.system(size: metrics.footnote * 0.92))
                         .foregroundStyle(.red)
                         .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -441,21 +540,19 @@ struct PremiumView: View {
         }
     }
 
-    private func featureRow(icon: String, title: String, subtitle: String) -> some View {
-        HStack(alignment: .center, spacing: 12 * scale) {
-            Image(systemName: icon)
-                .font(isPad ? .system(size: 28) : .title3)
-                .foregroundStyle(character.color)
-                .frame(width: 28 * scale)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(isPad ? .system(size: 24, weight: .bold) : .subheadline.weight(.bold))
-                    .foregroundStyle(character.deepColor)
-                Text(subtitle)
-                    .font(isPad ? .system(size: 20) : .footnote)
-                    .foregroundStyle(character.deepColor.opacity(0.7))
-            }
+    private func featureRow(title: String, subtitle: String,
+                            metrics: PremiumMetrics) -> some View {
+        VStack(alignment: .center, spacing: 2) {
+            Text(title)
+                .font(.system(size: metrics.featureTitle, weight: .bold))
+                .foregroundStyle(character.deepColor)
+            Text(subtitle)
+                .font(.system(size: metrics.featureSubtitle))
+                .foregroundStyle(character.deepColor.opacity(0.7))
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
     }
 
     private func unlockCelebration(animal: AnimalCharacter) -> some View {
@@ -657,17 +754,25 @@ struct PremiumView: View {
 }
 
 private extension View {
-    func characterRowBadgeStyle(character: AnimalCharacter) -> some View {
+    /// One pill for every caption under an animal, so a tick and a fly total
+    /// share the same shape and height. `isFilled` marks the earned ones.
+    func characterTileBadgeStyle(character: AnimalCharacter,
+                                 isUnlocked: Bool,
+                                 isFilled: Bool = false,
+                                 size: CGFloat) -> some View {
         self
-            .font(.system(size: 10, weight: .heavy, design: .rounded))
-            .foregroundStyle(character.deepColor)
+            .font(.system(size: size, weight: .heavy, design: .rounded))
+            .foregroundStyle(isFilled ? .white
+                                      : character.deepColor.opacity(isUnlocked ? 1 : 0.75))
             .lineLimit(1)
-            .minimumScaleFactor(0.7)
+            .minimumScaleFactor(0.6)
             .allowsTightening(true)
-            .padding(.horizontal, 5)
-            .padding(.vertical, 4)
-            .background(character.color.opacity(0.16), in: Capsule())
-            .fixedSize(horizontal: true, vertical: false)
+            .frame(minWidth: size * 1.5, minHeight: size * 1.25)
+            .padding(.horizontal, size * 0.6)
+            .padding(.vertical, size * 0.35)
+            .background(isFilled ? character.color
+                                 : character.color.opacity(isUnlocked ? 0.22 : 0.10),
+                        in: Capsule())
     }
 }
 

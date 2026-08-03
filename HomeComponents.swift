@@ -29,10 +29,12 @@ enum GoalPeriod: String, CaseIterable, Identifiable {
 
 // MARK: - Streak
 
-/// The compact streak module in the top-right of the header: day count, a
-/// progress rail toward the goal, and the minutes underneath.
-struct CompactStreakView: View {
+/// The streak module: one wide bar under the character, with the day count at
+/// one end, the minutes played at the other, and the goal rail filling whatever
+/// is left between them.
+struct StreakBar: View {
     let accent: Color
+    let height: CGFloat
     let action: () -> Void
     @ObservedObject private var tracker = PlaytimeTracker.shared
     @AppStorage("ui.goalPeriod") private var goalPeriodRaw = GoalPeriod.weekly.rawValue
@@ -40,11 +42,9 @@ struct CompactStreakView: View {
     private var goalPeriod: GoalPeriod { GoalPeriod(rawValue: goalPeriodRaw) ?? .weekly }
     private var isPad: Bool { AppLayout.isPad }
 
-    // One factor drives every dimension, so the widget keeps its proportions
-    // when it scales up for the larger iPad layout.
-    private var scale: CGFloat { isPad ? 1.4 : 1 }
-    private var railWidth: CGFloat { 74 * scale }
-    private var rowSpacing: CGFloat { 5 * scale }
+    // Everything inside is a fraction of the bar's own height, so the module
+    // keeps its proportions at whatever height the header hands it.
+    private var scale: CGFloat { height / 26 }
 
     private var progressMinutes: Int {
         goalPeriod == .weekly ? tracker.weekMinutes : tracker.todayMinutes
@@ -60,10 +60,7 @@ struct CompactStreakView: View {
 
     var body: some View {
         Button(action: action) {
-            // Constant spacing between three self-sizing rows: the module has a
-            // stable natural height and is centred in the header, so a longer
-            // name next to it never squashes or stretches these gaps.
-            VStack(spacing: rowSpacing) {
+            HStack(spacing: 9 * scale) {
                 headline
                     .foregroundStyle(accent)
                 progressLine
@@ -71,10 +68,14 @@ struct CompactStreakView: View {
                     .font(.system(size: 11.5 * scale, weight: .semibold))
                     .foregroundStyle(accent.opacity(0.62))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .fixedSize()
             }
+            .padding(.horizontal, 11 * scale)
             .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
+            .frame(height: height)
+            .background(accent.opacity(0.08), in: Capsule())
+            .overlay(Capsule().stroke(accent.opacity(0.12), lineWidth: 1))
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("streak")
@@ -89,38 +90,37 @@ struct CompactStreakView: View {
         if tracker.streakDays == 0 {
             HStack(alignment: .firstTextBaseline, spacing: 4 * scale) {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 15 * scale, weight: .bold))
+                    .font(.system(size: 13 * scale, weight: .bold))
                 Text("streak.dayOne")
-                    .font(.system(size: 15 * scale, weight: .heavy, design: .rounded))
+                    .font(.system(size: 13 * scale, weight: .heavy, design: .rounded))
             }
             .fixedSize()
-            // The sparkle carries less visual weight than the text, so a
-            // geometric centre reads as shifted right; nudge left to optically
-            // centre the badge over the rail below it.
-            .offset(x: -4 * scale)
         } else {
             HStack(alignment: .firstTextBaseline, spacing: 4 * scale) {
                 Text(verbatim: "\(tracker.streakDays)")
-                    .font(.system(size: 28 * scale, weight: .heavy, design: .rounded))
+                    .font(.system(size: 17 * scale, weight: .heavy, design: .rounded))
                 Image(systemName: "flame.fill")
-                    .font(.system(size: 17 * scale, weight: .bold))
+                    .font(.system(size: 13 * scale, weight: .bold))
             }
+            .fixedSize()
         }
     }
 
-    // Fixed-width rail, so the fill can be sized directly without a
-    // GeometryReader and stays perfectly centred under the day count.
+    // The rail is the only flexible part of the bar, so it takes whatever the
+    // day count and the minutes leave over.
     private var progressLine: some View {
-        Capsule()
-            .fill(accent.opacity(0.15))
-            .frame(width: railWidth, height: 7 * scale)
-            .overlay(alignment: .leading) {
-                Capsule()
-                    .fill(LinearGradient(colors: [accent.opacity(0.6), accent],
-                                         startPoint: .leading, endPoint: .trailing))
-                    .frame(width: max(6 * scale, railWidth * goalProgress))
-                    .animation(.snappy(duration: 0.4), value: goalProgress)
-            }
+        GeometryReader { proxy in
+            Capsule()
+                .fill(accent.opacity(0.15))
+                .overlay(alignment: .leading) {
+                    Capsule()
+                        .fill(LinearGradient(colors: [accent.opacity(0.6), accent],
+                                             startPoint: .leading, endPoint: .trailing))
+                        .frame(width: max(6 * scale, proxy.size.width * goalProgress))
+                        .animation(.snappy(duration: 0.4), value: goalProgress)
+                }
+        }
+        .frame(height: 6 * scale)
     }
 }
 

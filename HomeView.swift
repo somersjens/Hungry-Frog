@@ -101,9 +101,39 @@ struct HomeView: View {
 
     private var menuScale: CGFloat { isPad ? 1.4 : 1 }
     private var menuControlSpacing: CGFloat { isPad ? 14 : 10 }
-    private var topicButtonDiameter: CGFloat { isPad ? 58 : 38 }
+    private var modeButtonHeight: CGFloat { isPad ? 48 : 37 }
     private var levelGridSpacing: CGFloat { isPad ? 16 : 10 }
     private var levelCardHeight: CGFloat { isPad ? 124 : 88 }
+    private var menuCardPadding: CGFloat { isPad ? 20 : 13 }
+    private var menuCardSpacing: CGFloat { isPad ? 24 : 14 }
+    /// The character is exactly as tall as the two control rows beside it — the
+    /// topics and the row under them — so the two halves of the card square off.
+    private var characterBox: CGFloat {
+        topicButtonDiameter + menuControlSpacing + modeButtonHeight
+    }
+    private var streakBarHeight: CGFloat { isPad ? 32 : 24 }
+    /// Where the divider sits. The player side only has to carry the character,
+    /// three short lines and the streak bar, so the controls get the wider half.
+    private var playerPanelWidth: CGFloat { isPad ? 458 : 325 }
+
+    /// The room the topics and the row under them have, worked out from the same
+    /// numbers the card is laid out with. Knowing it here means the controls can
+    /// size themselves to the screen without a nested `GeometryReader` — and the
+    /// character, which has to match their height, can read that height too.
+    private var controlColumnWidth: CGFloat {
+        let available = min(AppLayout.landscapeContentWidth,
+                            max(0, viewportWidth - AppLayout.landscapeGutter * 2))
+        return available - menuCardPadding * 2 - playerPanelWidth - menuCardSpacing * 2 - 1
+    }
+
+    /// The six topic circles grow to fill their row, so what is left between them
+    /// is a deliberate gap rather than leftover space. They stop growing at a
+    /// size that keeps the whole header comfortably short.
+    private var topicButtonDiameter: CGFloat {
+        let gap: CGFloat = isPad ? 12 : 8
+        let fits = (controlColumnWidth - gap * 5) / 6
+        return min(isPad ? 68 : 46, max(isPad ? 58 : 38, fits))
+    }
 
     var body: some View {
         // Reading the revision redraws the personal bests when iCloud updates.
@@ -198,9 +228,9 @@ struct HomeView: View {
     /// Everything above the level grid lives in one card, so the boundary
     /// between "settings for the next run" and "pick a level" stays obvious.
     private var menuCard: some View {
-        HStack(alignment: .top, spacing: isPad ? 24 : 14) {
+        HStack(alignment: .top, spacing: menuCardSpacing) {
             playerPanel
-                .frame(width: isPad ? 500 : 350)
+                .frame(width: playerPanelWidth)
 
             Rectangle()
                 .fill(character.deepColor.opacity(0.2))
@@ -220,7 +250,7 @@ struct HomeView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .padding(isPad ? 20 : 13)
+        .padding(menuCardPadding)
         .background {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(.white.opacity(0.76))
@@ -232,11 +262,16 @@ struct HomeView: View {
         .shadow(color: character.deepColor.opacity(0.12), radius: 14, y: 7)
     }
 
+    /// The player side is exactly as tall as the two rows of controls across the
+    /// divider: the character fills that height on the left, and beside it the
+    /// three lines that describe the player sit at the top with the streak bar
+    /// pushed to the bottom. The bar therefore starts where the character ends
+    /// and finishes level with the row of subcategory buttons.
     private var playerPanel: some View {
-        VStack(alignment: .leading, spacing: isPad ? 10 : 7) {
-            HStack(alignment: .center, spacing: isPad ? 16 : 10) {
-                characterButton
+        HStack(alignment: .center, spacing: isPad ? 16 : 10) {
+            characterButton
 
+            VStack(alignment: .leading, spacing: isPad ? 4 : 3) {
                 Button {
                     nameDraft = playerName
                     showNameEditor = true
@@ -248,31 +283,32 @@ struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(character.deepColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
 
-                CompactStreakView(accent: character.deepColor) {
+                totalCounter
+                topicHeader
+
+                Spacer(minLength: isPad ? 5 : 4)
+
+                StreakBar(accent: character.deepColor, height: streakBarHeight) {
                     NotificationManager.shared.requestAuthorizationOnStreakTap {
                         showGoalPicker = true
                     }
                 }
-                .frame(maxWidth: .infinity)
                 .popover(isPresented: $showGoalPicker, arrowEdge: .top) {
                     DailyGoalPicker(theme: character)
                         .padding()
                         .presentationCompactAdaptation(.popover)
                 }
-                .frame(width: isPad ? 142 : 96)
             }
-
-            totalCounter
-            topicHeader
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(height: characterBox)
     }
 
     // MARK: Character
 
     private var characterButton: some View {
-        let box: CGFloat = isPad ? 96 : 62
+        let box = characterBox
         return ZStack {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(LinearGradient(colors: [character.skyColor, character.tintColor],
@@ -339,6 +375,7 @@ struct HomeView: View {
         .font(.system(size: isPad ? 20 : 14, weight: .bold, design: .rounded))
         .foregroundStyle(character.deepColor)
         .lineLimit(1)
+        .minimumScaleFactor(0.7)
         .animation(.spring(response: 0.35, dampingFraction: 0.75), value: totalCards)
     }
 
@@ -387,6 +424,7 @@ struct HomeView: View {
         .font(.system(size: isPad ? 20 : 14, weight: .bold, design: .rounded))
         .foregroundStyle(character.deepColor)
         .lineLimit(1)
+        .minimumScaleFactor(0.7)
     }
 
     /// Cards earned across every level of the selected topic.
@@ -476,11 +514,13 @@ struct HomeView: View {
     private func topicIcon(_ option: MathTopic, isSelected: Bool) -> some View {
         // Bare glyphs, not the `.circle.fill` variants: the button already
         // provides the circle, so the only solid is the selected one. Per-symbol
-        // point sizes even out their differing optical heights.
-        let size = option.symbolPointSize * menuScale
+        // point sizes even out their differing optical heights, and the glyph
+        // tracks the circle so a wider row never leaves the symbols swimming.
+        let scale = menuScale * topicButtonDiameter / (isPad ? 58 : 38)
+        let size = option.symbolPointSize * scale
         return Image(systemName: option.symbolName)
             .font(.system(size: size, weight: .bold))
-            .frame(height: 24 * menuScale)
+            .frame(height: 24 * scale)
             .foregroundStyle(isSelected ? .white : character.deepColor)
     }
 
@@ -516,7 +556,7 @@ struct HomeView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .frame(maxWidth: .infinity)
-                        .frame(height: isPad ? 48 : 37)
+                        .frame(height: modeButtonHeight)
                         .padding(.horizontal, isPad ? 8 : 2)
                         .background(isSelected ? character.deepColor : .white.opacity(0.7),
                                     in: RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -537,72 +577,109 @@ struct HomeView: View {
     }
 
     /// The four Supermix combinations, shown only while Supermix is selected.
-    /// Each button spells out the operations it practises.
+    /// Each button spells out the operations it practises, and its width follows
+    /// its own operators — so the ladder from `+ −` to `+ − × ÷ %` is visible in
+    /// the button widths themselves. The row still spans exactly as wide as the
+    /// topics above it: the space left over goes into the buttons rather than
+    /// into gaps, which keeps the four reading as one group.
     private var supermixPicker: some View {
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: isPad ? 12 : 8),
-                            GridItem(.flexible(), spacing: isPad ? 12 : 8)],
-                  spacing: isPad ? 12 : 8) {
-            ForEach(MixedVariant.allCases) { variant in
-                let isSelected = variant == mixedVariant
-                Button {
-                    AppAudio.shared.playMenuTap()
-                    // Tapping the one already chosen explains it instead.
-                    if isSelected {
-                        showInfoPopup(header: L("info.topic.header"),
-                                      message: L(key: variant.detailKey),
-                                      anchorKey: "super.\(variant.rawValue)")
-                    } else {
-                        infoPopup = nil
-                        mixedVariantRaw = variant.rawValue
-                    }
-                } label: {
-                    supermixLabel(variant)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
-                    .foregroundStyle(isSelected ? .white : character.deepColor)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: isPad ? 48 : 37)
-                    .background(isSelected ? character.deepColor : .white.opacity(0.62),
-                                in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(character.deepColor.opacity(isSelected ? 0 : 0.28), lineWidth: 1))
-                    .reportAnchor("super.\(variant.rawValue)")
-                    .animation(.snappy(duration: 0.2), value: isSelected)
+        let variants = MixedVariant.allCases
+        let gap = supermixGap
+        let glyphs = variants.reduce(CGFloat.zero) { $0 + supermixGlyphWidth($1) }
+        return GeometryReader { proxy in
+            let free = proxy.size.width - glyphs - gap * CGFloat(variants.count - 1)
+            // Shared out over the eight button edges, but never below the inset
+            // that keeps the glyphs clear of the rounded corners.
+            let inset = max(supermixMinimumInset, free / CGFloat(variants.count * 2))
+            HStack(spacing: gap) {
+                ForEach(variants) { variant in
+                    supermixButton(variant, inset: inset)
                 }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("supermix-\(variant.rawValue)")
-                .accessibilityLabel(Text(verbatim: variant.operators.joined(separator: " ")))
-                .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
             }
         }
+        .frame(height: modeButtonHeight)
     }
 
-    /// Every column reserves as many slots as its longest button needs — four
-    /// on the left (`+ − × ÷`), five on the right (`+ − × ÷ %`) — and a shorter
-    /// button centres itself inside them. That is what puts the operators the
-    /// two buttons in a column share directly underneath one another, instead
-    /// of letting each row pack tight against its own content.
+    private func supermixButton(_ variant: MixedVariant, inset: CGFloat) -> some View {
+        let isSelected = variant == mixedVariant
+        return Button {
+            AppAudio.shared.playMenuTap()
+            // Tapping the one already chosen explains it instead.
+            if isSelected {
+                showInfoPopup(header: L("info.topic.header"),
+                              message: L(key: variant.detailKey),
+                              anchorKey: "super.\(variant.rawValue)")
+            } else {
+                infoPopup = nil
+                mixedVariantRaw = variant.rawValue
+            }
+        } label: {
+            supermixLabel(variant)
+            .lineLimit(1)
+            .foregroundStyle(isSelected ? .white : character.deepColor)
+            .padding(.horizontal, inset)
+            .frame(height: modeButtonHeight)
+            .background(isSelected ? character.deepColor : .white.opacity(0.62),
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(character.deepColor.opacity(isSelected ? 0 : 0.28), lineWidth: 1))
+            .reportAnchor("super.\(variant.rawValue)")
+            .animation(.snappy(duration: 0.2), value: isSelected)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("supermix-\(variant.rawValue)")
+        .accessibilityLabel(Text(verbatim: variant.operators.joined(separator: " ")))
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private var supermixGap: CGFloat { isPad ? 10 : 7 }
+    private var supermixMinimumInset: CGFloat { isPad ? 10 : 5 }
+    private var supermixSlotSpacing: CGFloat { 2 }
+
+    /// One slot per operator. They keep their full size until the row would
+    /// stop fitting — on the narrowest phone the four buttons still have to sit
+    /// side by side, so there the glyphs give way rather than the layout.
+    private var supermixSlotWidth: CGFloat {
+        let base: CGFloat = isPad ? 22 : 14
+        guard controlColumnWidth > 0 else { return base }
+        let variants = MixedVariant.allCases
+        let slots = variants.reduce(CGFloat.zero) { total, variant in
+            total + variant.operators.reduce(CGFloat.zero) {
+                $0 + (MixedVariant.heavyOperatorGlyphs[$1] ?? 1)
+            }
+        }
+        let spacings = variants.reduce(0) { $0 + $1.operationCount - 1 }
+        let fixed = supermixSlotSpacing * CGFloat(spacings)
+            + supermixGap * CGFloat(variants.count - 1)
+            + supermixMinimumInset * CGFloat(variants.count * 2)
+        return min(base, max(isPad ? 14 : 9, (controlColumnWidth - fixed) / slots))
+    }
+
+    /// What a button's operators occupy on their own, before any padding — the
+    /// row's spacing is worked out from these.
+    private func supermixGlyphWidth(_ variant: MixedVariant) -> CGFloat {
+        let slots = variant.operators.reduce(CGFloat.zero) { total, symbol in
+            total + supermixSlotWidth * (MixedVariant.heavyOperatorGlyphs[symbol] ?? 1)
+        }
+        return slots + supermixSlotSpacing * CGFloat(variant.operators.count - 1)
+    }
+
+    /// One equal slot per operator, so the glyphs inside a button are evenly
+    /// spaced however many there are.
     ///
     /// `%` reads optically heavier than the rest at the same point size, so it
     /// gets its own smaller size and a narrower slot.
     private func supermixLabel(_ variant: MixedVariant) -> some View {
-        let font = Font.system(size: isPad ? 26 : 19, weight: .heavy, design: .rounded)
-        let heavyFont = Font.system(size: isPad ? 21 : 15, weight: .heavy, design: .rounded)
-        let slotWidth: CGFloat = isPad ? 30 : 20
-        let active = variant.operators
-        let totalSlots = MixedVariant.slotCount(forColumnOf: variant)
-        // A shorter button sits in the middle of the reserved slots: "+ −"
-        // lands in slots 2 and 3 of 4, not at the front.
-        let offset = (totalSlots - active.count) / 2
+        let glyph = supermixSlotWidth * (isPad ? 0.91 : 1)
+        let font = Font.system(size: glyph, weight: .heavy, design: .rounded)
+        let heavyFont = Font.system(size: glyph * 0.82, weight: .heavy, design: .rounded)
 
-        return HStack(spacing: 2) {
-            ForEach(0..<totalSlots, id: \.self) { slot in
-                let index = slot - offset
-                let symbol = (index >= 0 && index < active.count) ? active[index] : ""
+        return HStack(spacing: supermixSlotSpacing) {
+            ForEach(Array(variant.operators.enumerated()), id: \.offset) { _, symbol in
                 let heavy = MixedVariant.heavyOperatorGlyphs[symbol]
                 Text(verbatim: symbol)
                     .font(heavy == nil ? font : heavyFont)
-                    .frame(width: slotWidth * (heavy ?? 1))
+                    .frame(width: supermixSlotWidth * (heavy ?? 1))
             }
         }
     }

@@ -2784,6 +2784,23 @@
         }
       }
     },
+    "premium.advantages" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advantages"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voordelen"
+          }
+        }
+      }
+    },
     "premium.availableAt %lld" : {
       "extractionState" : "manual",
       "localizations" : {
