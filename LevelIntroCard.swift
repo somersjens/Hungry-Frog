@@ -122,7 +122,11 @@ struct LevelIntroCard: View {
     /// three lines stay comfortably readable rather than shouting.
     private var featureIconScale: CGFloat { 0.8 }
     private var featureTextScale: CGFloat { isPad ? (1.1 * 0.9) : (0.88 * 0.9 * 1.1) }
-    private var portraitSize: CGFloat { 70 * scale }
+    /// The portrait sets the height of the whole heading: the title sits on one
+    /// line above the two audio buttons, and together they fill exactly this.
+    private var portraitSize: CGFloat { 88 * scale }
+    private var audioRowHeight: CGFloat { 34 * scale }
+    private var headingSpacing: CGFloat { 8 * scale }
 
     var body: some View {
         let info = LevelIntro.info(for: board)
@@ -137,46 +141,49 @@ struct LevelIntroCard: View {
 
             GeometryReader { proxy in
                 ScrollView {
-                    HStack(alignment: .top, spacing: 0) {
-                        // Stable action column: the title, audio and navigation
-                        // stay together on both the start and pause versions.
-                        VStack(alignment: .leading, spacing: 14 * scale) {
-                            HStack(alignment: .center, spacing: 12 * scale) {
-                                characterPortrait
-                                audioControlStack
-                                Text(info.title)
-                                    .font(.system(size: 29 * textScale * titleScale,
-                                                  weight: .heavy, design: .rounded))
-                                    .foregroundStyle(theme.deepColor)
-                                    .lineLimit(2)
-                                    .minimumScaleFactor(0.5)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(spacing: 0) {
+                        HStack(alignment: .top, spacing: 0) {
+                            // Stable action column: the title, audio and
+                            // navigation stay together on both the start and
+                            // pause versions. The buttons are pushed to the
+                            // bottom so the last one lines up with the last
+                            // description opposite it.
+                            VStack(alignment: .leading, spacing: 0) {
+                                heading(title: info.title)
+
+                                Spacer(minLength: 16 * scale)
+
+                                actionButtons
                             }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                            .padding(.trailing, 22 * scale)
 
-                            actionButtons
+                            Rectangle()
+                                .fill(theme.deepColor.opacity(0.14))
+                                .frame(width: 1)
 
-                            if isContinuation { pausedMessage }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                        .padding(.trailing, 22 * scale)
-
-                        Rectangle()
-                            .fill(theme.deepColor.opacity(0.14))
-                            .frame(width: 1, height: isPad ? 310 : 260)
-
-                        // The information side deliberately contains only the
-                        // three descriptions and their icons.
-                        VStack(spacing: 12 * scale) {
-                            ForEach(features) { feature in
-                                featureCard(feature)
+                            // The information side deliberately contains only
+                            // the three descriptions and their icons.
+                            VStack(spacing: 12 * scale) {
+                                ForEach(features) { feature in
+                                    featureCard(feature)
+                                }
                             }
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.leading, 22 * scale)
                         }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.leading, 22 * scale)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                        // Only a paused run adds height below that shared
+                        // baseline; otherwise the card ends right after it.
+                        if isContinuation {
+                            pausedMessage
+                                .padding(.top, 14 * scale)
+                        }
                     }
                     .padding(24 * scale)
                     .frame(maxWidth: isPad ? 900 : 760)
-                    .background(.background, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .background(.background.opacity(0.93), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
                     .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous)
                         .stroke(theme.deepColor.opacity(0.14), lineWidth: 1))
@@ -187,6 +194,29 @@ struct LevelIntroCard: View {
                 }
                 .scrollBounceBehavior(.basedOnSize)
             }
+        }
+    }
+
+    /// Portrait on the left; beside it the level title on a single line with
+    /// the two audio buttons underneath. The pair is pinned to the portrait's
+    /// height, so the heading reads as one block whatever the title says.
+    private func heading(title: String) -> some View {
+        HStack(alignment: .top, spacing: 12 * scale) {
+            characterPortrait
+
+            VStack(alignment: .leading, spacing: headingSpacing) {
+                Text(title)
+                    .font(.system(size: 29 * textScale * titleScale,
+                                  weight: .heavy, design: .rounded))
+                    .foregroundStyle(theme.deepColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
+                    .allowsTightening(true)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+
+                audioControlRow
+            }
+            .frame(height: portraitSize)
         }
     }
 
@@ -223,13 +253,25 @@ struct LevelIntroCard: View {
     /// Confirms that the run is safely waiting without repeating a potentially
     /// awkward singular/plural bubble count.
     private var pausedMessage: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "pause.fill")
-            Text("game.intro.progressPaused")
+        // The empty half keeps the note centred under the action column rather
+        // than under the whole card.
+        HStack(spacing: 0) {
+            HStack(spacing: 6) {
+                Image(systemName: "pause.fill")
+                Text("game.intro.progressPaused")
+            }
+            .font(.system(size: 13 * textScale, weight: .semibold))
+            .foregroundStyle(theme.deepColor.opacity(0.62))
+            .frame(maxWidth: .infinity)
+            .padding(.trailing, 22 * scale)
+
+            Color.clear.frame(width: 1, height: 0)
+
+            Color.clear
+                .frame(maxWidth: .infinity)
+                .frame(height: 0)
+                .padding(.leading, 22 * scale)
         }
-        .font(.system(size: 13 * textScale, weight: .semibold))
-        .foregroundStyle(theme.deepColor.opacity(0.62))
-        .frame(maxWidth: .infinity)
         .accessibilityIdentifier("intro-paused")
     }
 
@@ -248,17 +290,13 @@ struct LevelIntroCard: View {
 
     /// Music and sound effects are controlled separately, so a player can keep
     /// the feedback sounds while silencing the background track.
-    private var audioControlStack: some View {
-        VStack(spacing: 0) {
+    private var audioControlRow: some View {
+        HStack(spacing: 8 * scale) {
             audioButton(icon: "music.note",
                         isOn: audio.musicEnabled,
                         accessibilityLabel: L("settings.music")) {
                 withAnimation(.snappy(duration: 0.2)) { audio.toggleMusic() }
             }
-
-            Rectangle()
-                .fill(theme.deepColor.opacity(0.14))
-                .frame(height: 1)
 
             audioButton(icon: "speaker.wave.2.fill",
                         isOn: audio.gameSoundsEnabled,
@@ -266,11 +304,6 @@ struct LevelIntroCard: View {
                 withAnimation(.snappy(duration: 0.2)) { audio.toggleGameSounds() }
             }
         }
-        .frame(width: 42 * scale, height: portraitSize)
-        .background(theme.skyColor)
-        .clipShape(RoundedRectangle(cornerRadius: 14 * scale, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14 * scale, style: .continuous)
-            .stroke(theme.deepColor.opacity(0.15), lineWidth: 1))
     }
 
     private func audioButton(icon: String,
@@ -290,7 +323,11 @@ struct LevelIntroCard: View {
                 }
             }
             .foregroundStyle(theme.deepColor.opacity(isOn ? 1 : 0.55))
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(width: 42 * scale, height: audioRowHeight)
+            .background(theme.skyColor)
+            .clipShape(RoundedRectangle(cornerRadius: 12 * scale, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12 * scale, style: .continuous)
+                .stroke(theme.deepColor.opacity(0.15), lineWidth: 1))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
