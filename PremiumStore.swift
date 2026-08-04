@@ -15,7 +15,7 @@ import StoreKit
 final class PremiumStore: ObservableObject {
     static let shared = PremiumStore()
     /// Must exactly match the non-consumable Product ID in App Store Connect.
-    static let productID = "premium_unlock_all"
+    static let productID = "premium_unlock_all_hungry_frog"
 
     // Seed from the cached entitlement so the very first frame already knows
     // whether a Premium character is unlocked. Without this, launch renders one

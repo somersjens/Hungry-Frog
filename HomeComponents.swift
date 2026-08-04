@@ -652,7 +652,7 @@ struct LevelCardView: View {
                            delay: Self.scoreCountDelay,
                            duration: Self.scoreCountDuration)
                 .font(.system(size: 13 * cardScale, weight: .bold))
-            CurrencyIcon(size: 9 * cardScale)
+            CurrencyIcon(size: 15 * cardScale)
                 // The launch anchor is read from the unscaled layout frame, so
                 // the flying card starts exactly overlapping this glyph.
                 .background {
@@ -683,19 +683,19 @@ struct LevelCardView: View {
             // No score yet: leave the corner empty.
             EmptyView()
         case .one:
-            RoundedRectangle(cornerRadius: 1.5)
+            RoundedRectangle(cornerRadius: 1.8)
                 .fill(displayedTier.color(for: theme))
-                .frame(width: 9 * cardScale, height: 9 * cardScale)
+                .frame(width: 11 * cardScale, height: 11 * cardScale)
                 .rotationEffect(.degrees(45))
                 .padding(.leading, 1)
         case .two:
             CornerFlagShape()
                 .fill(displayedTier.color(for: theme))
-                .frame(width: 12 * cardScale, height: 14 * cardScale)
+                .frame(width: 14 * cardScale, height: 16.5 * cardScale)
         case .three, .maxed:
             PennantShape()
                 .fill(displayedTier.color(for: theme))
-                .frame(width: 12 * cardScale, height: 14 * cardScale)
+                .frame(width: 14 * cardScale, height: 16.5 * cardScale)
         }
     }
 
@@ -760,7 +760,7 @@ struct LevelCardView: View {
                                    delay: Self.scoreCountDelay,
                                    duration: Self.scoreCountDuration)
                         .font(.system(size: 13 * cardScale, weight: .bold))
-                    CurrencyIcon(size: 9 * cardScale)
+                    CurrencyIcon(size: 15 * cardScale)
                         // Once the max card has been revealed, the flight must
                         // still start on this exact bubble. Without an anchor
                         // here the standard card's disappearing glyph leaves
@@ -815,23 +815,24 @@ struct LevelCardView: View {
         .shadow(color: metal.opacity(0.35), radius: 6, y: 3)
     }
 
-    /// Ferns curl up both sides of every maxed level. Their stems sit just
-    /// outside the card edge while the leaves overlap it slightly, framing the
-    /// score without narrowing the number or bubble line.
+    /// A small twig strung with lily blossoms grows up both sides of every
+    /// maxed level, pulled in toward the score rather than hugging the
+    /// card's outer edge — a shape that reads as a sprig from the frog's own
+    /// pond, not a drifting plant.
     private func completedFerns(color _: Color, highlight: Color) -> some View {
         HStack(spacing: 0) {
-            CompletionFern(color: highlight, revealStartedAt: fernRevealStartedAt)
-                .frame(width: 25 * cardScale, height: 52 * cardScale)
+            CompletionTwig(color: highlight, revealStartedAt: fernRevealStartedAt)
+                .frame(width: 16 * cardScale, height: 40 * cardScale)
                 .rotationEffect(.degrees(-3), anchor: .bottom)
-                .offset(x: 13 * cardScale, y: 3 * cardScale)
+                .offset(x: 30 * cardScale, y: 5 * cardScale)
 
             Spacer(minLength: 0)
 
-            CompletionFern(color: highlight, revealStartedAt: fernRevealStartedAt)
-                .frame(width: 25 * cardScale, height: 52 * cardScale)
+            CompletionTwig(color: highlight, revealStartedAt: fernRevealStartedAt)
+                .frame(width: 16 * cardScale, height: 40 * cardScale)
                 .scaleEffect(x: -1, y: 1)
                 .rotationEffect(.degrees(3), anchor: .bottom)
-                .offset(x: -13 * cardScale, y: 3 * cardScale)
+                .offset(x: -30 * cardScale, y: 5 * cardScale)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
@@ -885,10 +886,11 @@ struct LevelCardView: View {
     }
 }
 
-/// A compact water fern for the sides of a completed level card. Its detached,
-/// oval leaves and bowed stem deliberately echo a celebratory laurel, while the
-/// irregular spacing keeps it organic enough for the reef setting.
-private struct CompletionFern: View {
+/// A compact twig for the sides of a completed level card, strung with tiny
+/// lily blossoms along a gently bowed stem. It echoes a celebratory laurel
+/// while staying close to what a frog would actually sit next to, rather
+/// than the drifting, curled fronds of a reef plant.
+private struct CompletionTwig: View {
     let color: Color
     /// Nil means this is an already-completed card and should render fully.
     let revealStartedAt: Date?
@@ -897,21 +899,20 @@ private struct CompletionFern: View {
         let id: Int
         let x: CGFloat
         let y: CGFloat
-        let width: CGFloat
-        let height: CGFloat
+        /// Fraction of the twig's *width* — used for both dimensions of the
+        /// blossom's frame, so it always stays circular even though the
+        /// overall twig is much taller than it is wide.
+        let size: CGFloat
         let rotation: Double
     }
 
+    /// Four blossoms, generously spaced so each reads as its own flower
+    /// instead of blurring into a busy cluster.
     private let leaves: [Leaf] = [
-        Leaf(id: 0, x: 0.63, y: 0.82, width: 0.25, height: 0.12, rotation: 48),
-        Leaf(id: 1, x: 0.29, y: 0.75, width: 0.27, height: 0.12, rotation: 27),
-        Leaf(id: 2, x: 0.62, y: 0.66, width: 0.28, height: 0.12, rotation: -42),
-        Leaf(id: 3, x: 0.18, y: 0.58, width: 0.28, height: 0.12, rotation: 13),
-        Leaf(id: 4, x: 0.57, y: 0.49, width: 0.29, height: 0.12, rotation: -52),
-        Leaf(id: 5, x: 0.19, y: 0.39, width: 0.27, height: 0.115, rotation: -7),
-        Leaf(id: 6, x: 0.62, y: 0.31, width: 0.27, height: 0.115, rotation: -58),
-        Leaf(id: 7, x: 0.34, y: 0.20, width: 0.25, height: 0.11, rotation: -25),
-        Leaf(id: 8, x: 0.70, y: 0.14, width: 0.23, height: 0.105, rotation: -45)
+        Leaf(id: 0, x: 0.62, y: 0.85, size: 0.50, rotation: 0),
+        Leaf(id: 1, x: 0.36, y: 0.62, size: 0.54, rotation: 18),
+        Leaf(id: 2, x: 0.58, y: 0.39, size: 0.50, rotation: -16),
+        Leaf(id: 3, x: 0.36, y: 0.16, size: 0.44, rotation: 10)
     ]
 
     var body: some View {
@@ -921,7 +922,7 @@ private struct CompletionFern: View {
             } ?? .greatestFiniteMagnitude
             GeometryReader { proxy in
                 ZStack {
-                    FernStemShape()
+                    TwigStemShape()
                         .trim(from: 0, to: stemProgress(at: elapsed))
                         .stroke(color.opacity(0.62),
                                 style: StrokeStyle(lineWidth: max(1, proxy.size.width * 0.05),
@@ -933,8 +934,8 @@ private struct CompletionFern: View {
                         let leafY = proxy.size.height * leaf.y
 
                         // A short petiole connects every leaf to the bowed
-                        // stem, so the ornament reads as a growing fern rather
-                        // than a loose row of capsules.
+                        // stem, so the ornament reads as a growing twig rather
+                        // than a loose row of leaves.
                         Path { path in
                             path.move(to: CGPoint(x: proxy.size.width * stemX(at: leaf.y),
                                                   y: leafY))
@@ -945,17 +946,16 @@ private struct CompletionFern: View {
                                 style: StrokeStyle(lineWidth: max(0.7, proxy.size.width * 0.025),
                                                    lineCap: .round))
 
-                        FernLeafShape()
+                        TwigLilyShape()
                             .fill(
                                 LinearGradient(colors: [color.opacity(0.95), color.opacity(0.62)],
                                                startPoint: .topLeading,
                                                endPoint: .bottomTrailing)
                             )
-                            .frame(width: proxy.size.width * leaf.width,
-                                   height: proxy.size.height * leaf.height)
-                            .scaleEffect(x: progress, y: progress, anchor: .leading)
-                            .rotationEffect(.degrees(leaf.rotation
-                                + (leaf.x < stemX(at: leaf.y) ? -14 : 14) * (1 - progress)))
+                            .frame(width: proxy.size.width * leaf.size,
+                                   height: proxy.size.width * leaf.size)
+                            .scaleEffect(progress, anchor: .center)
+                            .rotationEffect(.degrees(leaf.rotation + (1 - progress) * 30))
                             .opacity(min(1, progress))
                             .position(x: leafX, y: leafY)
                     }
@@ -978,37 +978,52 @@ private struct CompletionFern: View {
         return CGFloat(1 + c3 * pow(raw - 1, 3) + c1 * pow(raw - 1, 2))
     }
 
-    /// Approximation of the stem's horizontal position at a leaf's height.
+    /// Approximation of the stem's horizontal position at a leaf's height,
+    /// mirroring `TwigStemShape`'s single shallow bow.
     private func stemX(at y: CGFloat) -> CGFloat {
-        let fromBottom = 1 - y
-        return 0.76 - 0.10 * fromBottom - 0.34 * sin(fromBottom * .pi)
+        let t = 1 - y
+        return (1 - t) * (1 - t) * 0.70 + 2 * (1 - t) * t * 0.50 + t * t * 0.56
     }
 }
 
-/// A pointed, slightly asymmetric leaf reads more naturally at this tiny size
-/// than a capsule, while remaining crisp on both phone and iPad.
-private struct FernLeafShape: Shape {
+/// A tiny five-petal lily blossom, strung one after another up the twig —
+/// a shape a frog would actually sit beside, rather than a pointed reef
+/// frond. Being radially symmetric it reads cleanly at any rotation, which
+/// is what lets a whole string of them sit naturally along a bowed stem.
+private struct TwigLilyShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.midY))
-        path.addCurve(to: CGPoint(x: rect.maxX, y: rect.midY),
-                      control1: CGPoint(x: rect.width * 0.30, y: rect.minY),
-                      control2: CGPoint(x: rect.width * 0.78, y: rect.minY + rect.height * 0.08))
-        path.addCurve(to: CGPoint(x: rect.minX, y: rect.midY),
-                      control1: CGPoint(x: rect.width * 0.72, y: rect.maxY),
-                      control2: CGPoint(x: rect.width * 0.22, y: rect.maxY - rect.height * 0.04))
-        path.closeSubpath()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let petalCount = 5
+        let petalLength = rect.height * 0.46
+        let petalWidth = rect.width * 0.34
+
+        for index in 0..<petalCount {
+            let angle = CGFloat(index) / CGFloat(petalCount) * 2 * .pi
+            let petalRect = CGRect(x: -petalWidth / 2, y: -petalLength,
+                                   width: petalWidth, height: petalLength)
+            var petal = Path(ellipseIn: petalRect)
+            let transform = CGAffineTransform(rotationAngle: angle)
+                .concatenating(CGAffineTransform(translationX: center.x, y: center.y))
+            petal = petal.applying(transform)
+            path.addPath(petal)
+        }
+
+        let coreRadius = rect.width * 0.10
+        path.addEllipse(in: CGRect(x: center.x - coreRadius, y: center.y - coreRadius,
+                                   width: coreRadius * 2, height: coreRadius * 2))
         return path
     }
 }
 
-private struct FernStemShape: Shape {
+/// A single shallow bow — a small twig's natural bend — rather than the deep
+/// S-curl of a drifting reef frond.
+private struct TwigStemShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.width * 0.76, y: rect.height * 0.94))
-        path.addCurve(to: CGPoint(x: rect.width * 0.66, y: rect.height * 0.10),
-                      control1: CGPoint(x: rect.width * 0.34, y: rect.height * 0.80),
-                      control2: CGPoint(x: rect.width * 0.08, y: rect.height * 0.34))
+        path.move(to: CGPoint(x: rect.width * 0.70, y: rect.height * 0.95))
+        path.addQuadCurve(to: CGPoint(x: rect.width * 0.56, y: rect.height * 0.08),
+                          control: CGPoint(x: rect.width * 0.50, y: rect.height * 0.50))
         return path
     }
 }
