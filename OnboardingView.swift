@@ -44,7 +44,8 @@ struct OnboardingView: View {
                             - artworkSide - columnSpacing))
 
                     HStack(alignment: .center, spacing: columnSpacing) {
-                        Image("no_background")
+                        CharacterCatalog.character(id: CharacterCatalog.freeCharacterID)
+                            .artwork
                             .resizable()
                             .scaledToFit()
                             .frame(width: artworkSide, height: artworkSide)

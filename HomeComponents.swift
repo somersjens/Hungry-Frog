@@ -1293,7 +1293,6 @@ struct AlternatingCardSummary: View {
                 animal.artwork
                     .resizable()
                     .scaledToFit()
-                    .scaleEffect(animal.selectorArtworkScale)
                     .frame(width: artworkSide * contentScale,
                            height: artworkSide * contentScale)
                     // Keep the full visual size, but let it extend equally above
@@ -1330,10 +1329,8 @@ struct AlternatingCardSummary: View {
 
     private var naturalPromptWidth: CGFloat {
         guard let prompt else { return 0 }
-        let animal = prompt.character
-        let artwork = artworkSide * max(1, animal.selectorArtworkScale)
         // Two HStack gaps plus the forward arrow, beside the measured text.
-        let decoration = 6 * scale + 10 * scale + artwork
+        let decoration = 6 * scale + 10 * scale + artworkSide
 #if canImport(UIKit)
         let system = UIFont.systemFont(ofSize: baseFontSize, weight: .heavy)
         let font = system.fontDescriptor.withDesign(.rounded)

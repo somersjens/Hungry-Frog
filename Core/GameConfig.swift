@@ -126,12 +126,12 @@ public enum GameConfig {
     /// The second half of the catalog is Premium-exclusive: `nil` means the
     /// character cannot be earned with cards at all, no matter the total.
     public static let characterUnlockRequirements: [Int?] = [
-        0,          // fox — from the start
-        500,        // frog
-        1_500,      // penguin
-        3_000,      // bunny
-        5_000,      // dog
-        nil, nil, nil, nil, nil   // lion, octopus, crab, elephant, bear — Premium
+        0,          // frog — from the start
+        500,        // penguin
+        1_500,      // bunny
+        3_000,      // dog
+        5_000,      // lion
+        nil, nil, nil, nil, nil   // octopus, crab, elephant, bear, fox — Premium
     ]
 
     // MARK: Level progress

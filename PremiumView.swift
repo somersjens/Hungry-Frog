@@ -34,16 +34,15 @@ private struct PremiumMetrics {
     var columnSpacing: CGFloat { s(14) }
 
     // Hero
-    var heroSize: CGFloat { s(148) }
+    var heroSize: CGFloat { s(170) }
     var nameSize: CGFloat { s(27) }
-    var badgeSize: CGFloat { s(12) }
+    var badgeSize: CGFloat { s(14) }
 
     // Offer
     var panelPadding: CGFloat { s(14) }
     var panelSpacing: CGFloat { s(9) }
     var headerSize: CGFloat { s(18) }
     var featureSpacing: CGFloat { s(10) }
-    var featureIcon: CGFloat { s(20) }
     var featureTitle: CGFloat { s(15) }
     var featureSubtitle: CGFloat { s(12.5) }
     var buttonFont: CGFloat { s(17) }
@@ -116,7 +115,8 @@ struct PremiumView: View {
                         if isSplit {
                             HStack(alignment: .top, spacing: metrics.columnSpacing) {
                                 heroPanel(metrics)
-                                    .frame(width: available * 0.42)
+                                    .frame(width: heroWidth(available: available,
+                                                            metrics: metrics))
                                 offerPanel(metrics)
                                     .frame(maxWidth: .infinity)
                                     .frame(maxHeight: .infinity)
@@ -177,6 +177,23 @@ struct PremiumView: View {
         }
     }
 
+    /// The hero column ends exactly where the first Premium-only animal starts
+    /// in the strip below, so the offer block visually claims that half of the
+    /// cast. Derived from the same tile maths the strip uses.
+    private func heroWidth(available: CGFloat, metrics: PremiumMetrics) -> CGFloat {
+        let contentWidth = available - metrics.cardPadding * 2
+        let columns = CGFloat(CharacterCatalog.all.count)
+        let tileWidth = (contentWidth
+                         - metrics.stripPadding * 2
+                         - metrics.tileSpacing * (columns - 1)) / columns
+        let earnable = CGFloat(CharacterCatalog.cardCharacters.count)
+        let width = metrics.stripPadding
+            + earnable * (tileWidth + metrics.tileSpacing)
+            - metrics.columnSpacing
+        // Never let an unusual catalog split starve either column.
+        return min(max(width, contentWidth * 0.3), contentWidth * 0.6)
+    }
+
     private var closeButton: some View {
         Button { dismiss() } label: {
             Image(systemName: "xmark")
@@ -193,8 +210,16 @@ struct PremiumView: View {
     private func heroPanel(_ metrics: PremiumMetrics) -> some View {
         VStack(spacing: metrics.stackSpacing * 0.5) {
             HStack(alignment: .center) {
-                if activeUnlockCharacterID == nil { closeButton }
-                Spacer()
+                if activeUnlockCharacterID == nil {
+                    closeButton
+                    Spacer()
+                    LanguagePicker(
+                        tint: character.deepColor.opacity(0.7),
+                        scale: isPad ? 1.12 : 0.8
+                    )
+                } else {
+                    Spacer()
+                }
             }
 
             Spacer(minLength: 0)
@@ -239,28 +264,16 @@ struct PremiumView: View {
     /// the sheet, opposite the close button.
     private func offerPanel(_ metrics: PremiumMetrics) -> some View {
         VStack(alignment: .center, spacing: metrics.panelSpacing) {
-            ZStack {
-                HStack(spacing: 8) {
-                    Image(systemName: "crown.fill")
-                        .font(.system(size: metrics.headerSize * 0.9, weight: .bold))
-                    Text(premium.isPremium ? "premium.youHavePremium" : "premium.advantages")
-                        .font(.system(size: metrics.headerSize, weight: .heavy, design: .rounded))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                }
-                .foregroundStyle(character.deepColor)
-                .frame(maxWidth: .infinity)
-
-                if activeUnlockCharacterID == nil {
-                    HStack {
-                        Spacer(minLength: 0)
-                        LanguagePicker(
-                            tint: character.deepColor.opacity(0.7),
-                            scale: isPad ? 1.12 : 0.8
-                        )
-                    }
-                }
+            HStack(spacing: 8) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: metrics.headerSize * 0.9, weight: .bold))
+                Text(premium.isPremium ? "premium.youHavePremium" : "premium.advantages")
+                    .font(.system(size: metrics.headerSize, weight: .heavy, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
+            .foregroundStyle(character.deepColor)
+            .frame(maxWidth: .infinity)
 
             // Two spacers keep the leftover height split above and below the
             // list instead of piling it all up over the buy button.
@@ -379,8 +392,7 @@ struct PremiumView: View {
                 animal.artwork
                     .resizable()
                     .scaledToFit()
-                    .frame(width: artSide * animal.selectorArtworkScale,
-                           height: artSide * animal.selectorArtworkScale)
+                    .frame(width: artSide, height: artSide)
                     .frame(height: artSide * 1.1)
                     .opacity(isAccessible ? 1 : 0.9)
 
@@ -416,9 +428,13 @@ struct PremiumView: View {
 
         if showsTick {
             Image(systemName: "checkmark")
+                .font(.system(size: metrics.tileBadge * 0.72, weight: .heavy))
+                .foregroundStyle(.white)
+                .frame(width: metrics.tileBadge * 1.25,
+                       height: metrics.tileBadge * 1.25)
+                .background(character.color, in: Circle())
                 .characterTileBadgeStyle(character: character,
                                          isUnlocked: true,
-                                         isFilled: true,
                                          size: metrics.tileBadge)
         } else if isStarter {
             Text(verbatim: L(key: "premium.start"))
@@ -755,24 +771,20 @@ struct PremiumView: View {
 
 private extension View {
     /// One pill for every caption under an animal, so a tick and a fly total
-    /// share the same shape and height. `isFilled` marks the earned ones.
+    /// share the same shape and height whatever they contain.
     func characterTileBadgeStyle(character: AnimalCharacter,
                                  isUnlocked: Bool,
-                                 isFilled: Bool = false,
                                  size: CGFloat) -> some View {
         self
             .font(.system(size: size, weight: .heavy, design: .rounded))
-            .foregroundStyle(isFilled ? .white
-                                      : character.deepColor.opacity(isUnlocked ? 1 : 0.75))
+            .foregroundStyle(character.deepColor.opacity(isUnlocked ? 1 : 0.75))
             .lineLimit(1)
             .minimumScaleFactor(0.6)
             .allowsTightening(true)
             .frame(minWidth: size * 1.5, minHeight: size * 1.25)
             .padding(.horizontal, size * 0.6)
             .padding(.vertical, size * 0.35)
-            .background(isFilled ? character.color
-                                 : character.color.opacity(isUnlocked ? 0.22 : 0.10),
-                        in: Capsule())
+            .background(character.color.opacity(isUnlocked ? 0.22 : 0.10), in: Capsule())
     }
 }
 
