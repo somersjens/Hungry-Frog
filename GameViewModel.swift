@@ -34,6 +34,9 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var hasBonusFishPower = false
     @Published private(set) var correctStreak = 0
     @Published private(set) var isStreakBoostActive = false
+    /// The moment double points run out, so the playing field can draw a live
+    /// countdown without asking the engine every frame.
+    @Published private(set) var boostDeadline: Date?
     @Published private(set) var isHeartFishAvailable = false
     /// Changes each time the streak boost starts, allowing the view to replay
     /// its bubble-style announcement even after an earlier streak was broken.
@@ -50,6 +53,12 @@ final class GameViewModel: ObservableObject {
     /// covering the reef. It runs once on continue instead of behind the card.
     private var pendingScheduledWork: (() -> Void)?
     private var lastCorrectCatchTime: TimeInterval?
+    /// Fires when the double-points window closes. The engine already scores by
+    /// timestamp; this only exists to drop the published flag, the music speed
+    /// and the countdown chip on the exact second they expire.
+    private var boostExpiryWork: DispatchWorkItem?
+    /// When the pause card went up, so the countdown can be handed back intact.
+    private var pausedAt: Date?
 
     var maximumRounds: Int { engine.maximumRounds }
     var acceptsInput: Bool { state == .answering && !isPaused }
@@ -67,6 +76,7 @@ final class GameViewModel: ObservableObject {
     func begin() {
         guard engine.state == .intro else { return }
         isPaused = false
+        pausedAt = nil
         PlaytimeTracker.shared.challengeStarted()
         AppAudio.shared.setGameplayActive(true, questionText: nil)
         AppAudio.shared.playSessionStart()
@@ -103,6 +113,9 @@ final class GameViewModel: ObservableObject {
         generation &+= 1
         pendingScheduledWork = nil
         lastCorrectCatchTime = nil
+        boostExpiryWork?.cancel()
+        boostExpiryWork = nil
+        pausedAt = nil
     }
 
     /// Temporarily stops an active run without ending it. The snapshot also
@@ -116,6 +129,11 @@ final class GameViewModel: ObservableObject {
         AppAudio.shared.setGameplayActive(false, questionText: nil)
         AppAudio.shared.setGameplayRate(1)
         lastCorrectCatchTime = nil
+        // The countdown stops with the game; `resume` hands back exactly what
+        // was left on it.
+        boostExpiryWork?.cancel()
+        boostExpiryWork = nil
+        pausedAt = Date()
     }
 
     /// Continues the in-memory run after its pause card. No round is rebuilt,
@@ -123,8 +141,14 @@ final class GameViewModel: ObservableObject {
     func resume() {
         guard engine.state != .intro, engine.state != .gameOver else { return }
         isPaused = false
+        if let pausedAt {
+            engine.shiftBoostDeadline(by: Date().timeIntervalSince(pausedAt))
+            self.pausedAt = nil
+            scheduleBoostExpiry()
+        }
         PlaytimeTracker.shared.challengeStarted()
         AppAudio.shared.setGameplayActive(true, questionText: nil)
+        sync()
         AppAudio.shared.setGameplayRate(isStreakBoostActive
                                         ? Float(GameConfig.streakSpeedMultiplier) : 1)
         let work = pendingScheduledWork
@@ -174,6 +198,8 @@ final class GameViewModel: ObservableObject {
         streakAnnouncementID = 0
         comboAnnouncementID = 0
         lastCorrectCatchTime = nil
+        boostExpiryWork?.cancel()
+        boostExpiryWork = nil
         AppAudio.shared.playSessionStart()
         openRound()
         announceRound()
@@ -189,7 +215,8 @@ final class GameViewModel: ObservableObject {
     @discardableResult
     func select(optionID: UUID) -> Bool {
         let outcome = engine.select(optionID: optionID,
-                                    usesBonusFish: hasBonusFishPower)
+                                    usesBonusFish: hasBonusFishPower,
+                                    now: Date())
         guard outcome != .ignored else { return false }
         // Every real interaction advances the playtime clock. Without these the
         // tracker only ever sees one gap from the first touch to the last,
@@ -217,6 +244,7 @@ final class GameViewModel: ObservableObject {
             if startedStreak {
                 streakAnnouncementID &+= 1
                 AppAudio.shared.playDoubleScore()
+                scheduleBoostExpiry()
             }
             haptic(.success)
             delay = GameConfig.nextRoundDelay.correct
@@ -252,6 +280,24 @@ final class GameViewModel: ObservableObject {
         return true
     }
 
+    /// Re-arms the countdown for whatever window the engine now holds. Called
+    /// on every fifth correct answer, so a run that lands another five with
+    /// three seconds left simply pushes the expiry back out to ten.
+    private func scheduleBoostExpiry() {
+        boostExpiryWork?.cancel()
+        guard let deadline = engine.boostDeadline else { return }
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.boostExpiryWork = nil
+            self.sync()
+        }
+        boostExpiryWork = work
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + max(0, deadline.timeIntervalSinceNow) + 0.05,
+            execute: work
+        )
+    }
+
     /// Called by the reef when the player catches the passing 2x fish. Multiple
     /// catches do not stack: one aura always represents one doubled answer.
     func catchBonusFish() {
@@ -283,6 +329,8 @@ final class GameViewModel: ObservableObject {
 
     private func finishSession() {
         AppAudio.shared.setGameplayRate(1)
+        boostExpiryWork?.cancel()
+        boostExpiryWork = nil
         recordResultIfNeeded()
     }
 
@@ -348,6 +396,7 @@ final class GameViewModel: ObservableObject {
         isGameOver = engine.state == .gameOver
         correctStreak = engine.correctStreak
         isStreakBoostActive = engine.isStreakBoostActive
+        boostDeadline = isStreakBoostActive ? engine.boostDeadline : nil
         isHeartFishAvailable = engine.isHeartFishAvailable
         visibleRounds = engine.visibleRounds
         AppAudio.shared.setGameplayRate(isStreakBoostActive

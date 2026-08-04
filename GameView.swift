@@ -56,8 +56,6 @@ struct GameView: View {
     /// After the card, the fish gets the stage to itself for one short looping
     /// entrance. The first round only opens when that animation is finished.
     @State private var playsFishEntrance = false
-    @State private var showsStreakBanner = false
-    @State private var streakBannerToken = 0
     /// A completed board gets one last moment in the reef before its result
     /// card appears. Other endings (no lives, or leaving) remain immediate.
     @State private var playsLevelCompletion = false
@@ -169,7 +167,10 @@ struct GameView: View {
                           playsFishEntrance: playsFishEntrance,
                           playsLevelCompletion: playsLevelCompletion,
                           reduceMotion: reduceMotion,
-                          topReserve: topInset + (isPad ? 54 : 42),
+                          // The HUD row's own height, so the swarm's ceiling is
+                          // the underside of the HUD and never the status bar
+                          // or the Dynamic Island behind it.
+                          topReserve: topInset + (isPad ? 64 : 50),
                           bottomReserve: screenInsets.bottom,
                           onHit: { model.select(optionID: $0) },
                           onFishEntranceComplete: finishFishEntrance,
@@ -182,13 +183,6 @@ struct GameView: View {
                 .animation(.easeOut(duration: 0.22), value: playsLevelCompletion)
                 .allowsHitTesting(!playsLevelCompletion)
 
-            if showsStreakBanner {
-                StreakBoostBanner(character: character, isPad: isPad)
-                    .padding(.top, topInset + (isPad ? 70 : 52))
-                    .transition(.scale(scale: 0.65).combined(with: .opacity))
-                    .allowsHitTesting(false)
-            }
-
             if model.comboAnnouncementID > 0 {
                 ComboFlyBanner(token: model.comboAnnouncementID,
                                character: character,
@@ -198,23 +192,6 @@ struct GameView: View {
             }
         }
         .ignoresSafeArea()
-        .onChange(of: model.streakAnnouncementID) { _, id in
-            guard id > 0 else { return }
-            showStreakBanner(for: id)
-        }
-    }
-
-    private func showStreakBanner(for token: Int) {
-        streakBannerToken = token
-        withAnimation(.spring(response: 0.38, dampingFraction: 0.68)) {
-            showsStreakBanner = true
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
-            guard streakBannerToken == token else { return }
-            withAnimation(.easeOut(duration: 0.25)) {
-                showsStreakBanner = false
-            }
-        }
     }
 
     private func finishLevelCompletion() {
@@ -243,8 +220,18 @@ struct GameView: View {
                 .padding(.horizontal, isPad ? 12 : 10)
                 .background(.white.opacity(0.88), in: Capsule())
                 .shadow(color: character.deepColor.opacity(0.12), radius: 5, y: 3)
+            if let deadline = model.boostDeadline {
+                DoublePointsChip(deadline: deadline,
+                                 token: model.streakAnnouncementID,
+                                 character: character,
+                                 isPad: isPad,
+                                 height: hudControlSize)
+                    .transition(.scale(scale: 0.4).combined(with: .opacity))
+            }
             Spacer(minLength: 0)
         }
+        .animation(.spring(response: 0.34, dampingFraction: 0.62),
+                   value: model.boostDeadline)
     }
 
     /// Pausing freezes the reef in place and puts the level card over it. The
@@ -340,40 +327,110 @@ private struct ComboFlyBanner: View {
     }
 }
 
-private struct StreakBoostBanner: View {
+/// The double-points window, in the HUD next to the score it is doubling.
+///
+/// It sits in the top row rather than over the pond on purpose: the reward has
+/// to be unmissable, but the question and the swarm underneath it are what the
+/// child is actually working with, and a banner across them would cost more
+/// time than the boost gives back.
+private struct DoublePointsChip: View {
+    let deadline: Date
+    /// Bumped on every fifth correct answer, so a window renewed while it is
+    /// still running replays the flash instead of quietly resetting its ring.
+    let token: Int
     let character: AnimalCharacter
     let isPad: Bool
+    let height: CGFloat
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var flash: CGFloat = 0
+
+    private var ringSize: CGFloat { isPad ? 34 : 27 }
 
     var body: some View {
-        HStack(spacing: isPad ? 10 : 7) {
-            Image(systemName: "flame.fill")
-            VStack(spacing: 0) {
-                Text("game.streakBoost.title")
-                    .font(.system(size: isPad ? 22 : 17, weight: .black, design: .rounded))
-                Text("game.streakBoost.subtitle")
-                    .font(.system(size: isPad ? 14 : 11, weight: .bold, design: .rounded))
-                    .opacity(0.82)
+        // Redrawn on a timer of its own: the countdown is the whole point of
+        // the chip, and the session engine has no per-frame clock to hang it on.
+        TimelineView(.periodic(from: .now, by: 1.0 / 20.0)) { context in
+            let remaining = max(0, deadline.timeIntervalSince(context.date))
+            let share = min(1, max(0, remaining / GameConfig.streakBoostDuration))
+            let isEnding = remaining <= 3
+
+            // Spelling the reward out is worth the width wherever the HUD has
+            // it; where it does not, the multiplier and the ring say the same
+            // thing in a third of the space.
+            ViewThatFits(in: .horizontal) {
+                chipBody(share: share, remaining: remaining, spellsItOut: true)
+                chipBody(share: share, remaining: remaining, spellsItOut: false)
             }
-            Image(systemName: "forward.fill")
+            .foregroundStyle(.white)
+            .padding(.horizontal, isPad ? 14 : 11)
+            .frame(height: height)
+            .background {
+                Capsule()
+                    .fill(LinearGradient(colors: [character.color, character.deepColor],
+                                         startPoint: .topLeading,
+                                         endPoint: .bottomTrailing))
+                    .overlay {
+                        Capsule().stroke(.white.opacity(0.9), lineWidth: 2)
+                    }
+                    .shadow(color: character.deepColor.opacity(0.35), radius: 7, y: 3)
+            }
+            // The last three seconds pulse, so the window closing is felt
+            // rather than only read off the number.
+            .scaleEffect(isEnding && !reduceMotion
+                         ? 1 + 0.06 * CGFloat(abs(sin(remaining * .pi)))
+                         : 1)
+            .overlay {
+                Capsule()
+                    .stroke(.white, lineWidth: 3)
+                    .scaleEffect(1 + flash * 0.5)
+                    .opacity(Double(1 - flash))
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("game.streakBoost.title"))
+            .accessibilityValue(Text(verbatim: "\(Int(ceil(remaining)))s"))
         }
-        .foregroundStyle(character.deepColor)
-        .padding(.horizontal, isPad ? 20 : 15)
-        .padding(.vertical, isPad ? 12 : 9)
-        .background {
-            Capsule()
-                .fill(.white.opacity(0.92))
-                .overlay {
-                    Capsule().stroke(.white, lineWidth: 2)
-                }
-                .shadow(color: character.deepColor.opacity(0.22), radius: 9, y: 5)
+        .onAppear { pulse() }
+        .onChange(of: token) { _, _ in pulse() }
+    }
+
+    private func chipBody(share: Double,
+                          remaining: TimeInterval,
+                          spellsItOut: Bool) -> some View {
+        HStack(spacing: isPad ? 9 : 6) {
+            Text(verbatim: "\(GameConfig.streakMultiplier)×")
+                .font(.system(size: isPad ? 26 : 20, weight: .black, design: .rounded))
+            if spellsItOut {
+                Text("game.streakBoost.title")
+                    .font(.system(size: isPad ? 17 : 13, weight: .heavy, design: .rounded))
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            countdownRing(share: share, remaining: remaining)
         }
-        .overlay(alignment: .bottomLeading) {
+    }
+
+    /// A ring that empties over the window, with the whole seconds left in it.
+    private func countdownRing(share: Double, remaining: TimeInterval) -> some View {
+        ZStack {
             Circle()
-                .fill(.white.opacity(0.8))
-                .frame(width: 10, height: 10)
-                .offset(x: 18, y: 10)
+                .stroke(.white.opacity(0.32), lineWidth: isPad ? 4 : 3)
+            Circle()
+                .trim(from: 0, to: share)
+                .stroke(.white,
+                        style: StrokeStyle(lineWidth: isPad ? 4 : 3, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            Text(verbatim: "\(Int(ceil(remaining)))")
+                .font(.system(size: isPad ? 15 : 12, weight: .heavy, design: .rounded))
+                .monospacedDigit()
         }
-        .accessibilityElement(children: .combine)
+        .frame(width: ringSize, height: ringSize)
+    }
+
+    private func pulse() {
+        guard !reduceMotion else { return }
+        flash = 0
+        withAnimation(.easeOut(duration: 0.55)) { flash = 1 }
     }
 }
 

@@ -56,10 +56,13 @@ public enum GameConfig {
 
     // MARK: Bonuses
 
-    /// Five correct answers in a row starts the fast 2x streak mode. It lasts
-    /// until the next wrong answer.
+    /// Every five correct answers in a row open a fixed window of double
+    /// points. The window is a reward for the run just made, so it keeps
+    /// counting down through a mistake instead of being snatched away; landing
+    /// another five in a row inside it simply restarts the full ten seconds.
     public static let streakThreshold = 5
     public static let streakMultiplier = 2
+    public static let streakBoostDuration: TimeInterval = 10
     public static let streakSpeedMultiplier = 1.5
     /// The first mistake while the streak boost is active breaks the streak,
     /// but only costs half a life instead of a full one.
@@ -91,7 +94,10 @@ public enum GameConfig {
     /// Answer cards fading/scaling in once the question is visible.
     public static let answerRevealDuration = 0.18
     /// How long correct/wrong feedback stays on screen before the next round.
-    public static let correctFeedbackDuration = 0.32
+    /// A correct catch is deliberately short: the swarm for the next sum is
+    /// already swooping in while the tongue is still reeling the last fly home,
+    /// which is what keeps a good run from stalling between questions.
+    public static let correctFeedbackDuration = 0.18
     public static let wrongFeedbackDuration = 0.55
     /// Gap between feedback ending and the next round's closed cards appearing.
     public static let roundTransitionDuration = 0.12

@@ -106,6 +106,11 @@ public final class MemoryGame {
     public private(set) var lastOutcome: AnswerOutcome?
     public private(set) var result = SessionResult()
     public private(set) var correctStreak = 0
+    /// When the current double-points window runs out, or nil when no window is
+    /// open. The engine owns no timer of its own: every rule that depends on the
+    /// window compares this against the moment being resolved, so the score a
+    /// tap earns is decided by when the tap happened and nothing else.
+    public private(set) var boostDeadline: Date?
     public private(set) var heartFishProgress = 0
     public private(set) var heartFishTarget = GameConfig.heartFishCorrectAnswers
     public private(set) var isHeartFishAvailable = false
@@ -130,7 +135,20 @@ public final class MemoryGame {
 
     /// Whether a tap on an answer card can be accepted right now.
     public var acceptsInput: Bool { state == .answering }
-    public var isStreakBoostActive: Bool { correctStreak >= GameConfig.streakThreshold }
+
+    /// Whether double points are running at `now`.
+    public func isStreakBoostActive(at now: Date) -> Bool {
+        guard let boostDeadline else { return false }
+        return now < boostDeadline
+    }
+
+    public var isStreakBoostActive: Bool { isStreakBoostActive(at: Date()) }
+
+    /// Seconds of double points left, for the countdown on the playing field.
+    public func streakBoostRemaining(at now: Date = Date()) -> TimeInterval {
+        guard let boostDeadline else { return 0 }
+        return max(0, boostDeadline.timeIntervalSince(now))
+    }
 
     /// Whether the answer values are readable. They are during the memorising
     /// beat, and again while the round resolves so the player can see what they
@@ -244,7 +262,9 @@ public final class MemoryGame {
     /// state — a second tap on the same round, a tap during feedback, a tap on
     /// a burned card — is ignored without touching score or lives.
     @discardableResult
-    public func select(optionID: UUID, usesBonusFish: Bool = false) -> AnswerOutcome {
+    public func select(optionID: UUID,
+                       usesBonusFish: Bool = false,
+                       now: Date = Date()) -> AnswerOutcome {
         guard state == .answering,
               let round,
               selectedOptionID == nil,
@@ -261,7 +281,10 @@ public final class MemoryGame {
 
         let outcome: AnswerOutcome
         if option.isCorrect {
-            let streakWasActive = isStreakBoostActive
+            // The answer is paid at the rate that was running when it was
+            // given: a catch made on the last tick of the window still doubles,
+            // and the five that reopen the window are not doubled by it.
+            let streakWasActive = isStreakBoostActive(at: now)
             let fishMultiplier = usesBonusFish ? GameConfig.bonusFishMultiplier : 1
             let streakMultiplier = streakWasActive ? GameConfig.streakMultiplier : 1
             let earned = GameConfig.normalCardReward * fishMultiplier * streakMultiplier
@@ -274,12 +297,20 @@ public final class MemoryGame {
             result.bonusCards += earned - GameConfig.normalCardReward
             correctStreak += 1
             advanceHeartFishProgressIfNeeded()
-            let startedStreak = !streakWasActive && isStreakBoostActive
+            // Every fifth in a row, not only the first five: a long run keeps
+            // renewing its own window from the top.
+            let startedStreak = correctStreak.isMultiple(of: GameConfig.streakThreshold)
+            if startedStreak {
+                boostDeadline = now.addingTimeInterval(GameConfig.streakBoostDuration)
+            }
             outcome = .correct(cardsEarned: earned,
                                usedBonusFish: usesBonusFish,
                                startedStreak: startedStreak)
         } else {
-            let streakWasActive = isStreakBoostActive
+            // A mistake breaks the run towards the next window but does not
+            // close the one already running — it was earned, and taking it away
+            // mid-countdown reads as the game cheating.
+            let streakWasActive = isStreakBoostActive(at: now)
             result.wrongAnswers += 1
             correctStreak = 0
             spendLifeHalves(streakWasActive
@@ -320,6 +351,14 @@ public final class MemoryGame {
         cards += 1
         result.cardsEarned += 1
         result.bonusCards += 1
+    }
+
+    /// Pushes a running double-points window forward by the time the session
+    /// spent behind the pause card, so a break never eats into a reward the
+    /// player has already earned.
+    public func shiftBoostDeadline(by interval: TimeInterval) {
+        guard interval > 0, let boostDeadline else { return }
+        self.boostDeadline = boostDeadline.addingTimeInterval(interval)
     }
 
     /// A missed heart fish returns after four more correct answers, rather than

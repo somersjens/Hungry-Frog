@@ -758,13 +758,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2× flies • 1.5× speed"
+            "value" : "2× flies for 10 seconds"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2× vliegen • 1,5× snelheid"
+            "value" : "2× vliegen, 10 seconden lang"
           }
         }
       }
@@ -775,13 +775,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Streak boost!"
+            "value" : "Double points!"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Streakboost!"
+            "value" : "Dubbele punten!"
           }
         }
       }
