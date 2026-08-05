@@ -211,6 +211,9 @@ final class AppAudio: NSObject, ObservableObject {
     /// what stuttered the game the first time a sound played.
     private var preparationStarted = false
     private var audioResourcesReady = false
+    /// The music asset is loaded on its own schedule — only once the music is
+    /// actually switched on (see `loadMusicPlayerIfNeeded`).
+    private var musicLoadStarted = false
     private var wantsMusicPlayback = false
     /// Audio output waits very briefly after activating the hardware session.
     /// Starting the engine and MP3 decoder in the same instant as that hardware
@@ -242,6 +245,12 @@ final class AppAudio: NSObject, ObservableObject {
         self.spokenSumsEnabled = GameSettings.spokenSumsEnabled
         super.init()
         registerForInterruptions()
+        // A silent app must never take the output away from another app. The
+        // category itself changes nothing until something activates the session,
+        // but having a mixing one in place means an implicit activation — by us
+        // or by any framework that touches audio — can no longer land on the
+        // process default (`.soloAmbient`), which pauses other apps' music.
+        if !hasAnyAudioEnabled { configureSessionIfNeeded() }
     }
 
     func toggleGameSounds() {
@@ -264,14 +273,26 @@ final class AppAudio: NSObject, ObservableObject {
     /// The heavy, blocking bits — file decode, `prepareToPlay`, session
     /// activation — happen here, at a calm moment, not mid-game.
     func prepare() {
+        // With every sound switch off, stay out of the audio system entirely.
+        // Preparation is not just decoding: `AVAudioPlayer.prepareToPlay()`
+        // acquires the audio hardware, which implicitly activates the shared
+        // session — under the process default category (`.soloAmbient`) that
+        // silences whatever the player has running in another app. On a cold
+        // launch this ran from the home screen's `onAppear` before any category
+        // of ours was applied, which is exactly the interruption being fixed.
+        // `preparationStarted` is deliberately left false, so turning a switch
+        // back on still prepares everything.
+        guard hasAnyAudioEnabled else { return }
         guard !preparationStarted else { return }
         preparationStarted = true
+        // Put our own category in place before the first player exists, so an
+        // implicit activation can never land on the solo default.
+        configureSessionIfNeeded()
+        // The music file is loaded separately, and only when the music is
+        // actually switched on (see the method).
+        loadMusicPlayerIfNeeded()
         prepareQueue.async { [weak self] in
             guard let self else { return }
-            // AVAudioPlayer's endless loop keeps this single compressed music
-            // asset in memory without repeatedly loading or creating players.
-            let music = Self.makePlayer(named: "frog_music", loops: -1, volume: 0,
-                                        enableRate: true)
             // Decode + lead-trim every effect into a ready-to-schedule PCM buffer
             // here, off the main thread, so play time does no file work at all.
             var buffers: [String: AVAudioPCMBuffer] = [:]
@@ -283,7 +304,6 @@ final class AppAudio: NSObject, ObservableObject {
             // enough to freeze a live game. Resolve it alongside file decoding.
             let voices = Self.bestVoicesByLanguage()
             DispatchQueue.main.async {
-                if self.musicPlayer == nil { self.musicPlayer = music }
                 self.installEffectBuffers(buffers)
                 self.voicesByLanguage = voices
                 self.speechVoicesResolved = true
@@ -328,6 +348,33 @@ final class AppAudio: NSObject, ObservableObject {
         // would stay down and every effect would be silent. Now that the nodes
         // exist, bring the engine up here.
         if sessionOutputReady { startEngineIfNeeded() }
+    }
+
+    /// Loads the looping music asset, once, and only while the music is on.
+    ///
+    /// This is kept out of `prepare()` because building the player is the one
+    /// step that reaches the audio hardware by itself: `prepareToPlay()`
+    /// implicitly activates the shared session. With the music switched off
+    /// there is nothing to play, so the file is never opened and the session is
+    /// never touched on its behalf — another app's music keeps running.
+    /// Switching the music back on comes through `startMusic()`, which calls
+    /// this; the load then happens there instead.
+    private func loadMusicPlayerIfNeeded() {
+        guard musicEnabled, !musicLoadStarted else { return }
+        musicLoadStarted = true
+        // The category (solo, since the music is on) before the hardware.
+        configureSessionIfNeeded()
+        prepareQueue.async { [weak self] in
+            // AVAudioPlayer's endless loop keeps this single compressed music
+            // asset in memory without repeatedly loading or creating players.
+            let music = Self.makePlayer(named: "frog_music", loops: -1, volume: 0,
+                                        enableRate: true)
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if self.musicPlayer == nil { self.musicPlayer = music }
+                self.startMusicIfReady()
+            }
+        }
     }
 
     /// Builds a fully prepared player. Runs the decode/`prepareToPlay` cost on
@@ -496,6 +543,9 @@ final class AppAudio: NSObject, ObservableObject {
         guard musicEnabled else { return }
         wantsMusicPlayback = true
         prepare()
+        // The music file is only opened from here on, so switching the music on
+        // after a silent launch still loads it.
+        loadMusicPlayerIfNeeded()
         activateSession()
         startMusicIfReady()
     }
