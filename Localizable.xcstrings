@@ -171,9 +171,7 @@
         }
       }
     },
-    "Combo! +1" : {
-
-    },
+    "Combo! +1" : {},
     "common.back" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -289,6 +287,346 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opslaan"
+          }
+        }
+      }
+    },
+    "food.carrot.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "carrots"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wortels"
+          }
+        }
+      }
+    },
+    "food.carrot.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "carrot"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wortel"
+          }
+        }
+      }
+    },
+    "food.chicken.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "chickens"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kippen"
+          }
+        }
+      }
+    },
+    "food.chicken.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "chicken"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kip"
+          }
+        }
+      }
+    },
+    "food.fish.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fish"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vissen"
+          }
+        }
+      }
+    },
+    "food.fish.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fish"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vis"
+          }
+        }
+      }
+    },
+    "food.fly.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "flies"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vliegen"
+          }
+        }
+      }
+    },
+    "food.fly.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fly"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vlieg"
+          }
+        }
+      }
+    },
+    "food.honey.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "honey"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "honing"
+          }
+        }
+      }
+    },
+    "food.honey.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "honey"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "honing"
+          }
+        }
+      }
+    },
+    "food.kibble.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kibble"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "brokken"
+          }
+        }
+      }
+    },
+    "food.kibble.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kibble"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "brok"
+          }
+        }
+      }
+    },
+    "food.meat.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "meat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vlees"
+          }
+        }
+      }
+    },
+    "food.meat.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "meat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vlees"
+          }
+        }
+      }
+    },
+    "food.peanut.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "peanuts"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pinda's"
+          }
+        }
+      }
+    },
+    "food.peanut.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "peanut"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pinda"
+          }
+        }
+      }
+    },
+    "food.pearl.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pearls"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "parels"
+          }
+        }
+      }
+    },
+    "food.pearl.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pearl"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "parel"
+          }
+        }
+      }
+    },
+    "food.shrimp.plural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "shrimp"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "garnalen"
+          }
+        }
+      }
+    },
+    "food.shrimp.singular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "shrimp"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "garnaal"
           }
         }
       }
@@ -956,23 +1294,6 @@
         }
       }
     },
-    "home.totalLabel" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Total"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Totaal"
-          }
-        }
-      }
-    },
     "home.defaultName" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1122,6 +1443,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Onderwerp"
+          }
+        }
+      }
+    },
+    "home.totalLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Totaal"
           }
         }
       }
@@ -1432,19 +1770,19 @@
         }
       }
     },
-    "levelIntro.cardsBullet %lld" : {
+    "levelIntro.cardsBullet %lld %@" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can collect up to |%lld flies| in this level."
+            "value" : "You can collect up to |%1$lld %2$@| in this level."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je kunt in dit level maximaal |%lld vliegen| verzamelen."
+            "value" : "Je kunt in dit level maximaal |%1$lld %2$@| verzamelen."
           }
         }
       }
@@ -1772,9 +2110,7 @@
         }
       }
     },
-    "locked" : {
-
-    },
+    "locked" : {},
     "menu.maximumCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2302,12 +2638,8 @@
         }
       }
     },
-    "off" : {
-
-    },
-    "on" : {
-
-    },
+    "off" : {},
+    "on" : {},
     "onboarding.level.advanced.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3923,9 +4255,7 @@
         }
       }
     },
-    "unlocked" : {
-
-    }
+    "unlocked" : {}
   },
   "version" : "1.0"
 }

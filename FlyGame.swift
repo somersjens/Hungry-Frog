@@ -59,6 +59,10 @@ private enum FlyConfig {
     static let waterlineShare: CGFloat = 0.72
 
     static func flySize(isPad: Bool) -> CGFloat { isPad ? 92 : 70 }
+    /// The food art and its answer number are drawn a third larger than the
+    /// tap target itself, so the number has real room at the food's centre —
+    /// the tap target, spacing and swarm density it flies in are unaffected.
+    static let foodVisualScale: CGFloat = 1.3
     static func offscreenMargin(isPad: Bool) -> CGFloat { isPad ? 118 : 86 }
     static func obstaclePadding(isPad: Bool) -> CGFloat { isPad ? 14 : 10 }
 
@@ -890,6 +894,9 @@ struct FlyPlayfield: View {
                 width: stage.width * character.mouth.opening.width,
                 height: stage.height * character.mouth.opening.height
             )
+            // What this character eats: the level fills with their own food
+            // instead of a generic fly, catch and all.
+            let foodImageName = FoodCatalog.imageName(for: character.id)
 
             ZStack {
                 PondBackdrop(tint: character.color, isPad: isPad)
@@ -902,7 +909,8 @@ struct FlyPlayfield: View {
                        engine.tongue?.flyID != fly.id
                         || engine.tongue?.hasLanded == false {
                         Button { engine.catchFly(fly.id, mouth: mouth) } label: {
-                            AnswerFlyView(fly: fly, isPad: isPad, clock: engine.clock)
+                            AnswerFlyView(fly: fly, foodImageName: foodImageName,
+                                          isPad: isPad, clock: engine.clock)
                         }
                         .buttonStyle(.plain)
                         .frame(width: FlyConfig.flySize(isPad: isPad) * 1.32,
@@ -929,7 +937,7 @@ struct FlyPlayfield: View {
                 // Drawn after the character: a tongue that emerges from behind
                 // the head reads as coming out of the back of the animal.
                 if let tongue = engine.tongue {
-                    TongueView(catchState: tongue, isPad: isPad,
+                    TongueView(catchState: tongue, foodImageName: foodImageName, isPad: isPad,
                                headSize: headSize, mouthOpening: mouthOpening,
                                mouth: character.mouth,
                                reduceMotion: reduceMotion)
@@ -1181,8 +1189,84 @@ private struct PondReeds: View {
     }
 }
 
+/// Only the fly's own artwork (`food_1`) is painted with wings already — every
+/// other food needs them added around it in code.
+private func foodPaintsOwnWings(_ foodImageName: String) -> Bool {
+    foodImageName == "food_1"
+}
+
+/// No two foods sit on the same colour, so the number painted on top of each
+/// one is picked to hold up against that specific artwork rather than
+/// leaning on an outline or a backing plate to do the work. Colours are
+/// chosen against the artwork itself: pale gold, tan and pink foods take a
+/// deep, food-matched shade; the near-black fly and the dark honey pot take
+/// a warm off-white instead.
+private func answerNumberColor(for foodImageName: String) -> Color {
+    switch foodImageName {
+    case "food_1": return .white                                        // fly — near-black body
+    case "food_2": return Color(red: 0.09, green: 0.22, blue: 0.42)      // fish — deep ocean blue on gold
+    case "food_3": return Color(red: 0.11, green: 0.34, blue: 0.14)      // carrot — leaf green on orange
+    case "food_4": return Color(red: 0.32, green: 0.19, blue: 0.07)      // kibble — dark biscuit brown on tan
+    case "food_5": return .white                                        // meat — red-orange
+    case "food_6": return Color(red: 0.30, green: 0.14, blue: 0.24)      // pearl — deep plum on pale pink
+    case "food_7": return Color(red: 0.42, green: 0.07, blue: 0.05)      // shrimp — deep shell red on orange
+    case "food_8": return Color(red: 0.30, green: 0.17, blue: 0.05)      // peanut — dark shell brown on tan
+    case "food_9": return Color(red: 1.0, green: 0.95, blue: 0.83)       // honey — warm cream on dark amber
+    case "food_10": return Color(red: 0.34, green: 0.14, blue: 0.04)     // chicken — deep roast brown on tan
+    default: return .white
+    }
+}
+
+/// The math answer, centred on whatever food is carrying it, in that food's
+/// own contrasting colour rather than an outline or a plate behind it.
+/// Shared between the flying and the just-caught view so a catch never
+/// jumps between two different badge styles.
+private func answerBadge(text: String, foodImageName: String, size: CGFloat) -> some View {
+    Text(verbatim: text)
+        .font(.system(size: size * 0.44, weight: .black, design: .rounded))
+        .minimumScaleFactor(0.55)
+        .lineLimit(1)
+        .foregroundStyle(answerNumberColor(for: foodImageName))
+        .frame(width: size * 0.78, height: size * 0.78)
+}
+
+/// Where a food's own wings attach, and how far apart they sit — read off
+/// each artwork's actual silhouette rather than one position tuned for the
+/// round fly, so a diagonal carrot or a top-heavy honey pot both keep their
+/// wings resting against their body instead of floating above it.
+private struct WingLayout {
+    /// Offsets as a fraction of the food's frame, from centre.
+    let dx: CGFloat
+    let dy: CGFloat
+    /// How far each wing sits from the pair's centre, and how that scales
+    /// the wing shape itself so narrower foods get proportionally smaller
+    /// wings rather than ones that overhang their body.
+    let spread: CGFloat
+
+    var scale: CGFloat { spread / 0.18 }
+}
+
+private func wingLayout(for foodImageName: String) -> WingLayout {
+    switch foodImageName {
+    case "food_2": return WingLayout(dx: -0.05, dy: -0.20, spread: 0.19)   // fish
+    case "food_3": return WingLayout(dx: 0.01, dy: -0.11, spread: 0.18)    // carrot
+    case "food_4": return WingLayout(dx: 0, dy: -0.16, spread: 0.18)       // kibble
+    case "food_5": return WingLayout(dx: -0.05, dy: -0.09, spread: 0.15)   // meat
+    case "food_6": return WingLayout(dx: 0.01, dy: -0.23, spread: 0.15)    // pearl
+    case "food_7": return WingLayout(dx: -0.02, dy: -0.18, spread: 0.24)   // shrimp
+    case "food_8": return WingLayout(dx: -0.01, dy: -0.12, spread: 0.18)   // peanut
+    case "food_9": return WingLayout(dx: 0.01, dy: -0.30, spread: 0.14)    // honey
+    case "food_10": return WingLayout(dx: -0.09, dy: -0.09, spread: 0.14)  // chicken
+    default: return WingLayout(dx: 0, dy: -0.18, spread: 0.22)             // fallback, unused by food_1
+    }
+}
+
 private struct AnswerFlyView: View {
     let fly: AnswerFly
+    /// This character's own food, so a bunny's level fills with carrots while
+    /// a penguin's fills with fish — the answer number always rides on top of
+    /// whatever is currently flying.
+    let foodImageName: String
     let isPad: Bool
     let clock: Double
 
@@ -1199,31 +1283,37 @@ private struct AnswerFlyView: View {
     var body: some View {
         let size = FlyConfig.flySize(isPad: isPad)
         let scatter = Double(fly.scatterProgress)
+        let wings = wingLayout(for: foodImageName)
         return ZStack {
-            Capsule()
-                .fill(.white.opacity(0.78))
-                .frame(width: size * 0.48, height: size * 0.30)
-                .rotationEffect(.degrees(-32 + sin(clock * 35 + fly.phase) * 9))
-                .offset(x: -size * 0.22, y: -size * 0.18)
-            Capsule()
-                .fill(.white.opacity(0.78))
-                .frame(width: size * 0.48, height: size * 0.30)
-                .rotationEffect(.degrees(32 - sin(clock * 35 + fly.phase) * 9))
-                .offset(x: size * 0.22, y: -size * 0.18)
-            Circle()
-                .fill(.black.opacity(0.88))
-                .frame(width: size * 0.68, height: size * 0.68)
-                .overlay {
-                    Circle().stroke(Color.yellow.opacity(0.9), lineWidth: size * 0.09)
-                }
+            // The fly's own artwork already carries its wings; painting a
+            // second pair on top of it would double up. Every other food
+            // needs them drawn in, anchored to that food's own silhouette.
+            if !foodPaintsOwnWings(foodImageName) {
+                Capsule()
+                    .fill(.white.opacity(0.78))
+                    .frame(width: size * 0.48 * wings.scale, height: size * 0.30 * wings.scale)
+                    .rotationEffect(.degrees(-32 + sin(clock * 35 + fly.phase) * 9))
+                    .offset(x: size * (wings.dx - wings.spread), y: size * wings.dy)
+                Capsule()
+                    .fill(.white.opacity(0.78))
+                    .frame(width: size * 0.48 * wings.scale, height: size * 0.30 * wings.scale)
+                    .rotationEffect(.degrees(32 - sin(clock * 35 + fly.phase) * 9))
+                    .offset(x: size * (wings.dx + wings.spread), y: size * wings.dy)
+            }
+            // Each food's own artwork leaves room at its centre for the
+            // answer, the same spot the plain fly's body used to fill.
+            Image(foodImageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: size, height: size)
                 .shadow(color: .black.opacity(0.18), radius: 5, y: 3)
-            Text(verbatim: fly.text)
-                .font(.system(size: size * 0.28, weight: .black, design: .rounded))
-                .minimumScaleFactor(0.55)
-                .lineLimit(1)
-                .foregroundStyle(.white)
-                .frame(width: size * 0.56)
+            answerBadge(text: fly.text, foodImageName: foodImageName, size: size * 0.5)
         }
+        // Rendered a third larger than the tap target it sits in: the food
+        // needs to be big enough that the number still has room to breathe
+        // at its centre, without also growing the hitbox or the spacing the
+        // swarm is laid out with.
+        .scaleEffect(FlyConfig.foodVisualScale)
         .frame(width: size, height: size)
         .rotationEffect(.degrees(tilt))
         // The swoop lands with a touch of scale behind it and the sweep out
@@ -1240,6 +1330,7 @@ private struct AnswerFlyView: View {
 
 private struct TongueView: View {
     let catchState: TongueCatch
+    let foodImageName: String
     let isPad: Bool
     /// Roughly the width of the character's head. The ribbon's girth and the
     /// stretch it needs to unroll are proportions of the head, not of the
@@ -1342,7 +1433,7 @@ private struct TongueView: View {
                               y: tip.y - sin(angle) * flySize * 0.24 * squash)
 
                 if catchState.hasLanded {
-                    StuckFlyView(text: catchState.text, size: flySize,
+                    StuckFlyView(text: catchState.text, foodImageName: foodImageName, size: flySize,
                                  squash: squash, angle: angle,
                                  struggle: catchState.elapsed, phase: catchState.flyPhase,
                                  muted: reduceMotion)
@@ -1569,6 +1660,7 @@ private func quadraticTangent(start: CGPoint, control: CGPoint, end: CGPoint,
 /// limp, and it keeps twitching while it is dragged back to the mouth.
 private struct StuckFlyView: View {
     let text: String
+    let foodImageName: String
     let size: CGFloat
     let squash: CGFloat
     let angle: CGFloat
@@ -1579,20 +1671,17 @@ private struct StuckFlyView: View {
     var body: some View {
         let twitch = muted ? 0 : sin(struggle * 46 + phase) * Double(6 * (0.3 + squash))
         ZStack {
-            wing(flipped: false)
-            wing(flipped: true)
-            Circle()
-                .fill(.black.opacity(0.88))
-                .frame(width: size * 0.68, height: size * 0.68)
-                .overlay {
-                    Circle().stroke(Color.yellow.opacity(0.9), lineWidth: size * 0.09)
-                }
-            Text(verbatim: text)
-                .font(.system(size: size * 0.25, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .minimumScaleFactor(0.5)
-                .frame(width: size * 0.56)
+            if !foodPaintsOwnWings(foodImageName) {
+                wing(flipped: false)
+                wing(flipped: true)
+            }
+            Image(foodImageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: size, height: size)
+            answerBadge(text: text, foodImageName: foodImageName, size: size * 0.5)
         }
+        .scaleEffect(FlyConfig.foodVisualScale)
         .rotationEffect(.degrees(twitch))
         // Compress along the direction the pad came from, which is what sells
         // the fly as splatted rather than merely carried.
@@ -1603,13 +1692,15 @@ private struct StuckFlyView: View {
 
     private func wing(flipped: Bool) -> some View {
         let side: CGFloat = flipped ? 1 : -1
+        let wings = wingLayout(for: foodImageName)
         // Splayed wide at the moment of impact, folding back as it settles.
         let splay = 34 + 30 * Double(squash)
         return Capsule()
             .fill(.white.opacity(0.62))
-            .frame(width: size * 0.5, height: size * 0.27)
+            .frame(width: size * 0.5 * wings.scale, height: size * 0.27 * wings.scale)
             .rotationEffect(.degrees(Double(side) * splay))
-            .offset(x: side * size * 0.26, y: -size * 0.1 + size * 0.16 * squash)
+            .offset(x: size * (wings.dx + side * wings.spread),
+                    y: size * wings.dy + size * 0.16 * squash)
     }
 }
 

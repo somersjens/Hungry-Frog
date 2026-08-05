@@ -34,7 +34,7 @@ private struct PremiumMetrics {
     var columnSpacing: CGFloat { s(14) }
 
     // Hero
-    var heroSize: CGFloat { s(170) }
+    var heroSize: CGFloat { s(196) }
     var nameSize: CGFloat { s(27) }
     var badgeSize: CGFloat { s(14) }
 
@@ -43,9 +43,11 @@ private struct PremiumMetrics {
     var panelSpacing: CGFloat { s(9) }
     var headerSize: CGFloat { s(18) }
     var featureSpacing: CGFloat { s(10) }
-    var featureTitle: CGFloat { s(15) }
-    var featureSubtitle: CGFloat { s(12.5) }
-    var buttonFont: CGFloat { s(17) }
+    var featureTitle: CGFloat { s(17) }
+    var featureSubtitle: CGFloat { s(14) }
+    // Capped independently of `unit`: the button's own text shouldn't grow as
+    // aggressively as the artwork does on the largest iPads.
+    var buttonFont: CGFloat { 17 * min(unit, 1.2) }
     var buttonPadding: CGFloat { s(11) }
     var footnote: CGFloat { s(12) }
 
@@ -222,7 +224,13 @@ struct PremiumView: View {
                 }
             }
 
-            Spacer(minLength: 0)
+            // On iPhone the circle sits right under the header — no flexible
+            // spacer competing for height here — so every bit of leftover
+            // room goes to the spacer below the badge instead of as dead air
+            // above the character. iPad keeps the airier, centered look.
+            if isPad {
+                Spacer(minLength: 0)
+            }
 
             let heroSize = metrics.heroSize
             ZStack {
@@ -259,36 +267,44 @@ struct PremiumView: View {
         .padding(.vertical, metrics.cardPadding * 0.4)
     }
 
-    /// Right half: what Premium gives you, and the button that buys it. The
-    /// language picker rides in the header row so it sits in the far corner of
-    /// the sheet, opposite the close button.
+    /// Right half: what Premium gives you, and the button that buys it, all in
+    /// one bordered card so the perks, the button and the fine print underneath
+    /// read as a single offer rather than stacked, separate blocks.
     private func offerPanel(_ metrics: PremiumMetrics) -> some View {
-        VStack(alignment: .center, spacing: metrics.panelSpacing) {
-            HStack(spacing: 8) {
-                Image(systemName: "crown.fill")
-                    .font(.system(size: metrics.headerSize * 0.9, weight: .bold))
-                Text(premium.isPremium ? "premium.youHavePremium" : "premium.advantages")
-                    .font(.system(size: metrics.headerSize, weight: .heavy, design: .rounded))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-            }
-            .foregroundStyle(character.deepColor)
-            .frame(maxWidth: .infinity)
-
-            // Two spacers keep the leftover height split above and below the
-            // list instead of piling it all up over the buy button.
-            Spacer(minLength: 0)
-
-            featureList(metrics)
-
-            Spacer(minLength: 0)
+        // One consistent gap between every item in the card — the three rows,
+        // and the step down into the button — so the whole block reads as an
+        // evenly paced list rather than a mix of tight and loose gaps.
+        let itemGap = metrics.featureSpacing * 0.75
+        return VStack(alignment: .center, spacing: 0) {
+            Spacer(minLength: itemGap)
+            featureRow(title: L("premium.feature.levels.title"),
+                       subtitle: L("premium.feature.levels.subtitle"),
+                       metrics: metrics)
+            Spacer(minLength: itemGap)
+            featureRow(title: L("premium.feature.animals.title"),
+                       subtitle: L("premium.feature.animals.subtitle"),
+                       metrics: metrics)
+            Spacer(minLength: itemGap)
+            featureRow(title: L("premium.feature.noAds.title"),
+                       subtitle: L("premium.feature.noAds.subtitle"),
+                       metrics: metrics)
+            Spacer(minLength: itemGap)
 
             purchaseSection(metrics)
         }
         .padding(metrics.panelPadding)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.white.opacity(0.42),
                     in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(colors: [character.color, character.deepColor],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing),
+                    lineWidth: 1.75
+                )
+                .opacity(0.55)
+        )
     }
 
     @ViewBuilder
@@ -334,21 +350,6 @@ struct PremiumView: View {
         .padding(.vertical, metrics.badgeSize * 0.5)
         .background(.white.opacity(0.58), in: Capsule())
         .overlay(Capsule().stroke(character.color.opacity(0.38), lineWidth: 1))
-    }
-
-    private func featureList(_ metrics: PremiumMetrics) -> some View {
-        VStack(alignment: .center, spacing: metrics.featureSpacing) {
-            featureRow(title: L("premium.feature.levels.title"),
-                       subtitle: L("premium.feature.levels.subtitle"),
-                       metrics: metrics)
-            featureRow(title: L("premium.feature.animals.title"),
-                       subtitle: L("premium.feature.animals.subtitle"),
-                       metrics: metrics)
-            featureRow(title: L("premium.feature.noAds.title"),
-                       subtitle: L("premium.feature.noAds.subtitle"),
-                       metrics: metrics)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     /// The whole cast in one row along the bottom, each animal captioned with
@@ -428,10 +429,10 @@ struct PremiumView: View {
 
         if showsTick {
             Image(systemName: "checkmark")
-                .font(.system(size: metrics.tileBadge * 0.72, weight: .heavy))
+                .font(.system(size: metrics.tileBadge * 0.6, weight: .heavy))
                 .foregroundStyle(.white)
-                .frame(width: metrics.tileBadge * 1.25,
-                       height: metrics.tileBadge * 1.25)
+                .frame(width: metrics.tileBadge * 0.9,
+                       height: metrics.tileBadge * 0.9)
                 .background(character.color, in: Circle())
                 .characterTileBadgeStyle(character: character,
                                          isUnlocked: true,
@@ -478,7 +479,7 @@ struct PremiumView: View {
             }
             .buttonStyle(.plain)
         } else {
-            VStack(spacing: metrics.panelSpacing * 0.55) {
+            VStack(spacing: 0) {
                 Button { showsParentApproval = true } label: {
                     HStack(spacing: 10) {
                         if premium.isPurchasing {
@@ -510,6 +511,12 @@ struct PremiumView: View {
                     .foregroundStyle(character.deepColor.opacity(0.7))
                     .frame(maxWidth: .infinity)
                     .multilineTextAlignment(.center)
+                    // A bigger, fixed step down from the button than between
+                    // the two fine-print lines below, which read as one
+                    // tightly grouped note — fixed so it can't stretch to
+                    // soak up the card's leftover height like a flexible
+                    // spacer would.
+                    .padding(.top, metrics.panelSpacing * 0.7)
 
                 Button("premium.restore") {
                     Task { await premium.restorePurchases() }
@@ -517,10 +524,12 @@ struct PremiumView: View {
                 .font(.system(size: metrics.footnote * 0.92))
                 .foregroundStyle(character.deepColor.opacity(0.7))
                 .frame(maxWidth: .infinity)
+                .padding(.top, metrics.footnote * 0.3)
 
                 if let error = premium.lastError {
                     Text(error)
                         .font(.system(size: metrics.footnote * 0.92))
+                        .padding(.top, metrics.footnote * 0.3)
                         .foregroundStyle(.red)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
@@ -558,7 +567,7 @@ struct PremiumView: View {
 
     private func featureRow(title: String, subtitle: String,
                             metrics: PremiumMetrics) -> some View {
-        VStack(alignment: .center, spacing: 2) {
+        VStack(alignment: .center, spacing: metrics.footnote * 0.28) {
             Text(title)
                 .font(.system(size: metrics.featureTitle, weight: .bold))
                 .foregroundStyle(character.deepColor)
@@ -574,8 +583,16 @@ struct PremiumView: View {
     private func unlockCelebration(animal: AnimalCharacter) -> some View {
         GeometryReader { proxy in
             let horizontalMargin: CGFloat = isPad ? 80 : 32
-            let maximumWidth: CGFloat = isPad ? 500 : 340
-            let cardWidth = min(maximumWidth, max(280, proxy.size.width - horizontalMargin))
+            let verticalMargin: CGFloat = isPad ? 96 : 40
+            let maximumWidth: CGFloat = isPad ? 440 : 340
+            // Reserve room for the title block below the stage so the whole
+            // card is bounded by the sheet's height too, not just its width —
+            // otherwise a wide iPad screen lets the (square) stage grow tall
+            // enough to run the card edge to edge.
+            let titleBlockHeight: CGFloat = 92 * scale
+            let widthBound = min(maximumWidth, max(280, proxy.size.width - horizontalMargin))
+            let heightBound = max(240, proxy.size.height - verticalMargin - titleBlockHeight)
+            let cardWidth = min(widthBound, heightBound)
             let stageSize = cardWidth
             let particleRadius = stageSize * 0.39
 
@@ -644,7 +661,7 @@ struct PremiumView: View {
                     .clipped()
 
                     Text(verbatim: L(key: "premium.characterUnlocked"))
-                        .font(.system(size: 19 * scale, weight: .black, design: .rounded))
+                        .font(.system(size: 24 * scale, weight: .black, design: .rounded))
                         .tracking(0.8)
                         .foregroundStyle(animal.deepColor)
                         .multilineTextAlignment(.center)
@@ -654,7 +671,7 @@ struct PremiumView: View {
                         .opacity(unlockGlow ? 1 : 0)
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 22 * scale)
-                        .padding(.vertical, 24 * scale)
+                        .padding(.vertical, 16 * scale)
                 }
                 .frame(width: cardWidth)
                 .background(animal.skyColor)
@@ -781,9 +798,9 @@ private extension View {
             .lineLimit(1)
             .minimumScaleFactor(0.6)
             .allowsTightening(true)
-            .frame(minWidth: size * 1.5, minHeight: size * 1.25)
-            .padding(.horizontal, size * 0.6)
-            .padding(.vertical, size * 0.35)
+            // Fixed rather than minimum sizing, so a tick (little content) and a
+            // fly total like "5000" (more content) render as the exact same pill.
+            .frame(width: size * 3.6, height: size * 1.4)
             .background(character.color.opacity(isUnlocked ? 0.22 : 0.10), in: Capsule())
     }
 }

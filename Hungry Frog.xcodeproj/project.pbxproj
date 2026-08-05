@@ -54,6 +54,7 @@
 		F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C601301E409F00464555 /* ProgressSync.swift */; };
 		F9F3C64F301E409F00464555 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EF301E409F00464555 /* GameView.swift */; };
 		F9F3C650301E409F00464555 /* CharacterUnlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */; };
+		D472BCA0289E0B68700FE7AC /* FoodCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F2561D8F361FD815587AD /* FoodCatalog.swift */; };
 		F9F3C651301E409F00464555 /* MemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E5301E409F00464555 /* MemoryGame.swift */; };
 		F9F3C652301E409F00464555 /* MathTopic.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E4301E409F00464555 /* MathTopic.swift */; };
 		F9F3C653301E409F00464555 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C607301E409F00464555 /* SettingsView.swift */; };
@@ -77,6 +78,7 @@
 		F9F3C5DC301E409F00464555 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		F9F3C5DD301E409F00464555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterUnlocks.swift; sourceTree = "<group>"; };
+		9E8F2561D8F361FD815587AD /* FoodCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodCatalog.swift; sourceTree = "<group>"; };
 		F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecimalAnswer.swift; sourceTree = "<group>"; };
 		F9F3C5E2301E409F00464555 /* GameConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfig.swift; sourceTree = "<group>"; };
 		F9F3C5E3301E409F00464555 /* MathQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathQuestion.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 			children = (
 				F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */,
 				F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */,
+				9E8F2561D8F361FD815587AD /* FoodCatalog.swift */,
 				F9F3C5E2301E409F00464555 /* GameConfig.swift */,
 				F9F3C5E3301E409F00464555 /* MathQuestion.swift */,
 				F9F3C5E4301E409F00464555 /* MathTopic.swift */,
@@ -357,6 +360,7 @@
 				F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */,
 				F9F3C64F301E409F00464555 /* GameView.swift in Sources */,
 				F9F3C650301E409F00464555 /* CharacterUnlocks.swift in Sources */,
+				D472BCA0289E0B68700FE7AC /* FoodCatalog.swift in Sources */,
 				F9F3C651301E409F00464555 /* MemoryGame.swift in Sources */,
 				F9F3C652301E409F00464555 /* MathTopic.swift in Sources */,
 				F9F3C653301E409F00464555 /* SettingsView.swift in Sources */,

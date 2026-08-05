@@ -114,25 +114,56 @@ struct HomeView: View {
     private var streakBarHeight: CGFloat { isPad ? 32 : 24 }
     /// Where the divider sits. The player side only has to carry the character,
     /// three short lines and the streak bar, so the controls get the wider half.
+    /// Only meaningful in the side-by-side layout — see `isCompactHeader`.
     private var playerPanelWidth: CGFloat { isPad ? 458 : 325 }
+
+    private var topicButtonGap: CGFloat { isPad ? 12 : 8 }
+    private var topicButtonMinDiameter: CGFloat { isPad ? 58 : 38 }
+    private var topicButtonMaxDiameter: CGFloat { isPad ? 68 : 46 }
+
+    /// The narrowest the topic row can ever be — six circles at their floor
+    /// size plus the gaps between them.
+    private var minControlColumnWidth: CGFloat {
+        topicButtonMinDiameter * 6 + topicButtonGap * 5
+    }
+
+    /// The card's own content width, clamped the same way in every layout
+    /// calculation below so they all agree on how much room there is.
+    private var availableCardWidth: CGFloat {
+        min(AppLayout.landscapeContentWidth,
+            max(0, viewportWidth - AppLayout.landscapeGutter * 2))
+    }
+
+    /// Below this width the player panel and the controls can't sit side by
+    /// side without forcing the topic circles under their floor size — that's
+    /// what pushed everything off-screen in portrait. Below it the header
+    /// stacks the player panel above the controls instead, and each gets the
+    /// full card width.
+    private var sideBySideMinWidth: CGFloat {
+        menuCardPadding * 2 + playerPanelWidth + menuCardSpacing * 2 + 1 + minControlColumnWidth
+    }
+
+    private var isCompactHeader: Bool {
+        availableCardWidth < sideBySideMinWidth
+    }
 
     /// The room the topics and the row under them have, worked out from the same
     /// numbers the card is laid out with. Knowing it here means the controls can
     /// size themselves to the screen without a nested `GeometryReader` — and the
     /// character, which has to match their height, can read that height too.
     private var controlColumnWidth: CGFloat {
-        let available = min(AppLayout.landscapeContentWidth,
-                            max(0, viewportWidth - AppLayout.landscapeGutter * 2))
-        return available - menuCardPadding * 2 - playerPanelWidth - menuCardSpacing * 2 - 1
+        if isCompactHeader {
+            return availableCardWidth - menuCardPadding * 2
+        }
+        return availableCardWidth - menuCardPadding * 2 - playerPanelWidth - menuCardSpacing * 2 - 1
     }
 
     /// The six topic circles grow to fill their row, so what is left between them
     /// is a deliberate gap rather than leftover space. They stop growing at a
     /// size that keeps the whole header comfortably short.
     private var topicButtonDiameter: CGFloat {
-        let gap: CGFloat = isPad ? 12 : 8
-        let fits = (controlColumnWidth - gap * 5) / 6
-        return min(isPad ? 68 : 46, max(isPad ? 58 : 38, fits))
+        let fits = (controlColumnWidth - topicButtonGap * 5) / 6
+        return min(topicButtonMaxDiameter, max(topicButtonMinDiameter, fits))
     }
 
     var body: some View {
@@ -228,27 +259,41 @@ struct HomeView: View {
     /// Everything above the level grid lives in one card, so the boundary
     /// between "settings for the next run" and "pick a level" stays obvious.
     private var menuCard: some View {
-        HStack(alignment: .top, spacing: menuCardSpacing) {
-            playerPanel
-                .frame(width: playerPanelWidth)
+        Group {
+            // In portrait — on iPhone always, and on iPad below its widest
+            // splits — there isn't room for the player panel and the topic
+            // row side by side without squeezing the topic circles under
+            // their floor size, which is what pushed the header off-screen.
+            // Stacking the two blocks instead gives each the full card width.
+            if isCompactHeader {
+                VStack(alignment: .leading, spacing: menuCardSpacing) {
+                    playerPanel
 
-            Rectangle()
-                .fill(character.deepColor.opacity(0.2))
-                .frame(width: 1)
-                .padding(.vertical, 2)
+                    Rectangle()
+                        .fill(character.deepColor.opacity(0.2))
+                        .frame(height: 1)
+                        .padding(.horizontal, 2)
 
-            // The session choices form one long control block beside the
-            // player. In landscape this is faster to scan than a tall sidebar
-            // and leaves the entire next row available to the levels.
-            VStack(spacing: menuControlSpacing) {
-                topicPicker
-                if topic.usesSupermixGrid {
-                    supermixPicker
-                } else {
-                    modePicker
+                    controlBlock
+                }
+            } else {
+                HStack(alignment: .top, spacing: menuCardSpacing) {
+                    playerPanel
+                        .frame(width: playerPanelWidth)
+
+                    Rectangle()
+                        .fill(character.deepColor.opacity(0.2))
+                        .frame(width: 1)
+                        .padding(.vertical, 2)
+
+                    // The session choices form one long control block beside
+                    // the player. In landscape this is faster to scan than a
+                    // tall sidebar and leaves the entire next row available
+                    // to the levels.
+                    controlBlock
+                        .frame(maxWidth: .infinity)
                 }
             }
-            .frame(maxWidth: .infinity)
         }
         .padding(menuCardPadding)
         .background {
@@ -260,6 +305,17 @@ struct HomeView: View {
                 }
         }
         .shadow(color: character.deepColor.opacity(0.12), radius: 14, y: 7)
+    }
+
+    private var controlBlock: some View {
+        VStack(spacing: menuControlSpacing) {
+            topicPicker
+            if topic.usesSupermixGrid {
+                supermixPicker
+            } else {
+                modePicker
+            }
+        }
     }
 
     /// The player side is exactly as tall as the two rows of controls across the
