@@ -49,6 +49,39 @@ private enum FlyConfig {
         return launch + (scatterTopSpeed(isPad: isPad) - launch) * x * x * (3 - 2 * x)
     }
 
+    /// The three droppings a swallowed wrong answer leaves behind. They are
+    /// thrown up out of the top of the head and fall back past it under their
+    /// own weight, each one a little later and a little differently than the
+    /// last so the burst never reads as one object split in three.
+    ///
+    /// All of it is measured against the character it comes out of rather than
+    /// given in points, so the burst keeps its proportions on a phone and on a
+    /// pad instead of needing a size for each. Launch and gravity are scaled
+    /// together, which lowers the arc without changing how long it takes.
+    static let poopLifetime = 1.05
+    static let poopDelays: [Double] = [0, 0.055, 0.11]
+    static func poopLaunchSpeed(bodyWidth: CGFloat) -> CGFloat { bodyWidth * 1.47 }
+    static func poopGravity(bodyWidth: CGFloat) -> CGFloat { bodyWidth * 3.92 }
+    static func poopDrift(bodyWidth: CGFloat) -> CGFloat { bodyWidth * 0.35 }
+    static func poopSize(bodyWidth: CGFloat) -> CGFloat { bodyWidth * 0.14 }
+
+    /// The tick a right answer leaves instead. Same size as a dropping, so the
+    /// two verdicts read as the same kind of thing, but it hops out once and
+    /// holds where it can be seen rather than tumbling back down.
+    static let praiseLifetime = 0.85
+    static func praiseSize(bodyWidth: CGFloat) -> CGFloat { poopSize(bodyWidth: bodyWidth) }
+
+    /// Where both leave from, as a fraction of the playing artwork, measured off
+    /// the character's own mouth: every pose is drawn around the same lounger,
+    /// so the top of the head sits this far above the muzzle whichever animal is
+    /// being played.
+    static let poopHeadOffset = CGSize(width: -0.02, height: -0.28)
+    /// Where the tick comes to rest, measured off the mouth the same way: out
+    /// past the brow on the side the character faces, and barely above the top
+    /// of the head. It belongs to the animal, so it stays against it instead of
+    /// climbing off into the sky the way a thrown dropping does.
+    static let praiseRestOffset = CGSize(width: -0.234, height: -0.341)
+
     /// Belt and braces: a scattered fly is dropped after this long even if the
     /// geometry somehow kept it inside the frame. Comfortably past the worst
     /// case the sweep-out speeds above produce on any screen the game runs at,
@@ -262,11 +295,78 @@ private struct TongueCatch {
     }
 }
 
-private struct CatchFeedback: Identifiable {
+/// One dropping of the burst a wrong answer produces, thrown out of the top of
+/// the character's head. Positions are offsets from that head, so the layer
+/// drawing them only has to know where the head is.
+private struct PoopDrop: Identifiable {
     let id = UUID()
-    let position: CGPoint
-    let isCorrect: Bool
+    /// How much later than the first of the burst this one leaves.
+    let delay: Double
+    /// Sideways travel and upward launch, in points per second.
+    let drift: CGFloat
+    let launch: CGFloat
+    let gravity: CGFloat
+    /// Degrees per second it tumbles at, and how big it is drawn.
+    let spin: Double
+    let size: CGFloat
     var elapsed: Double = 0
+
+    var isFinished: Bool { elapsed >= delay + FlyConfig.poopLifetime }
+
+    /// Time this one has actually been in the air.
+    private var flight: Double { max(0, elapsed - delay) }
+
+    var offset: CGSize {
+        let t = CGFloat(flight)
+        return CGSize(width: drift * t,
+                      height: -launch * t + gravity * t * t * 0.5)
+    }
+
+    var rotation: Double { spin * flight }
+
+    /// Pops to full size as it leaves, then thins out over the last stretch of
+    /// the fall rather than vanishing at the top of its arc.
+    var scale: CGFloat {
+        CGFloat(min(1, flight / 0.11)) * 0.35 + (flight > 0 ? 0.65 : 0)
+    }
+
+    var opacity: Double {
+        guard flight > 0 else { return 0 }
+        let fade = FlyConfig.poopLifetime - 0.32
+        return flight <= fade ? 1 : max(0, 1 - (flight - fade) / 0.32)
+    }
+}
+
+/// The tick a right answer pops out of the head with. The sound is the usual
+/// confirmation, but a child playing with it switched off — or in a noisy
+/// room — needs to be told they were right just as plainly, and this is that.
+private struct HeadPraise {
+    let id = UUID()
+    let size: CGFloat
+    var elapsed: Double = 0
+
+    var isFinished: Bool { elapsed >= FlyConfig.praiseLifetime }
+
+    /// How far along the hop from the head to its resting place it is: out fast
+    /// and easing to a stop, so it reads as thrown clear of the head rather
+    /// than slid into place. The two ends are the layer's to know — they come
+    /// off the artwork, which the simulation has no picture of.
+    var travel: CGFloat {
+        let t = CGFloat(min(1, elapsed / 0.34))
+        return 1 - pow(1 - t, 3)
+    }
+
+    /// A spring-loaded pop: past full size at the top of the climb and back.
+    var scale: CGFloat {
+        let t = CGFloat(min(1, elapsed / 0.30))
+        let overshoot: CGFloat = 0.55
+        return 1 + (overshoot + 1) * pow(t - 1, 3) + overshoot * pow(t - 1, 2)
+    }
+
+    var opacity: Double {
+        let fade = FlyConfig.praiseLifetime - 0.26
+        return elapsed <= fade ? 1 : max(0, 1 - (elapsed - fade) / 0.26)
+    }
 }
 
 /// `CADisplayLink` keeps its target alive, so the engine cannot be it: the
@@ -289,10 +389,18 @@ private final class FlyEngineTicker: NSObject {
 private final class FlyEngine: ObservableObject {
     @Published private(set) var flies: [AnswerFly] = []
     @Published private(set) var tongue: TongueCatch?
-    @Published private(set) var feedback: CatchFeedback?
+    @Published private(set) var poops: [PoopDrop] = []
+    @Published private(set) var praise: HeadPraise?
     @Published private(set) var clock: Double = 0
 
     var onHit: ((UUID) -> Bool)?
+    /// The frame the sticky pad lands on a piece of food, right or wrong.
+    var onImpact: (() -> Void)?
+    /// The frame a caught answer reaches the mouth, with whether it was right.
+    /// The outcome is only sounded here, at the swallow: the strike itself is a
+    /// third of a second long, and a verdict at the far end of it arrives
+    /// before the child has seen the food move.
+    var onSwallow: ((Bool) -> Void)?
 
     private var rounds: [GameRound] = []
     /// The question the swarm on screen belongs to. A wrong answer leaves the
@@ -359,6 +467,10 @@ private final class FlyEngine: ObservableObject {
             pendingSpecs.removeAll()
             retiredOptionIDs.removeAll()
             releaseTongue()
+            // The simulation stops with the session, so anything still in the
+            // air would hang there for as long as the scene is up.
+            poops.removeAll()
+            praise = nil
             scatter { _ in true }
             return
         }
@@ -463,7 +575,7 @@ private final class FlyEngine: ObservableObject {
         clock += FlyConfig.tick
         moveFlies()
         advanceTongue()
-        advanceFeedback()
+        advanceHeadMarks()
     }
 
     private func moveFlies() {
@@ -573,11 +685,10 @@ private final class FlyEngine: ObservableObject {
         if !catchState.didReportContact,
            catchState.elapsed >= FlyConfig.extensionTime {
             catchState.didReportContact = true
+            // The splat belongs to the collision, not to the answer: it sounds
+            // the same whether the food that was hit was the right one or not.
+            onImpact?()
             catchState.wasAccepted = onHit?(catchState.optionID) ?? false
-            if catchState.wasAccepted == true {
-                feedback = CatchFeedback(position: catchState.target,
-                                         isCorrect: catchState.isCorrect)
-            }
         }
         if catchState.elapsed >= catchState.total {
             if catchState.wasAccepted == true {
@@ -585,7 +696,11 @@ private final class FlyEngine: ObservableObject {
                 flies.removeAll { $0.id == catchState.flyID }
                 if catchState.isCorrect {
                     pendingSpecs.removeAll { $0.roundID == catchState.roundID }
+                    emitPraise()
+                } else {
+                    emitPoopBurst()
                 }
+                onSwallow?(catchState.isCorrect)
             } else if let index = flies.firstIndex(where: { $0.id == catchState.flyID }) {
                 // Input can close while the tongue is already travelling. The
                 // fly was never eaten: it resumes if its sum still stands, and
@@ -612,10 +727,51 @@ private final class FlyEngine: ObservableObject {
         self.tongue = nil
     }
 
-    private func advanceFeedback() {
-        guard var current = feedback else { return }
-        current.elapsed += FlyConfig.tick
-        feedback = current.elapsed >= 0.72 ? nil : current
+    /// Three droppings out of the head, fanned left, up and right. A burst that
+    /// is still in the air is replaced rather than added to, so answering wrong
+    /// twice in quick succession cannot pile them up.
+    private func emitPoopBurst() {
+        let body = characterRect.width
+        guard body > 0 else { return }
+        let launch = FlyConfig.poopLaunchSpeed(bodyWidth: body)
+        let gravity = FlyConfig.poopGravity(bodyWidth: body)
+        let drift = FlyConfig.poopDrift(bodyWidth: body)
+        let size = FlyConfig.poopSize(bodyWidth: body)
+        let fan: [(drift: CGFloat, launch: CGFloat, spin: Double, size: CGFloat)] = [
+            (-1.00, 0.88, -168, 0.86),
+            (-0.12, 1.00,   96, 1.00),
+            ( 0.94, 0.91,  184, 0.79)
+        ]
+        poops = zip(fan, FlyConfig.poopDelays).map { shape, delay in
+            PoopDrop(delay: delay,
+                     drift: drift * shape.drift,
+                     launch: launch * shape.launch,
+                     gravity: gravity,
+                     spin: shape.spin,
+                     size: size * shape.size)
+        }
+    }
+
+    /// The tick for a right answer. Like the burst it replaces whatever is
+    /// still on screen, so a fast run shows the newest verdict rather than
+    /// stacking one over another.
+    private func emitPraise() {
+        let body = characterRect.width
+        guard body > 0 else { return }
+        praise = HeadPraise(size: FlyConfig.praiseSize(bodyWidth: body))
+    }
+
+    private func advanceHeadMarks() {
+        if !poops.isEmpty {
+            var burst = poops
+            for index in burst.indices { burst[index].elapsed += FlyConfig.tick }
+            burst.removeAll { $0.isFinished }
+            poops = burst
+        }
+        if var current = praise {
+            current.elapsed += FlyConfig.tick
+            praise = current.isFinished ? nil : current
+        }
     }
 
     // MARK: - Dealing a swarm
@@ -921,6 +1077,10 @@ struct FlyPlayfield: View {
     let topReserve: CGFloat
     let bottomReserve: CGFloat
     let onHit: (UUID) -> Bool
+    /// The strike landing on a piece of food, and the catch arriving in the
+    /// mouth a third of a second later with the answer it was carrying.
+    let onImpact: () -> Void
+    let onSwallow: (Bool) -> Void
     let onFishEntranceComplete: () -> Void
     let onLevelCompletionFinished: () -> Void
 
@@ -956,6 +1116,16 @@ struct FlyPlayfield: View {
             // What this character eats: the level fills with their own food
             // instead of a generic fly, catch and all.
             let foodImageName = FoodCatalog.imageName(for: character.id)
+            // Top of the head, where the verdict on a swallowed answer appears,
+            // and the spot beside it a tick settles on.
+            let headTop = point(of: CGPoint(
+                x: character.mouth.center.x + FlyConfig.poopHeadOffset.width,
+                y: character.mouth.center.y + FlyConfig.poopHeadOffset.height
+            ), in: stage)
+            let praiseRest = point(of: CGPoint(
+                x: character.mouth.center.x + FlyConfig.praiseRestOffset.width,
+                y: character.mouth.center.y + FlyConfig.praiseRestOffset.height
+            ), in: stage)
 
             ZStack {
                 PondBackdrop(tint: character.color, isPad: isPad)
@@ -989,6 +1159,10 @@ struct FlyPlayfield: View {
                             mouth: character.mouth,
                             reduceMotion: reduceMotion)
 
+                // Above the character, so a mark arcing over the head is never
+                // cut in half by the artwork it came out of.
+                HeadMarkLayer(engine: engine, head: headTop, praiseRest: praiseRest)
+
                 if let active = rounds.first {
                     ActiveQuestionView(prompt: active.question.prompt,
                                        character: character,
@@ -1004,6 +1178,8 @@ struct FlyPlayfield: View {
             .clipped()
             .onAppear {
                 engine.onHit = onHit
+                engine.onImpact = onImpact
+                engine.onSwallow = onSwallow
                 applyLayout(in: proxy.size)
                 engine.sync(rounds: rounds)
                 engine.setLive(isLive)
@@ -1158,8 +1334,7 @@ private struct FlySwarmLayer: View {
     }
 }
 
-/// The strike: the tongue on its way out and back, and the tick or cross it
-/// leaves behind at the point of impact.
+/// The strike: the tongue on its way out and back.
 private struct TongueLayer: View {
     @ObservedObject var engine: FlyEngine
     let foodImageName: String
@@ -1177,16 +1352,72 @@ private struct TongueLayer: View {
                            mouth: mouth,
                            reduceMotion: reduceMotion)
             }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
+    }
+}
 
-            if let feedback = engine.feedback {
-                CatchFeedbackView(feedback: feedback, isPad: isPad)
-                    .id(feedback.id)
-                    .position(feedback.position)
-                    .allowsHitTesting(false)
+/// The verdict on a swallowed answer, played out over the character's head:
+/// three droppings for a wrong one, a tick for a right one. Both are measured
+/// from the one point given here.
+private struct HeadMarkLayer: View {
+    @ObservedObject var engine: FlyEngine
+    /// Top of the head, in this layer's own coordinates, and the spot beside it
+    /// the tick hops out to.
+    let head: CGPoint
+    let praiseRest: CGPoint
+
+    var body: some View {
+        ZStack {
+            ForEach(engine.poops) { poop in
+                Image("poop")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: poop.size, height: poop.size)
+                    .rotationEffect(.degrees(poop.rotation))
+                    .scaleEffect(poop.scale)
+                    .opacity(poop.opacity)
+                    .position(x: head.x + poop.offset.width,
+                              y: head.y + poop.offset.height)
+            }
+
+            if let praise = engine.praise {
+                let travel = praise.travel
+                PraiseTickView(size: praise.size)
+                    .scaleEffect(praise.scale)
+                    .opacity(praise.opacity)
+                    .position(x: head.x + (praiseRest.x - head.x) * travel,
+                              y: head.y + (praiseRest.y - head.y) * travel)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+/// A tick on a green coin. It has to hold up at the size of a dropping against
+/// a pond full of colour, so it carries its own disc and a white rim rather
+/// than being a bare glyph laid over whatever happens to be behind it.
+private struct PraiseTickView: View {
+    let size: CGFloat
+
+    var body: some View {
+        Image(systemName: "checkmark")
+            .font(.system(size: size * 0.52, weight: .black, design: .rounded))
+            .foregroundStyle(.white)
+            .frame(width: size, height: size)
+            .background(
+                Circle().fill(
+                    LinearGradient(colors: [Color(red: 0.36, green: 0.84, blue: 0.40),
+                                            Color(red: 0.13, green: 0.62, blue: 0.24)],
+                                   startPoint: .top, endPoint: .bottom)
+                )
+            )
+            .overlay(Circle().stroke(.white.opacity(0.92), lineWidth: size * 0.075))
+            .shadow(color: Color(red: 0.06, green: 0.28, blue: 0.10).opacity(0.34),
+                    radius: size * 0.13, y: size * 0.07)
     }
 }
 
@@ -1883,45 +2114,6 @@ private struct StuckFlyView: View {
             .rotationEffect(.degrees(Double(side) * splay))
             .offset(x: size * (wings.dx + side * wings.spread),
                     y: size * wings.dy + size * 0.16 * squash)
-    }
-}
-
-private struct CatchFeedbackView: View {
-    let feedback: CatchFeedback
-    let isPad: Bool
-
-    var body: some View {
-        let progress = CGFloat(min(1, feedback.elapsed / 0.72))
-        let color = feedback.isCorrect
-            ? Color(red: 0.18, green: 0.72, blue: 0.31)
-            : Color(red: 0.90, green: 0.20, blue: 0.22)
-        let base = isPad ? CGFloat(70) : 52
-
-        ZStack {
-            Circle()
-                .stroke(color.opacity(Double(1 - progress)), lineWidth: isPad ? 7 : 5)
-                .frame(width: base * (0.55 + progress),
-                       height: base * (0.55 + progress))
-
-            ForEach(0..<8, id: \.self) { index in
-                Circle()
-                    .fill(color.opacity(Double(1 - progress)))
-                    .frame(width: isPad ? 8 : 6, height: isPad ? 8 : 6)
-                    .offset(x: CGFloat(cos(Double(index) * .pi / 4)) * base * progress * 0.72,
-                            y: CGFloat(sin(Double(index) * .pi / 4)) * base * progress * 0.72)
-            }
-
-            Image(systemName: feedback.isCorrect ? "checkmark" : "xmark")
-                .font(.system(size: isPad ? 31 : 23, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(width: isPad ? 54 : 42, height: isPad ? 54 : 42)
-                .background(color, in: Circle())
-                .shadow(color: color.opacity(0.35), radius: 7, y: 4)
-                .scaleEffect(1 + progress * 0.12)
-                .opacity(Double(1 - max(0, progress - 0.62) / 0.38))
-        }
-        .offset(y: -progress * (isPad ? 30 : 22))
-        .accessibilityHidden(true)
     }
 }
 

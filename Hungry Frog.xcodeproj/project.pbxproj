@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D472BCA0289E0B68700FE7AC /* FoodCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F2561D8F361FD815587AD /* FoodCatalog.swift */; };
+		F9E6FB5D30234FD0001D93E4 /* splash.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5B30234FD0001D93E4 /* splash.caf */; };
+		F9E6FB5E30234FD0001D93E4 /* score_increase_main.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */; };
+		F9E6FB5F30234FD0001D93E4 /* wrong_answer.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */; };
 		F9F3C61E301E409F00464555 /* score_increase.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C606301E409F00464555 /* score_increase.caf */; };
 		F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C619301E409F00464555 /* sfx_wrong.caf */; };
 		F9F3C621301E409F00464555 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C600301E409F00464555 /* Products.storekit */; };
@@ -54,7 +58,6 @@
 		F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C601301E409F00464555 /* ProgressSync.swift */; };
 		F9F3C64F301E409F00464555 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EF301E409F00464555 /* GameView.swift */; };
 		F9F3C650301E409F00464555 /* CharacterUnlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */; };
-		D472BCA0289E0B68700FE7AC /* FoodCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8F2561D8F361FD815587AD /* FoodCatalog.swift */; };
 		F9F3C651301E409F00464555 /* MemoryGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E5301E409F00464555 /* MemoryGame.swift */; };
 		F9F3C652301E409F00464555 /* MathTopic.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E4301E409F00464555 /* MathTopic.swift */; };
 		F9F3C653301E409F00464555 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C607301E409F00464555 /* SettingsView.swift */; };
@@ -72,13 +75,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9E8F2561D8F361FD815587AD /* FoodCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodCatalog.swift; sourceTree = "<group>"; };
+		F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = score_increase_main.caf; sourceTree = "<group>"; };
+		F9E6FB5B30234FD0001D93E4 /* splash.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = splash.caf; sourceTree = "<group>"; };
+		F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wrong_answer.caf; sourceTree = "<group>"; };
 		F9F3C5CA301E405E00464555 /* Hungry Frog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hungry Frog.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientReefBackground.swift; sourceTree = "<group>"; };
 		F9F3C5DB301E409F00464555 /* AppAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAudio.swift; sourceTree = "<group>"; };
 		F9F3C5DC301E409F00464555 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		F9F3C5DD301E409F00464555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F9F3C5E0301E409F00464555 /* CharacterUnlocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterUnlocks.swift; sourceTree = "<group>"; };
-		9E8F2561D8F361FD815587AD /* FoodCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodCatalog.swift; sourceTree = "<group>"; };
 		F9F3C5E1301E409F00464555 /* DecimalAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecimalAnswer.swift; sourceTree = "<group>"; };
 		F9F3C5E2301E409F00464555 /* GameConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfig.swift; sourceTree = "<group>"; };
 		F9F3C5E3301E409F00464555 /* MathQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MathQuestion.swift; sourceTree = "<group>"; };
@@ -182,6 +188,9 @@
 				F9F3C604301E409F00464555 /* ResultView.swift */,
 				F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */,
 				F9F3C606301E409F00464555 /* score_increase.caf */,
+				F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */,
+				F9E6FB5B30234FD0001D93E4 /* splash.caf */,
+				F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */,
 				F9F3C607301E409F00464555 /* SettingsView.swift */,
 				F9F3C608301E409F00464555 /* sfx_card_count.caf */,
 				F9F3C609301E409F00464555 /* sfx_card_flight.caf */,
@@ -310,6 +319,9 @@
 				F9F3C625301E409F00464555 /* sfx_switch_off.caf in Resources */,
 				F9F3C626301E409F00464555 /* sfx_switch_on.caf in Resources */,
 				F9F3C627301E409F00464555 /* sfx_session_start.caf in Resources */,
+				F9E6FB5D30234FD0001D93E4 /* splash.caf in Resources */,
+				F9E6FB5E30234FD0001D93E4 /* score_increase_main.caf in Resources */,
+				F9E6FB5F30234FD0001D93E4 /* wrong_answer.caf in Resources */,
 				F9F3C9AD301F3CBE00464555 /* frog_music.mp3 in Resources */,
 				F9F3C628301E409F00464555 /* sfx_select.wav in Resources */,
 				F9F3C629301E409F00464555 /* sfx_card_flip.wav in Resources */,
@@ -516,12 +528,12 @@
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphonesimulator*]" = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -565,12 +577,12 @@
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIRequiresFullScreen[sdk=iphonesimulator*]" = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";

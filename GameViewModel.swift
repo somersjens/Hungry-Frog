@@ -236,7 +236,6 @@ final class GameViewModel: ObservableObject {
                 sync()
             }
             lastCorrectCatchTime = now
-            AppAudio.shared.playCorrect()
             if usedBonusFish {
                 hasBonusFishPower = false
                 AppAudio.shared.playDoubleScore()
@@ -246,17 +245,13 @@ final class GameViewModel: ObservableObject {
                 AppAudio.shared.playDoubleScore()
                 scheduleBoostExpiry()
             }
-            haptic(.success)
             delay = GameConfig.nextRoundDelay.correct
-        case .wrong(_, let lostHalfLife):
+        case .wrong:
             lastCorrectCatchTime = nil
-            AppAudio.shared.playWrong()
-            if lostHalfLife {
-                AppAudio.shared.playHalfLife()
-            } else {
-                AppAudio.shared.playLifeLost()
-            }
-            haptic(.error)
+            // Neither the verdict's sound nor its haptic fires here any more —
+            // both wait for `reportCatchOutcome`. The life going is no longer
+            // sounded at all: it played on the strike and drowned out the
+            // wrong-answer sound arriving at the mouth behind it.
             delay = GameConfig.nextRoundDelay.wrong
         case .ignored:
             return false
@@ -278,6 +273,21 @@ final class GameViewModel: ObservableObject {
             self.sync()
         }
         return true
+    }
+
+    /// Announces the verdict on a catch. The answer is scored the moment the
+    /// tongue reaches the food, but it is only heard and felt here — when the
+    /// food arrives in the mouth — so sound, haptic and the mark over the
+    /// character's head all land on the swallow the child is watching rather
+    /// than a third of a second ahead of it.
+    func reportCatchOutcome(isCorrect: Bool) {
+        if isCorrect {
+            AppAudio.shared.playCorrect()
+            haptic(.success)
+        } else {
+            AppAudio.shared.playWrongAnswer()
+            haptic(.wrongAnswer)
+        }
     }
 
     /// Re-arms the countdown for whatever window the engine now holds. Called
@@ -415,7 +425,7 @@ final class GameViewModel: ObservableObject {
         }
     }
 
-    private enum Haptic { case light, rigid, success, error }
+    private enum Haptic { case light, rigid, success, error, wrongAnswer }
 
 #if canImport(UIKit)
     // Kept for the whole session rather than built per answer. A fresh
@@ -425,6 +435,7 @@ final class GameViewModel: ObservableObject {
     // for the next answer, which during a fast streak is moments away.
     private lazy var lightGenerator = UIImpactFeedbackGenerator(style: .light)
     private lazy var rigidGenerator = UIImpactFeedbackGenerator(style: .rigid)
+    private lazy var heavyGenerator = UIImpactFeedbackGenerator(style: .heavy)
     private lazy var notificationGenerator = UINotificationFeedbackGenerator()
 #endif
 
@@ -443,6 +454,18 @@ final class GameViewModel: ObservableObject {
         case .error:
             notificationGenerator.notificationOccurred(.error)
             notificationGenerator.prepare()
+        case .wrongAnswer:
+            // The system's error pattern on its own is a polite little stutter,
+            // easy to miss with the device flat on a table or in a thick case.
+            // A full-strength knock in front of it gives the mistake a body,
+            // and the gap is what keeps the two from merging into one buzz.
+            heavyGenerator.impactOccurred(intensity: 1)
+            heavyGenerator.prepare()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
+                guard let self else { return }
+                self.notificationGenerator.notificationOccurred(.error)
+                self.notificationGenerator.prepare()
+            }
         }
 #endif
     }

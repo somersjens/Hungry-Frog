@@ -185,6 +185,8 @@ struct GameView: View {
                               topReserve: topInset + (isPad ? 64 : 50) + hudExtraReserve,
                               bottomReserve: screenInsets.bottom,
                               onHit: { model.select(optionID: $0) },
+                              onImpact: { AppAudio.shared.playSplash() },
+                              onSwallow: { model.reportCatchOutcome(isCorrect: $0) },
                               onFishEntranceComplete: finishFishEntrance,
                               onLevelCompletionFinished: finishLevelCompletion)
 

@@ -139,14 +139,25 @@ final class AppAudio: NSObject, ObservableObject {
         /// sound fires immediately (measured per file; no re-encoding needed).
         let lead: TimeInterval
     }
-    // Short effects are shipped as uncompressed CAF/PCM: unlike MP3 they need no
-    // runtime decode, so re-triggering one (rewind to `lead` + `play`) during a
-    // busy frame costs no CPU and can't contend for the shared audio decoder.
-    // The three `wav` files were already PCM. `volume`/`lead` are unchanged: the
-    // conversion preserved each file's sample rate, channels and timing exactly.
+    // Most of these are shipped as uncompressed CAF/PCM, converted from the
+    // originals without touching their sample rate, channels or timing — which
+    // is why their `volume`/`lead` have never had to change. The three `wav`
+    // files were already PCM.
+    //
+    // The newer files (`splash`, `wrong_answer`, `score_increase_main`) are AAC
+    // inside the same CAF container, which is a quarter of the download for no
+    // cost at all: every effect is decoded into a PCM buffer once in `prepare()`
+    // and only ever scheduled from memory afterwards, so nothing here is ever
+    // decoded on a busy frame whatever the file holds. Their leading silence was
+    // trimmed out of the files themselves rather than skipped at load, so their
+    // `lead` is 0.
     private static let effects: [Effect] = [
         Effect(key: "correct",       file: "sfx_correct",        ext: "caf", volume: 0.14, lead: 0.0),
         Effect(key: "wrong",         file: "sfx_wrong",          ext: "caf", volume: 0.11, lead: 0.065),
+        // The strike landing on a piece of food, right or wrong, and the
+        // wrong answer arriving in the mouth behind it.
+        Effect(key: "splash",        file: "splash",             ext: "caf", volume: 0.24, lead: 0.0),
+        Effect(key: "wrongAnswer",   file: "wrong_answer",       ext: "caf", volume: 0.087, lead: 0.0),
         // The card flip that opens a round.
         Effect(key: "cardFlip",      file: "sfx_card_flip",      ext: "wav", volume: 0.10, lead: 0.015),
         // The question card turning face up.
@@ -165,7 +176,9 @@ final class AppAudio: NSObject, ObservableObject {
         // The card counters on the result screen and the home header.
         Effect(key: "cardCount",     file: "sfx_card_count",     ext: "caf", volume: 1.0,  lead: 0.065),
         Effect(key: "cardFlight",    file: "sfx_card_flight",    ext: "caf", volume: 0.812, lead: 0.35),
-        Effect(key: "cardTotal",     file: "score_increase",     ext: "caf", volume: 1.0,  lead: 0.0),
+        // The header totals climbing on the menu. The sound runs for as long as
+        // the counters do, where the old blip was over before they had started.
+        Effect(key: "cardTotal",     file: "score_increase_main", ext: "caf", volume: 0.094, lead: 0.0),
         Effect(key: "select",        file: "sfx_select",         ext: "wav", volume: 0.17, lead: 0.0),
         Effect(key: "switchOn",      file: "sfx_switch_on",      ext: "caf", volume: 0.89, lead: 0.200),
         Effect(key: "switchOff",     file: "sfx_switch_off",     ext: "caf", volume: 1.0,  lead: 0.170)
@@ -556,6 +569,8 @@ final class AppAudio: NSObject, ObservableObject {
     // Answers.
     func playCorrect()          { playEffect("correct") }
     func playWrong()            { playEffect("wrong") }
+    func playSplash()           { playEffect("splash") }        // the tongue lands on food
+    func playWrongAnswer()      { playEffect("wrongAnswer") }   // a wrong answer is swallowed
     func playCardFlip()         { playEffect("cardFlip") }         // a card turns over
     func playCardReveal()       { playEffect("cardReveal") }       // the question becomes visible
     func playDoubleCardAppear() { playEffect("doubleCard") }       // the thick special card

@@ -20,7 +20,9 @@ struct ResultView: View {
     @State private var isPresented = false
     @State private var badgeLanded = false
     @State private var shineSweep = false
-    @State private var showsBubbleRain = false
+    @State private var showsFlySwarm = false
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var isPad: Bool { AppLayout.isPad }
     private var scale: CGFloat { isPad ? 1.2 : 1 }
@@ -83,10 +85,11 @@ struct ResultView: View {
             .scaleEffect(isPresented ? 1 : 0.93)
             .offset(y: isPresented ? 0 : 18)
 
-            // Layered above the card, so the burst rains over the result rather
-            // than behind it. It starts once the card entrance is underway.
-            if showsBubbleRain {
-                BubbleRainView()
+            // Layered above the card, so the swarm passes over the result
+            // rather than behind it. It starts once the card entrance is
+            // underway.
+            if showsFlySwarm {
+                FlySwarmCelebration(color: character.deepColor)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
             }
@@ -95,11 +98,13 @@ struct ResultView: View {
             withAnimation(.spring(response: 0.46, dampingFraction: 0.82)) {
                 isPresented = true
             }
-            // Only a score this level has never seen before rains bubbles;
+            // Only a score this level has never seen before draws the swarm;
             // matching or falling short of the old best ends quietly.
             guard showsNewBest else { return }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.34) {
-                showsBubbleRain = true
+            if !reduceMotion {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.34) {
+                    showsFlySwarm = true
+                }
             }
             // The badge drops in after the card has settled, then glints once.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.42) {
@@ -393,92 +398,111 @@ struct ResultView: View {
     }
 }
 
-/// A shower of bubbles for a new personal best: they drift down over the card
-/// and pop, one after another, instead of the confetti this used to rain.
-private struct BubbleRainView: View {
-    @State private var bubbles: [RainBubble]
+/// A swarm of flies for a new personal best: the reward the whole game is
+/// played for rises up over the card, wandering the way flies actually do,
+/// instead of the bubble rain this used to shower.
+private struct FlySwarmCelebration: View {
+    let color: Color
 
-    init() {
-        // Keep the reward visible without covering the result card in a dense
-        // curtain. The varied timing still makes this feel organic.
-        _bubbles = State(initialValue: (0..<18).map { _ in RainBubble() })
+    @State private var flies: [CelebrationFly]
+    @State private var startedAt = Date()
+    /// Every fly is drawn from the elapsed time, so once the last one has left
+    /// the top edge there is nothing further to redraw and the clock can stop.
+    @State private var hasSettled = false
+
+    init(color: Color) {
+        self.color = color
+        // Enough to read as a swarm, few enough to leave the card readable
+        // underneath it.
+        _flies = State(initialValue: (0..<16).map { _ in CelebrationFly() })
+    }
+
+    /// When the slowest fly is gone, plus a moment's margin.
+    private var span: Double {
+        (flies.map { $0.delay + $0.riseDuration }.max() ?? 0) + 0.2
     }
 
     var body: some View {
         GeometryReader { proxy in
-            ZStack {
-                ForEach(bubbles) { bubble in
-                    FallingBubble(bubble: bubble, area: proxy.size)
+            TimelineView(.animation(paused: hasSettled)) { context in
+                let elapsed = context.date.timeIntervalSince(startedAt)
+                ZStack {
+                    ForEach(flies) { fly in
+                        CelebrationFlyView(fly: fly, elapsed: elapsed,
+                                           area: proxy.size, color: color)
+                    }
                 }
             }
         }
+        .allowsHitTesting(false)
         .accessibilityHidden(true)
+        .task {
+            try? await Task.sleep(nanoseconds: UInt64(span * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            hasSettled = true
+        }
     }
 }
 
-private struct RainBubble: Identifiable {
+private struct CelebrationFly: Identifiable {
     let id = UUID()
-    /// Share of the width the bubble falls down.
-    let x = CGFloat.random(in: 0.08...0.92)
-    let diameter = CGFloat.random(in: 8...22)
-    /// Share of the height at which it bursts, so they do not all pop in a line.
-    let burstY = CGFloat.random(in: 0.34...0.86)
-    let fallDuration = Double.random(in: 1.55...2.45)
-    let delay = Double.random(in: 0...1.1)
-    /// A little sideways wander on the way down.
-    let drift = CGFloat.random(in: -14...14)
+    /// Share of the width the fly climbs around.
+    let x = CGFloat.random(in: 0.06...0.94)
+    let size = CGFloat.random(in: 15...30)
+    let riseDuration = Double.random(in: 2.0...3.1)
+    let delay = Double.random(in: 0...0.95)
+    /// How far it wanders sideways, and how many times it crosses back over on
+    /// the way up. The two together are what make the climb read as a fly's
+    /// path rather than a balloon's.
+    let sway = CGFloat.random(in: 24...62)
+    let waves = Double.random(in: 1.3...2.5)
+    let phase = Double.random(in: 0...(2 * .pi))
+    /// Wingbeat, in beats per second: fast enough to blur, slow enough that the
+    /// body still visibly bobs with it.
+    let beat = Double.random(in: 15...21)
 }
 
-private struct FallingBubble: View {
-    let bubble: RainBubble
+private struct CelebrationFlyView: View {
+    let fly: CelebrationFly
+    let elapsed: TimeInterval
     let area: CGSize
-
-    @State private var hasFallen = false
-    @State private var isBursting = false
-    @State private var burstFinished = false
+    let color: Color
 
     var body: some View {
-        ZStack {
-            // A faint ring lingers for a moment after the shell dissolves. It
-            // gives each bubble a soft finish instead of a sudden large pop.
-            Circle()
-                .stroke(.white.opacity(0.62), lineWidth: 0.8)
-                .scaleEffect(isBursting ? (burstFinished ? 1.5 : 1.08) : 0.88)
-                .opacity(isBursting && !burstFinished ? 0.3 : 0)
+        let t = (elapsed - fly.delay) / fly.riseDuration
 
-            Circle()
-                .fill(
-                    RadialGradient(colors: [.white.opacity(0.78), .white.opacity(0.16)],
-                                   center: UnitPoint(x: 0.34, y: 0.30),
-                                   startRadius: 1,
-                                   endRadius: bubble.diameter * 0.7)
+        if t >= 0, t <= 1 {
+            let angle = t * fly.waves * 2 * .pi + fly.phase
+            // The climb is linear: a fly holds its speed, it does not coast to
+            // a stop the way a falling bubble did.
+            let travel = area.height + fly.size * 2
+            let wingPhase = elapsed * fly.beat * 2 * .pi + fly.phase
+
+            CurrencyIcon(size: fly.size)
+                // A white copy just behind the fly keeps it legible over both
+                // the dark scrim and the light card underneath it.
+                .foregroundStyle(.white.opacity(0.5))
+                .scaleEffect(1.2)
+                .overlay { CurrencyIcon(size: fly.size).foregroundStyle(color) }
+                // Wings beating: the body squeezes narrow and springs back.
+                .scaleEffect(x: 1 - 0.1 * abs(sin(wingPhase)), y: 1)
+                // It banks into each turn rather than sliding sideways flat.
+                .rotationEffect(.degrees(cos(angle) * 15))
+                .opacity(fade(at: t))
+                .position(
+                    x: area.width * fly.x + sin(angle) * fly.sway,
+                    y: area.height + fly.size - travel * t
+                        // A small bob on the wingbeat itself.
+                        + sin(wingPhase) * fly.size * 0.05
                 )
-                .overlay { Circle().stroke(.white.opacity(0.66), lineWidth: 0.9) }
-                .scaleEffect(isBursting ? 1.14 : 1)
-                .opacity(isBursting ? 0 : 0.78)
         }
-        .frame(width: bubble.diameter, height: bubble.diameter)
-        .position(x: area.width * bubble.x + (hasFallen ? bubble.drift : 0),
-                  y: hasFallen ? area.height * bubble.burstY : -bubble.diameter)
-        .onAppear {
-            withAnimation(
-                .timingCurve(0.32, 0.48, 0.42, 1,
-                             duration: bubble.fallDuration)
-                    .delay(bubble.delay)
-            ) {
-                hasFallen = true
-            }
+    }
 
-            // Let the bubble settle, dissolve its shell, then gently fade
-            // the remaining ring. The two short phases avoid a hard cut.
-            DispatchQueue.main.asyncAfter(
-                deadline: .now() + bubble.delay + bubble.fallDuration + 0.06
-            ) {
-                withAnimation(.easeOut(duration: 0.18)) { isBursting = true }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) {
-                    withAnimation(.easeOut(duration: 0.34)) { burstFinished = true }
-                }
-            }
-        }
+    /// In as it enters at the bottom, out before it reaches the top edge, so no
+    /// fly is ever cut off by the frame.
+    private func fade(at t: Double) -> Double {
+        if t < 0.12 { return t / 0.12 }
+        if t > 0.82 { return (1 - t) / 0.18 }
+        return 1
     }
 }
