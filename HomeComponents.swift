@@ -915,8 +915,17 @@ private struct CompletionTwig: View {
         Leaf(id: 3, x: 0.36, y: 0.16, size: 0.44, rotation: 10)
     ]
 
+    /// The reveal lasts well under a second, after which the twig is a still
+    /// ornament. Left running, its timeline would go on waking every completed
+    /// card on the menu — two twigs apiece — at the display's full refresh rate
+    /// for as long as the screen is up, including while a level is being played
+    /// over it.
+    @State private var hasSettled = false
+    /// Comfortably past the last blossom (stem 0.48s, final leaf 0.625s).
+    private static let revealDuration: TimeInterval = 0.9
+
     var body: some View {
-        TimelineView(.animation) { context in
+        TimelineView(.animation(paused: hasSettled)) { context in
             let elapsed = revealStartedAt.map {
                 max(0, context.date.timeIntervalSince($0))
             } ?? .greatestFiniteMagnitude
@@ -963,6 +972,20 @@ private struct CompletionTwig: View {
             }
         }
         .shadow(color: color.opacity(0.16), radius: 1, y: 0.5)
+        .task(id: revealStartedAt) {
+            guard let revealStartedAt else {
+                hasSettled = true
+                return
+            }
+            hasSettled = false
+            let remaining = Self.revealDuration
+                - Date().timeIntervalSince(revealStartedAt)
+            if remaining > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+            }
+            hasSettled = true
+        }
     }
 
     private func stemProgress(at elapsed: TimeInterval) -> CGFloat {
@@ -1155,8 +1178,13 @@ struct CountingNumber: View {
     var delay = 0.0
     var duration = 0.78
 
+    /// A finished (or never-started) count is a plain number. The timeline is
+    /// stopped for it, so a total sitting on the menu does not keep the
+    /// display link awake for the life of the screen.
+    @State private var hasSettled = false
+
     var body: some View {
-        TimelineView(.animation) { context in
+        TimelineView(.animation(paused: hasSettled)) { context in
             let elapsed = startedAt.map { context.date.timeIntervalSince($0) }
                 ?? .greatestFiniteMagnitude
             let progress = startedAt == nil
@@ -1171,6 +1199,19 @@ struct CountingNumber: View {
                 .scaleEffect(1 + sin(progress * .pi) * 0.13)
         }
         .accessibilityLabel(Text(verbatim: "\(to)"))
+        .task(id: startedAt) {
+            guard let startedAt else {
+                hasSettled = true
+                return
+            }
+            hasSettled = false
+            let remaining = delay + duration - Date().timeIntervalSince(startedAt)
+            if remaining > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+            }
+            hasSettled = true
+        }
     }
 }
 
@@ -1472,8 +1513,13 @@ struct LevelReturnFocusGlow: View {
     let strokeColor: Color
     let glowColor: Color
 
+    /// The glow is fully faded by 1.98s (see `glowOpacity`). The view itself
+    /// may outlive the celebration it belongs to, so stop the clock once there
+    /// is nothing left to draw rather than keep redrawing an invisible ring.
+    @State private var hasSettled = false
+
     var body: some View {
-        TimelineView(.animation) { context in
+        TimelineView(.animation(paused: hasSettled)) { context in
             let elapsed = max(0, context.date.timeIntervalSince(startedAt))
             RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(strokeColor, lineWidth: lineWidth)
@@ -1482,6 +1528,15 @@ struct LevelReturnFocusGlow: View {
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+        .task(id: startedAt) {
+            hasSettled = false
+            let remaining = 2.0 - Date().timeIntervalSince(startedAt)
+            if remaining > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+            }
+            hasSettled = true
+        }
     }
 
     private func glowOpacity(at elapsed: TimeInterval) -> Double {

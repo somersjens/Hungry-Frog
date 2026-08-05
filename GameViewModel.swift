@@ -417,13 +417,32 @@ final class GameViewModel: ObservableObject {
 
     private enum Haptic { case light, rigid, success, error }
 
+#if canImport(UIKit)
+    // Kept for the whole session rather than built per answer. A fresh
+    // generator has to wake the Taptic engine before it can fire, which is
+    // main-thread work landing in the same frame as the catch that asked for
+    // it; a warm one fires immediately. `prepare()` afterwards keeps it warm
+    // for the next answer, which during a fast streak is moments away.
+    private lazy var lightGenerator = UIImpactFeedbackGenerator(style: .light)
+    private lazy var rigidGenerator = UIImpactFeedbackGenerator(style: .rigid)
+    private lazy var notificationGenerator = UINotificationFeedbackGenerator()
+#endif
+
     private func haptic(_ kind: Haptic) {
 #if canImport(UIKit)
         switch kind {
-        case .light: UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        case .rigid: UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-        case .success: UINotificationFeedbackGenerator().notificationOccurred(.success)
-        case .error: UINotificationFeedbackGenerator().notificationOccurred(.error)
+        case .light:
+            lightGenerator.impactOccurred()
+            lightGenerator.prepare()
+        case .rigid:
+            rigidGenerator.impactOccurred()
+            rigidGenerator.prepare()
+        case .success:
+            notificationGenerator.notificationOccurred(.success)
+            notificationGenerator.prepare()
+        case .error:
+            notificationGenerator.notificationOccurred(.error)
+            notificationGenerator.prepare()
         }
 #endif
     }

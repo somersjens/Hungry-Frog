@@ -43,6 +43,16 @@ final class PlaytimeTracker: ObservableObject {
     private var lastAccrual: Date?
     private var unsavedSeconds: Double = 0
 
+    /// The day the published summaries were last computed for, plus the caches
+    /// that keep `accrue` off the calendar and the date formatter. See
+    /// `dayKey(for:)` and `weekSeconds(at:)`.
+    private var displayedDayKey = ""
+    private var cachedDayKey = ""
+    private var cachedDayStart: Date?
+    private var cachedDayEnd: Date?
+    private var weekInterval: DateInterval?
+    private var weekSecondsCache: Double = 0
+
     private let idleLimit: TimeInterval = 45
     private let saveInterval: Double = 30
     private let daysKey = "playtime.days"
@@ -165,16 +175,30 @@ final class PlaytimeTracker: ObservableObject {
 
     private func accrue(_ delta: TimeInterval, at date: Date,
                         allowPersistence: Bool = true) {
-        let key = dayFormatter.string(from: date)
+        let key = dayKey(for: date)
         var record = days[key] ?? DayRecord(date: key, seconds: 0, goalMinutes: dailyGoalMinutes)
+        let previousMinutes = Int(record.seconds / 60)
+        let previousGoalMet = record.goalMet
         record.seconds += delta
         record.goalMinutes = dailyGoalMinutes
         days[key] = record
+        if weekInterval?.contains(date) == true { weekSecondsCache += delta }
 
         unsavedSeconds += delta
         if allowPersistence, unsavedSeconds >= saveInterval {
             save(force: false)
         }
+
+        // This runs on every single answer, and recomputing the summaries walks
+        // the week and the streak through a `DateFormatter`. Nothing on screen
+        // is finer than a whole minute, and the streak can only move when
+        // today's goal is met or the day turns over — so unless one of those
+        // has actually happened there is nothing to recompute or publish.
+        guard key != displayedDayKey
+                || Int(record.seconds / 60) != previousMinutes
+                || record.goalMet != previousGoalMet
+                || Int(weekSeconds(at: date) / 60) != weekMinutes
+        else { return }
         recomputeDisplay()
     }
 
@@ -210,14 +234,53 @@ final class PlaytimeTracker: ObservableObject {
     // MARK: Derived values
 
     private func recomputeDisplay() {
-        let todayKey = dayFormatter.string(from: Date())
+        let now = Date()
+        let todayKey = dayKey(for: now)
+        displayedDayKey = todayKey
         let today = Int((days[todayKey]?.seconds ?? 0) / 60)
-        let week = Int(currentWeekSeconds() / 60)
+        let week = Int(weekSeconds(at: now) / 60)
         let streak = computeStreak()
         // Publish only when a visible value actually changed.
         if today != todayMinutes { todayMinutes = today }
         if week != weekMinutes { weekMinutes = week }
         if streak != streakDays { streakDays = streak }
+    }
+
+    // MARK: Hot-path caches
+
+    /// Today's key, held for as long as "today" lasts. Formatting a date is
+    /// far from free and this is asked for on every interaction.
+    private func dayKey(for date: Date) -> String {
+        if let start = cachedDayStart, let end = cachedDayEnd,
+           date >= start, date < end {
+            return cachedDayKey
+        }
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: date)
+        cachedDayStart = start
+        cachedDayEnd = calendar.date(byAdding: .day, value: 1, to: start)
+            ?? start.addingTimeInterval(24 * 60 * 60)
+        cachedDayKey = dayFormatter.string(from: date)
+        return cachedDayKey
+    }
+
+    /// The running week total, kept up to date by `accrue` rather than summed
+    /// over seven formatted days every time it is read. Recomputed in full
+    /// when the week rolls over or the stored days are replaced.
+    private func weekSeconds(at date: Date) -> Double {
+        if let interval = weekInterval, interval.contains(date) {
+            return weekSecondsCache
+        }
+        weekInterval = Calendar.current.dateInterval(of: .weekOfYear, for: date)
+        weekSecondsCache = currentWeekSeconds()
+        return weekSecondsCache
+    }
+
+    /// Drops both caches: called whenever `days` is replaced wholesale.
+    private func invalidateCaches() {
+        cachedDayStart = nil
+        cachedDayEnd = nil
+        weekInterval = nil
     }
 
     private func currentWeekSeconds() -> Double {
@@ -257,6 +320,7 @@ final class PlaytimeTracker: ObservableObject {
         guard let data = UserDefaults.standard.data(forKey: daysKey),
               let decoded = try? JSONDecoder().decode([String: DayRecord].self, from: data) else { return }
         days = decoded
+        invalidateCaches()
     }
 
     private func save(force: Bool) {

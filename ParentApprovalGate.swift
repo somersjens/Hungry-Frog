@@ -38,18 +38,38 @@ struct ParentApprovalGate: View {
 
             GeometryReader { proxy in
                 ScrollView {
-                    HStack(alignment: .center, spacing: AppLayout.isPad ? 48 : 28) {
-                        VStack(spacing: 18) {
-                            header
-                            if failures > 0 {
-                                failureIndicator
-                                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    Group {
+                        // iPad presents this sheet as a centered form sheet
+                        // rather than edge-to-edge, so the side-by-side split
+                        // that works in an iPhone-width sheet leaves the
+                        // description column too narrow and truncates its
+                        // text. Stacking it above the card instead gives both
+                        // the full sheet width, which there is plenty of.
+                        if AppLayout.isPad {
+                            VStack(spacing: 24) {
+                                header
+                                if failures > 0 {
+                                    failureIndicator
+                                        .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                                }
+                                approvalCard
+                                    .frame(maxWidth: 620)
+                            }
+                        } else {
+                            HStack(alignment: .center, spacing: 28) {
+                                VStack(spacing: 18) {
+                                    header
+                                    if failures > 0 {
+                                        failureIndicator
+                                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                                    }
+                                }
+                                .frame(width: 220)
+
+                                approvalCard
+                                    .frame(maxWidth: 620)
                             }
                         }
-                        .frame(width: AppLayout.isPad ? 300 : 220)
-
-                        approvalCard
-                            .frame(maxWidth: 620)
                     }
                     .padding(.horizontal, AppLayout.landscapeGutter * 2)
                     .padding(.vertical, AppLayout.isPad ? 36 : 20)

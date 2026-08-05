@@ -858,13 +858,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You collected all the flies."
+            "value" : "You collected all the flies"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je hebt alle vliegen verzameld."
+            "value" : "Je hebt alle vliegen verzameld"
           }
         }
       }

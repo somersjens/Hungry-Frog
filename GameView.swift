@@ -77,9 +77,10 @@ struct GameView: View {
                            startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
 
-            // The level's own wallpaper, exactly as the original game had it.
-            LevelWallpaper(level: request.level, tint: character.color)
-                .ignoresSafeArea()
+            // The level's own wallpaper used to sit here. The pond fills the
+            // whole screen opaquely on top of it, so all it ever contributed
+            // was a screenful of glyph layers for the compositor to blend away
+            // behind the playfield on every single frame.
 
             // Keep the level visible underneath every card. The result is an
             // overlay over the reef that was just played, exactly like the
@@ -157,38 +158,50 @@ struct GameView: View {
         // the very first frame, before the insets have been sampled.
         let topInset = max(screenInsets.top, isPad ? 24 : 16)
 
-        return ZStack(alignment: .top) {
-            FlyPlayfield(rounds: model.visibleRounds,
-                          maximumRounds: model.maximumRounds,
-                          character: character,
-                          isPad: isPad,
-                          isLive: model.acceptsInput,
-                          isRunning: isReefRunning,
-                          playsFishEntrance: playsFishEntrance,
-                          playsLevelCompletion: playsLevelCompletion,
-                          reduceMotion: reduceMotion,
-                          // The HUD row's own height, so the swarm's ceiling is
-                          // the underside of the HUD and never the status bar
-                          // or the Dynamic Island behind it.
-                          topReserve: topInset + (isPad ? 64 : 50),
-                          bottomReserve: screenInsets.bottom,
-                          onHit: { model.select(optionID: $0) },
-                          onFishEntranceComplete: finishFishEntrance,
-                          onLevelCompletionFinished: finishLevelCompletion)
+        return GeometryReader { proxy in
+            // On an iPad held in portrait the HUD row and the sum card both
+            // want the top-right corner: the row is wide (bigger controls,
+            // bigger type) and the sum card is pinned to the right regardless
+            // of width. Splitting the double-points chip onto a row of its
+            // own keeps the primary row short enough to leave the card clear,
+            // rather than letting the two fight over the same strip.
+            let isPortraitPad = isPad && proxy.size.height > proxy.size.width
+            let hudExtraReserve: CGFloat = isPortraitPad ? hudControlSize + hudRowSpacing : 0
 
-            hud
-                .padding(.horizontal, isPad ? 28 : 16)
-                .padding(.top, topInset + (isPad ? 12 : 6))
-                .opacity(playsLevelCompletion ? 0 : 1)
-                .animation(.easeOut(duration: 0.22), value: playsLevelCompletion)
-                .allowsHitTesting(!playsLevelCompletion)
+            ZStack(alignment: .top) {
+                FlyPlayfield(rounds: model.visibleRounds,
+                              maximumRounds: model.maximumRounds,
+                              character: character,
+                              isPad: isPad,
+                              isLive: model.acceptsInput,
+                              isRunning: isReefRunning,
+                              playsFishEntrance: playsFishEntrance,
+                              playsLevelCompletion: playsLevelCompletion,
+                              reduceMotion: reduceMotion,
+                              // The HUD's own height, so the swarm's ceiling is
+                              // the underside of the HUD and never the status bar
+                              // or the Dynamic Island behind it. Taller still when
+                              // the double-points chip drops to its own row.
+                              topReserve: topInset + (isPad ? 64 : 50) + hudExtraReserve,
+                              bottomReserve: screenInsets.bottom,
+                              onHit: { model.select(optionID: $0) },
+                              onFishEntranceComplete: finishFishEntrance,
+                              onLevelCompletionFinished: finishLevelCompletion)
 
-            if model.comboAnnouncementID > 0 {
-                ComboFlyBanner(token: model.comboAnnouncementID,
-                               character: character,
-                               isPad: isPad)
-                    .padding(.top, topInset + (isPad ? 116 : 88))
-                    .allowsHitTesting(false)
+                hud(isPortraitPad: isPortraitPad)
+                    .padding(.horizontal, isPad ? 28 : 16)
+                    .padding(.top, topInset + (isPad ? 12 : 6))
+                    .opacity(playsLevelCompletion ? 0 : 1)
+                    .animation(.easeOut(duration: 0.22), value: playsLevelCompletion)
+                    .allowsHitTesting(!playsLevelCompletion)
+
+                if model.comboAnnouncementID > 0 {
+                    ComboFlyBanner(token: model.comboAnnouncementID,
+                                   character: character,
+                                   isPad: isPad)
+                        .padding(.top, topInset + (isPad ? 116 : 88) + hudExtraReserve)
+                        .allowsHitTesting(false)
+                }
             }
         }
         .ignoresSafeArea()
@@ -208,31 +221,58 @@ struct GameView: View {
 
     // MARK: - HUD
 
-    private var hud: some View {
-        HStack(spacing: isPad ? 10 : 8) {
-            pauseButton
-            progressCounter
-            LivesView(lives: model.livesRemaining,
-                      character: character,
-                      isPad: isPad,
-                      glyphSize: hudHeartSize,
-                      rowHeight: hudControlSize)
-                .padding(.horizontal, isPad ? 12 : 10)
-                .background(.white.opacity(0.88), in: Capsule())
-                .shadow(color: character.deepColor.opacity(0.12), radius: 5, y: 3)
-            if let deadline = model.boostDeadline {
-                DoublePointsChip(deadline: deadline,
-                                 token: model.streakAnnouncementID,
-                                 character: character,
-                                 isPad: isPad,
-                                 height: hudControlSize)
-                    .transition(.scale(scale: 0.4).combined(with: .opacity))
+    /// On every layout but an iPad in portrait, the double-points chip shares
+    /// the top row with the pause button, the counter and the hearts. An iPad
+    /// in portrait doesn't have the width to spare — that row is pinned next
+    /// to the sum card — so the chip drops to a row of its own underneath.
+    private func hud(isPortraitPad: Bool) -> some View {
+        Group {
+            if isPortraitPad {
+                VStack(alignment: .leading, spacing: hudRowSpacing) {
+                    primaryHudRow
+                    if let deadline = model.boostDeadline {
+                        HStack(spacing: 0) {
+                            doublePointsChip(deadline: deadline)
+                            Spacer(minLength: 0)
+                        }
+                    }
+                }
+            } else {
+                HStack(spacing: hudRowSpacing) {
+                    primaryHudRow
+                    if let deadline = model.boostDeadline {
+                        doublePointsChip(deadline: deadline)
+                    }
+                    Spacer(minLength: 0)
+                }
             }
-            Spacer(minLength: 0)
         }
         .animation(.spring(response: 0.34, dampingFraction: 0.62),
                    value: model.boostDeadline)
     }
+
+    @ViewBuilder
+    private var primaryHudRow: some View {
+        pauseButton
+        progressCounter
+        LivesView(lives: model.livesRemaining,
+                  character: character,
+                  isPad: isPad,
+                  glyphSize: hudHeartSize,
+                  rowHeight: hudControlSize)
+            .padding(.horizontal, isPad ? 12 : 10)
+    }
+
+    private func doublePointsChip(deadline: Date) -> some View {
+        DoublePointsChip(deadline: deadline,
+                          token: model.streakAnnouncementID,
+                          character: character,
+                          isPad: isPad,
+                          height: hudControlSize)
+            .transition(.scale(scale: 0.4).combined(with: .opacity))
+    }
+
+    private var hudRowSpacing: CGFloat { isPad ? 10 : 8 }
 
     /// Pausing freezes the reef in place and puts the level card over it. The
     /// player can continue immediately or leave for the main menu from there.
@@ -243,18 +283,17 @@ struct GameView: View {
             showsPauseCard = true
             showsIntro = true
         } label: {
-            // Inverted against the rest of the HUD: the disc carries the theme
-            // colour and the bars are punched clean out of it, so the playing
-            // field shows through where the glyph used to be.
             Circle()
                 .fill(character.deepColor)
                 .frame(width: hudControlSize, height: hudControlSize)
                 .overlay {
                     Image(systemName: "pause.fill")
                         .font(.system(size: pauseGlyphSize, weight: .bold))
-                        .blendMode(.destinationOut)
+                        .foregroundStyle(.white)
                 }
-                .compositingGroup()
+                .overlay {
+                    Circle().stroke(.white.opacity(0.92), lineWidth: 3)
+                }
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("pause")
@@ -279,12 +318,15 @@ struct GameView: View {
                 .monospacedDigit()
                 .lineLimit(1)
                 .contentTransition(.numericText(value: Double(model.cards)))
-            FlyCurrencyIcon(size: hudSymbolSize)
+            ZStack {
+                FlyCurrencyIcon(size: hudSymbolSize)
+                    .foregroundStyle(.white.opacity(0.85))
+                    .scaleEffect(1.22)
+                FlyCurrencyIcon(size: hudSymbolSize)
+            }
         }
         .padding(.horizontal, isPad ? 13 : 11)
         .frame(height: hudControlSize, alignment: .center)
-        .background(.white.opacity(0.88), in: Capsule())
-        .shadow(color: character.deepColor.opacity(0.12), radius: 5, y: 3)
         .foregroundStyle(character.deepColor)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: model.cards)
         .accessibilityIdentifier("progress")
@@ -344,59 +386,70 @@ private struct DoublePointsChip: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var flash: CGFloat = 0
+    /// True over the last three seconds of the window. Held as state and
+    /// animated once rather than recomputed per frame, so the chip's gradient,
+    /// stroke and shadow are laid out a single time and the pulse afterwards
+    /// costs nothing but a transform.
+    @State private var isEnding = false
+    @State private var endingWork: DispatchWorkItem?
 
     private var ringSize: CGFloat { isPad ? 34 : 27 }
 
     var body: some View {
-        // Redrawn on a timer of its own: the countdown is the whole point of
-        // the chip, and the session engine has no per-frame clock to hang it on.
-        TimelineView(.periodic(from: .now, by: 1.0 / 20.0)) { context in
-            let remaining = max(0, deadline.timeIntervalSince(context.date))
-            let share = min(1, max(0, remaining / GameConfig.streakBoostDuration))
-            let isEnding = remaining <= 3
-
+        // Only the countdown ring is redrawn on a clock (see `CountdownRing`).
+        // Wrapping the whole chip in a `TimelineView`, as this used to, rebuilt
+        // its gradient, its shadow and a `ViewThatFits` — which lays its
+        // contents out twice — twenty times a second, for the entire length of
+        // a streak. That is exactly the stretch of play the chip appears in.
+        //
+        // The ring is a sibling of the `ViewThatFits`, not inside it: only the
+        // wording is in question, and a candidate that is merely measured
+        // should not be a second live countdown.
+        HStack(spacing: isPad ? 9 : 6) {
             // Spelling the reward out is worth the width wherever the HUD has
             // it; where it does not, the multiplier and the ring say the same
             // thing in a third of the space.
             ViewThatFits(in: .horizontal) {
-                chipBody(share: share, remaining: remaining, spellsItOut: true)
-                chipBody(share: share, remaining: remaining, spellsItOut: false)
+                wording(spellsItOut: true)
+                wording(spellsItOut: false)
             }
-            .foregroundStyle(.white)
-            .padding(.horizontal, isPad ? 14 : 11)
-            .frame(height: height)
-            .background {
-                Capsule()
-                    .fill(LinearGradient(colors: [character.color, character.deepColor],
-                                         startPoint: .topLeading,
-                                         endPoint: .bottomTrailing))
-                    .overlay {
-                        Capsule().stroke(.white.opacity(0.9), lineWidth: 2)
-                    }
-                    .shadow(color: character.deepColor.opacity(0.35), radius: 7, y: 3)
-            }
-            // The last three seconds pulse, so the window closing is felt
-            // rather than only read off the number.
-            .scaleEffect(isEnding && !reduceMotion
-                         ? 1 + 0.06 * CGFloat(abs(sin(remaining * .pi)))
-                         : 1)
-            .overlay {
-                Capsule()
-                    .stroke(.white, lineWidth: 3)
-                    .scaleEffect(1 + flash * 0.5)
-                    .opacity(Double(1 - flash))
-            }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("game.streakBoost.title"))
-            .accessibilityValue(Text(verbatim: "\(Int(ceil(remaining)))s"))
+            CountdownRing(deadline: deadline, size: ringSize, isPad: isPad)
         }
-        .onAppear { pulse() }
+        .foregroundStyle(.white)
+        .padding(.horizontal, isPad ? 14 : 11)
+        .frame(height: height)
+        .background {
+            Capsule()
+                .fill(LinearGradient(colors: [character.color, character.deepColor],
+                                     startPoint: .topLeading,
+                                     endPoint: .bottomTrailing))
+                .overlay {
+                    Capsule().stroke(.white.opacity(0.9), lineWidth: 2)
+                }
+                .shadow(color: character.deepColor.opacity(0.35), radius: 7, y: 3)
+        }
+        // The last three seconds pulse, so the window closing is felt
+        // rather than only read off the number.
+        .scaleEffect(isEnding ? 1.06 : 1)
+        .overlay {
+            Capsule()
+                .stroke(.white, lineWidth: 3)
+                .scaleEffect(1 + flash * 0.5)
+                .opacity(Double(1 - flash))
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("game.streakBoost.title"))
+        .accessibilityValue(Text(verbatim:
+            "\(Int(ceil(max(0, deadline.timeIntervalSinceNow))))s"))
+        .onAppear { pulse(); armEndingPulse() }
         .onChange(of: token) { _, _ in pulse() }
+        // A window renewed while it is still running pushes the closing pulse
+        // back out with it.
+        .onChange(of: deadline) { _, _ in armEndingPulse() }
+        .onDisappear { endingWork?.cancel() }
     }
 
-    private func chipBody(share: Double,
-                          remaining: TimeInterval,
-                          spellsItOut: Bool) -> some View {
+    private func wording(spellsItOut: Bool) -> some View {
         HStack(spacing: isPad ? 9 : 6) {
             Text(verbatim: "\(GameConfig.streakMultiplier)×")
                 .font(.system(size: isPad ? 26 : 20, weight: .black, design: .rounded))
@@ -406,31 +459,60 @@ private struct DoublePointsChip: View {
                     .lineLimit(1)
                     .fixedSize()
             }
-            countdownRing(share: share, remaining: remaining)
         }
-    }
-
-    /// A ring that empties over the window, with the whole seconds left in it.
-    private func countdownRing(share: Double, remaining: TimeInterval) -> some View {
-        ZStack {
-            Circle()
-                .stroke(.white.opacity(0.32), lineWidth: isPad ? 4 : 3)
-            Circle()
-                .trim(from: 0, to: share)
-                .stroke(.white,
-                        style: StrokeStyle(lineWidth: isPad ? 4 : 3, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-            Text(verbatim: "\(Int(ceil(remaining)))")
-                .font(.system(size: isPad ? 15 : 12, weight: .heavy, design: .rounded))
-                .monospacedDigit()
-        }
-        .frame(width: ringSize, height: ringSize)
     }
 
     private func pulse() {
         guard !reduceMotion else { return }
         flash = 0
         withAnimation(.easeOut(duration: 0.55)) { flash = 1 }
+    }
+
+    /// Schedules the closing pulse for the moment three seconds are left. The
+    /// swell itself is a repeating animation the render server owns, so no
+    /// frame of it costs a body evaluation.
+    private func armEndingPulse() {
+        endingWork?.cancel()
+        withTransaction(Transaction(animation: nil)) { isEnding = false }
+        guard !reduceMotion else { return }
+        let work = DispatchWorkItem {
+            withAnimation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
+                isEnding = true
+            }
+        }
+        endingWork = work
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + max(0, deadline.timeIntervalSinceNow - 3),
+            execute: work
+        )
+    }
+}
+
+/// A ring that empties over the double-points window, with the whole seconds
+/// left in it. The only part of the chip that is on a clock.
+private struct CountdownRing: View {
+    let deadline: Date
+    let size: CGFloat
+    let isPad: Bool
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1.0 / 12.0)) { context in
+            let remaining = max(0, deadline.timeIntervalSince(context.date))
+            let share = min(1, max(0, remaining / GameConfig.streakBoostDuration))
+            ZStack {
+                Circle()
+                    .stroke(.white.opacity(0.32), lineWidth: isPad ? 4 : 3)
+                Circle()
+                    .trim(from: 0, to: share)
+                    .stroke(.white,
+                            style: StrokeStyle(lineWidth: isPad ? 4 : 3, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                Text(verbatim: "\(Int(ceil(remaining)))")
+                    .font(.system(size: isPad ? 15 : 12, weight: .heavy, design: .rounded))
+                    .monospacedDigit()
+            }
+        }
+        .frame(width: size, height: size)
     }
 }
 
@@ -550,6 +632,12 @@ struct LivesView: View {
     private func heart(at index: Int) -> some View {
         let size = glyphSize
         return ZStack {
+            // A soft white outline behind every heart, full or empty, so the
+            // row stays legible over any part of the pond.
+            Image(systemName: "heart.fill")
+                .foregroundStyle(.white.opacity(0.85))
+                .scaleEffect(1.22)
+
             Image(systemName: "heart.fill")
                 .foregroundStyle(heartColor.opacity(0.22))
             if index < wholeHearts {

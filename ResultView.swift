@@ -116,11 +116,16 @@ struct ResultView: View {
     private var card: some View {
         HStack(alignment: .center, spacing: 28 * scale) {
             VStack(spacing: 0) {
+                characterBadge
+                    // Pulled up so the title reads as sitting on the badge
+                    // rather than as a separate block underneath it.
+                    .padding(.bottom, -10 * scale)
+
                 if isCompleted {
                     completionTitle.frame(maxWidth: .infinity)
                 } else {
                     Text(titleKey)
-                        .font(.system(size: 29 * textScale, weight: .heavy, design: .rounded))
+                        .font(.system(size: 38 * textScale, weight: .heavy, design: .rounded))
                         .foregroundStyle(character.deepColor)
                         .multilineTextAlignment(.center)
                         .lineLimit(1)
@@ -128,19 +133,13 @@ struct ResultView: View {
                         .frame(maxWidth: .infinity)
                 }
 
-                Text(verbatim: encouragement)
-                    .font(.system(size: (isCompleted ? 17 : 20) * textScale,
-                                  weight: isCompleted ? .medium : .semibold))
-                    .foregroundStyle(character.deepColor.opacity(0.64))
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 10 * scale)
-                    .frame(minHeight: 30 * scale)
+                encouragementRow
 
                 scoreCapsule
-                    .padding(.top, 20 * scale)
+                    .padding(.top, 12 * scale)
 
                 if !result.unlockedCharacterIDs.isEmpty {
-                    unlockedRow.padding(.top, 14 * scale)
+                    unlockedRow.padding(.top, 8 * scale)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -156,8 +155,59 @@ struct ResultView: View {
         }
     }
 
+    /// The played character, styled exactly like the large preview in the
+    /// Premium screen: a soft colour-tinted glow, a thin ring and the artwork
+    /// floating free with its own drop shadow — no white-ringed disc.
+    private var characterBadge: some View {
+        let heroSize = 118 * scale
+        return ZStack {
+            Circle()
+                .fill(RadialGradient(
+                    colors: [character.color.opacity(0.35), character.color.opacity(0.05)],
+                    center: .center, startRadius: 6, endRadius: heroSize * 0.8
+                ))
+                .frame(width: heroSize, height: heroSize)
+            Circle()
+                .stroke(character.color.opacity(0.30), lineWidth: 2)
+                .frame(width: heroSize * 0.92, height: heroSize * 0.92)
+            character.artwork
+                .resizable()
+                .scaledToFit()
+                .frame(width: heroSize * 0.86, height: heroSize * 0.86)
+                .shadow(color: character.deepColor.opacity(0.25), radius: 16, y: 9)
+        }
+        .frame(width: heroSize, height: heroSize)
+        .accessibilityHidden(true)
+    }
+
+    /// The level-based description, flanked by the small leaf ornaments the
+    /// original reference used around "Good try".
+    private var encouragementRow: some View {
+        HStack(spacing: 6 * scale) {
+            leafOrnament
+            Text(verbatim: encouragement)
+                .font(.system(size: (isCompleted ? 13 : 14) * textScale,
+                              weight: isCompleted ? .medium : .semibold))
+                .foregroundStyle(character.deepColor.opacity(0.64))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+            // The right leaf is the left one's exact mirror image, not an
+            // independently rotated copy.
+            leafOrnament.scaleEffect(x: -1, y: 1)
+        }
+        .frame(minHeight: 20 * scale)
+    }
+
+    private var leafOrnament: some View {
+        Image(systemName: "leaf.fill")
+            .font(.system(size: 10 * textScale, weight: .semibold))
+            .foregroundStyle(character.color.opacity(0.5))
+            .rotationEffect(.degrees(18))
+    }
+
     private var completionTitle: some View {
-        let fontSize = 29 * textScale
+        let fontSize = 38 * textScale
         return HStack(spacing: 7 * scale) {
             operationLabel(fontSize: fontSize)
             Text("game.end.completionSuffix")
@@ -227,41 +277,44 @@ struct ResultView: View {
         Text(verbatim: "\(levelScore) / \(maximum)")
             // Keep "x / y" from flipping around.
             .environment(\.layoutDirection, .leftToRight)
-            .font(.system(size: 30 * textScale, weight: .heavy, design: .rounded))
+            .font(.system(size: 28 * textScale, weight: .heavy, design: .rounded))
             .foregroundStyle(character.color)
-            .padding(.horizontal, 27 * scale)
+            .padding(.horizontal, 24 * scale)
             .padding(.vertical, 10 * scale)
-            .background(character.tintColor, in: Capsule())
-            .overlay { Capsule().stroke(character.color.opacity(0.12), lineWidth: 1) }
-            // The smaller capsule deliberately sits just beyond the score's
-            // top-right corner, leaving the tally itself unobscured.
-            .overlay(alignment: .topTrailing) {
+            .background(character.tintColor, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(character.color.opacity(0.16), lineWidth: 1)
+            }
+            // Detached from the box rather than stacked inside it: it floats
+            // above, centred, straddling the top edge.
+            .overlay(alignment: .top) {
                 if showsNewBest {
                     newBestBadge
-                        .offset(x: 30, y: -16)
                         .scaleEffect(badgeLanded ? 1 : 0.4)
-                        .rotationEffect(.degrees(badgeLanded ? 0 : -18))
                         .opacity(badgeLanded ? 1 : 0)
+                        .offset(y: -12 * scale)
                 }
             }
             .accessibilityIdentifier("score")
             .accessibilityLabel(Text(L("game.accessibility.scoreOutOf \(levelScore) \(maximum)")))
     }
 
+    /// A small pill centred above the score, detached from the box itself.
     private var newBestBadge: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 3) {
             Text("game.highScore")
                 .lineLimit(1)
-            CurrencyIcon(size: 13 * textScale)
+            CurrencyIcon(size: 9 * textScale)
         }
-        // The badge is an overlay pinned to the score capsule's width, so a long
-        // translation would wrap; fixedSize lets it grow on one line instead.
         .fixedSize()
-        .font(.system(size: 13 * textScale, weight: .bold, design: .rounded))
+        .font(.system(size: 9.5 * textScale, weight: .bold, design: .rounded))
         .foregroundStyle(.white)
-        .padding(.horizontal, 10 * textScale)
-        .padding(.vertical, 6 * textScale)
+        .padding(.horizontal, 7 * textScale)
+        .padding(.vertical, 3.5 * textScale)
         .background(character.color, in: Capsule())
+        .overlay { Capsule().stroke(.white.opacity(0.85), lineWidth: 1.5) }
+        .shadow(color: character.deepColor.opacity(0.28), radius: 4, y: 2)
         // A soft diagonal highlight sweeps across once as the badge lands.
         // Clipped to the capsule and starting off-badge, it is invisible before
         // and after that single pass — no fade bookkeeping needed.
@@ -271,9 +324,9 @@ struct ResultView: View {
                     LinearGradient(colors: [.white.opacity(0), .white.opacity(0.55), .white.opacity(0)],
                                    startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
-                .frame(width: 26)
+                .frame(width: 20)
                 .rotationEffect(.degrees(18))
-                .offset(x: shineSweep ? 90 : -90)
+                .offset(x: shineSweep ? 70 : -70)
                 .allowsHitTesting(false)
         }
         .clipShape(Capsule())
@@ -306,12 +359,12 @@ struct ResultView: View {
     }
 
     private var buttons: some View {
-        VStack(spacing: 10 * scale) {
+        VStack(spacing: 12 * scale) {
             Button(action: onPlayAgain) {
                 Label("game.end.playAgain", systemImage: "arrow.counterclockwise")
-                    .font(isPad ? .title3.weight(.bold) : .headline.weight(.bold))
+                    .font(.system(size: 20 * textScale, weight: .heavy, design: .rounded))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14 * scale)
+                    .padding(.vertical, 17 * scale)
                     .foregroundStyle(.white)
                     .background(
                         LinearGradient(colors: [character.color, character.deepColor],
@@ -324,9 +377,9 @@ struct ResultView: View {
 
             Button(action: onExit) {
                 Label("game.end.mainMenu", systemImage: "house.fill")
-                    .font(isPad ? .title3.weight(.semibold) : .headline.weight(.semibold))
+                    .font(.system(size: 18 * textScale, weight: .bold, design: .rounded))
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14 * scale)
+                    .padding(.vertical, 17 * scale)
                     .foregroundStyle(character.deepColor)
                     .background(character.skyColor, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
                     .overlay {
