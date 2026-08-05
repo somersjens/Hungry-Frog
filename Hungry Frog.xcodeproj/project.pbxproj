@@ -11,17 +11,16 @@
 		F9E6FB5D30234FD0001D93E4 /* splash.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5B30234FD0001D93E4 /* splash.caf */; };
 		F9E6FB5E30234FD0001D93E4 /* score_increase_main.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */; };
 		F9E6FB5F30234FD0001D93E4 /* wrong_answer.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */; };
-		F9F3C61E301E409F00464555 /* score_increase.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C606301E409F00464555 /* score_increase.caf */; };
 		F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C619301E409F00464555 /* sfx_wrong.caf */; };
 		F9F3C621301E409F00464555 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C600301E409F00464555 /* Products.storekit */; };
 		F9F3C622301E409F00464555 /* sfx_double_card.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60E301E409F00464555 /* sfx_double_card.caf */; };
-		F9F3C623301E409F00464555 /* sfx_half_life.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C611301E409F00464555 /* sfx_half_life.wav */; };
+		F9F3C623301E409F00464555 /* sfx_half_life.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C611301E409F00464555 /* sfx_half_life.caf */; };
 		F9F3C624301E409F00464555 /* sfx_card_flight.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C609301E409F00464555 /* sfx_card_flight.caf */; };
 		F9F3C625301E409F00464555 /* sfx_switch_off.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C617301E409F00464555 /* sfx_switch_off.caf */; };
 		F9F3C626301E409F00464555 /* sfx_switch_on.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C618301E409F00464555 /* sfx_switch_on.caf */; };
 		F9F3C627301E409F00464555 /* sfx_session_start.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C616301E409F00464555 /* sfx_session_start.caf */; };
-		F9F3C628301E409F00464555 /* sfx_select.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C615301E409F00464555 /* sfx_select.wav */; };
-		F9F3C629301E409F00464555 /* sfx_card_flip.wav in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60A301E409F00464555 /* sfx_card_flip.wav */; };
+		F9F3C628301E409F00464555 /* sfx_select.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C615301E409F00464555 /* sfx_select.caf */; };
+		F9F3C629301E409F00464555 /* sfx_card_flip.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60A301E409F00464555 /* sfx_card_flip.caf */; };
 		F9F3C62A301E409F00464555 /* sfx_life_lost.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C614301E409F00464555 /* sfx_life_lost.caf */; };
 		F9F3C62C301E409F00464555 /* sfx_card_reveal.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60B301E409F00464555 /* sfx_card_reveal.caf */; };
 		F9F3C62D301E409F00464555 /* sfx_high_score.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C612301E409F00464555 /* sfx_high_score.caf */; };
@@ -51,9 +50,9 @@
 		F9F3C647301E409F00464555 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DC301E409F00464555 /* AppSettings.swift */; };
 		F9F3C648301E409F00464555 /* ReviewRequestCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */; };
 		F9F3C649301E409F00464555 /* AppAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DB301E409F00464555 /* AppAudio.swift */; };
-		F9F3C64A301E409F00464555 /* ReefGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C603301E409F00464555 /* ReefGame.swift */; };
+		F9F3C64A301E409F00464555 /* ScreenSafeArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C603301E409F00464555 /* ScreenSafeArea.swift */; };
 		F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FF301E409F00464555 /* PremiumView.swift */; };
-		F9F3C64C301E409F00464555 /* AmbientReefBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */; };
+		F9F3C64C301E409F00464555 /* MenuMeadowBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */; };
 		F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E6301E409F00464555 /* PausedSessionStore.swift */; };
 		F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C601301E409F00464555 /* ProgressSync.swift */; };
 		F9F3C64F301E409F00464555 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EF301E409F00464555 /* GameView.swift */; };
@@ -70,7 +69,7 @@
 		F9F3C65A301E409F00464555 /* RoundFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EA301E409F00464555 /* RoundFactory.swift */; };
 		F9F3C65C301E409F00464555 /* GameConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E2301E409F00464555 /* GameConfig.swift */; };
 		F9F3C65D301E409F00464555 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E8301E409F00464555 /* ProgressStore.swift */; };
-		F9F3C9AD301F3CBE00464555 /* frog_music.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C9AC301F3CBE00464555 /* frog_music.mp3 */; };
+		F9F3C9AD301F3CBE00464555 /* frog_music.m4a in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C9AC301F3CBE00464555 /* frog_music.m4a */; };
 		FA11F00131A1000000000001 /* FlyGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00231A1000000000001 /* FlyGame.swift */; };
 /* End PBXBuildFile section */
 
@@ -80,7 +79,7 @@
 		F9E6FB5B30234FD0001D93E4 /* splash.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = splash.caf; sourceTree = "<group>"; };
 		F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wrong_answer.caf; sourceTree = "<group>"; };
 		F9F3C5CA301E405E00464555 /* Hungry Frog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hungry Frog.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientReefBackground.swift; sourceTree = "<group>"; };
+		F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMeadowBackground.swift; sourceTree = "<group>"; };
 		F9F3C5DB301E409F00464555 /* AppAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAudio.swift; sourceTree = "<group>"; };
 		F9F3C5DC301E409F00464555 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		F9F3C5DD301E409F00464555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -115,32 +114,31 @@
 		F9F3C600301E409F00464555 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		F9F3C601301E409F00464555 /* ProgressSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSync.swift; sourceTree = "<group>"; };
 		F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotedPurchaseCoordinator.swift; sourceTree = "<group>"; };
-		F9F3C603301E409F00464555 /* ReefGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReefGame.swift; sourceTree = "<group>"; };
+		F9F3C603301E409F00464555 /* ScreenSafeArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSafeArea.swift; sourceTree = "<group>"; };
 		F9F3C604301E409F00464555 /* ResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultView.swift; sourceTree = "<group>"; };
 		F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewRequestCoordinator.swift; sourceTree = "<group>"; };
-		F9F3C606301E409F00464555 /* score_increase.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = score_increase.caf; sourceTree = "<group>"; };
 		F9F3C607301E409F00464555 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F9F3C608301E409F00464555 /* sfx_card_count.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_card_count.caf; sourceTree = "<group>"; };
 		F9F3C609301E409F00464555 /* sfx_card_flight.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_card_flight.caf; sourceTree = "<group>"; };
-		F9F3C60A301E409F00464555 /* sfx_card_flip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sfx_card_flip.wav; sourceTree = "<group>"; };
+		F9F3C60A301E409F00464555 /* sfx_card_flip.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_card_flip.caf; sourceTree = "<group>"; };
 		F9F3C60B301E409F00464555 /* sfx_card_reveal.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_card_reveal.caf; sourceTree = "<group>"; };
 		F9F3C60C301E409F00464555 /* sfx_character_unlock.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_character_unlock.caf; sourceTree = "<group>"; };
 		F9F3C60D301E409F00464555 /* sfx_correct.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_correct.caf; sourceTree = "<group>"; };
 		F9F3C60E301E409F00464555 /* sfx_double_card.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_double_card.caf; sourceTree = "<group>"; };
 		F9F3C60F301E409F00464555 /* sfx_double_score.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_double_score.caf; sourceTree = "<group>"; };
 		F9F3C610301E409F00464555 /* sfx_flamethrower.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_flamethrower.caf; sourceTree = "<group>"; };
-		F9F3C611301E409F00464555 /* sfx_half_life.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sfx_half_life.wav; sourceTree = "<group>"; };
+		F9F3C611301E409F00464555 /* sfx_half_life.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_half_life.caf; sourceTree = "<group>"; };
 		F9F3C612301E409F00464555 /* sfx_high_score.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_high_score.caf; sourceTree = "<group>"; };
 		F9F3C613301E409F00464555 /* sfx_level_complete.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_level_complete.caf; sourceTree = "<group>"; };
 		F9F3C614301E409F00464555 /* sfx_life_lost.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_life_lost.caf; sourceTree = "<group>"; };
-		F9F3C615301E409F00464555 /* sfx_select.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sfx_select.wav; sourceTree = "<group>"; };
+		F9F3C615301E409F00464555 /* sfx_select.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_select.caf; sourceTree = "<group>"; };
 		F9F3C616301E409F00464555 /* sfx_session_start.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_session_start.caf; sourceTree = "<group>"; };
 		F9F3C617301E409F00464555 /* sfx_switch_off.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_off.caf; sourceTree = "<group>"; };
 		F9F3C618301E409F00464555 /* sfx_switch_on.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_on.caf; sourceTree = "<group>"; };
 		F9F3C619301E409F00464555 /* sfx_wrong.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_wrong.caf; sourceTree = "<group>"; };
 		F9F3C61B301E409F00464555 /* SpokenMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenMath.swift; sourceTree = "<group>"; };
 		F9F3C61C301E409F00464555 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		F9F3C9AC301F3CBE00464555 /* frog_music.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = frog_music.mp3; sourceTree = "<group>"; };
+		F9F3C9AC301F3CBE00464555 /* frog_music.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = frog_music.m4a; sourceTree = "<group>"; };
 		FA11F00231A1000000000001 /* FlyGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGame.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -158,8 +156,8 @@
 		F9F3C5C1301E405E00464555 = {
 			isa = PBXGroup;
 			children = (
-				F9F3C9AC301F3CBE00464555 /* frog_music.mp3 */,
-				F9F3C5DA301E409F00464555 /* AmbientReefBackground.swift */,
+				F9F3C9AC301F3CBE00464555 /* frog_music.m4a */,
+				F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */,
 				F9F3C5DB301E409F00464555 /* AppAudio.swift */,
 				F9F3C5DC301E409F00464555 /* AppSettings.swift */,
 				F9F3C5DD301E409F00464555 /* Assets.xcassets */,
@@ -183,29 +181,28 @@
 				F9F3C600301E409F00464555 /* Products.storekit */,
 				F9F3C601301E409F00464555 /* ProgressSync.swift */,
 				F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */,
-				F9F3C603301E409F00464555 /* ReefGame.swift */,
+				F9F3C603301E409F00464555 /* ScreenSafeArea.swift */,
 				FA11F00231A1000000000001 /* FlyGame.swift */,
 				F9F3C604301E409F00464555 /* ResultView.swift */,
 				F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */,
-				F9F3C606301E409F00464555 /* score_increase.caf */,
 				F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */,
 				F9E6FB5B30234FD0001D93E4 /* splash.caf */,
 				F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */,
 				F9F3C607301E409F00464555 /* SettingsView.swift */,
 				F9F3C608301E409F00464555 /* sfx_card_count.caf */,
 				F9F3C609301E409F00464555 /* sfx_card_flight.caf */,
-				F9F3C60A301E409F00464555 /* sfx_card_flip.wav */,
+				F9F3C60A301E409F00464555 /* sfx_card_flip.caf */,
 				F9F3C60B301E409F00464555 /* sfx_card_reveal.caf */,
 				F9F3C60C301E409F00464555 /* sfx_character_unlock.caf */,
 				F9F3C60D301E409F00464555 /* sfx_correct.caf */,
 				F9F3C60E301E409F00464555 /* sfx_double_card.caf */,
 				F9F3C60F301E409F00464555 /* sfx_double_score.caf */,
 				F9F3C610301E409F00464555 /* sfx_flamethrower.caf */,
-				F9F3C611301E409F00464555 /* sfx_half_life.wav */,
+				F9F3C611301E409F00464555 /* sfx_half_life.caf */,
 				F9F3C612301E409F00464555 /* sfx_high_score.caf */,
 				F9F3C613301E409F00464555 /* sfx_level_complete.caf */,
 				F9F3C614301E409F00464555 /* sfx_life_lost.caf */,
-				F9F3C615301E409F00464555 /* sfx_select.wav */,
+				F9F3C615301E409F00464555 /* sfx_select.caf */,
 				F9F3C616301E409F00464555 /* sfx_session_start.caf */,
 				F9F3C617301E409F00464555 /* sfx_switch_off.caf */,
 				F9F3C618301E409F00464555 /* sfx_switch_on.caf */,
@@ -310,11 +307,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9F3C61E301E409F00464555 /* score_increase.caf in Resources */,
 				F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */,
 				F9F3C621301E409F00464555 /* Products.storekit in Resources */,
 				F9F3C622301E409F00464555 /* sfx_double_card.caf in Resources */,
-				F9F3C623301E409F00464555 /* sfx_half_life.wav in Resources */,
+				F9F3C623301E409F00464555 /* sfx_half_life.caf in Resources */,
 				F9F3C624301E409F00464555 /* sfx_card_flight.caf in Resources */,
 				F9F3C625301E409F00464555 /* sfx_switch_off.caf in Resources */,
 				F9F3C626301E409F00464555 /* sfx_switch_on.caf in Resources */,
@@ -322,9 +318,9 @@
 				F9E6FB5D30234FD0001D93E4 /* splash.caf in Resources */,
 				F9E6FB5E30234FD0001D93E4 /* score_increase_main.caf in Resources */,
 				F9E6FB5F30234FD0001D93E4 /* wrong_answer.caf in Resources */,
-				F9F3C9AD301F3CBE00464555 /* frog_music.mp3 in Resources */,
-				F9F3C628301E409F00464555 /* sfx_select.wav in Resources */,
-				F9F3C629301E409F00464555 /* sfx_card_flip.wav in Resources */,
+				F9F3C9AD301F3CBE00464555 /* frog_music.m4a in Resources */,
+				F9F3C628301E409F00464555 /* sfx_select.caf in Resources */,
+				F9F3C629301E409F00464555 /* sfx_card_flip.caf in Resources */,
 				F9F3C62A301E409F00464555 /* sfx_life_lost.caf in Resources */,
 				F9F3C62C301E409F00464555 /* sfx_card_reveal.caf in Resources */,
 				F9F3C62D301E409F00464555 /* sfx_high_score.caf in Resources */,
@@ -364,10 +360,10 @@
 				F9F3C647301E409F00464555 /* AppSettings.swift in Sources */,
 				F9F3C648301E409F00464555 /* ReviewRequestCoordinator.swift in Sources */,
 				F9F3C649301E409F00464555 /* AppAudio.swift in Sources */,
-				F9F3C64A301E409F00464555 /* ReefGame.swift in Sources */,
+				F9F3C64A301E409F00464555 /* ScreenSafeArea.swift in Sources */,
 				FA11F00131A1000000000001 /* FlyGame.swift in Sources */,
 				F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */,
-				F9F3C64C301E409F00464555 /* AmbientReefBackground.swift in Sources */,
+				F9F3C64C301E409F00464555 /* MenuMeadowBackground.swift in Sources */,
 				F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */,
 				F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */,
 				F9F3C64F301E409F00464555 /* GameView.swift in Sources */,
@@ -458,6 +454,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_OPTIMIZATION = space;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

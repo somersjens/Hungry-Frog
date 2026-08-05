@@ -159,14 +159,14 @@ final class AppAudio: NSObject, ObservableObject {
         Effect(key: "splash",        file: "splash",             ext: "caf", volume: 0.24, lead: 0.0),
         Effect(key: "wrongAnswer",   file: "wrong_answer",       ext: "caf", volume: 0.087, lead: 0.0),
         // The card flip that opens a round.
-        Effect(key: "cardFlip",      file: "sfx_card_flip",      ext: "wav", volume: 0.10, lead: 0.015),
+        Effect(key: "cardFlip",      file: "sfx_card_flip",      ext: "caf", volume: 0.10, lead: 0.015),
         // The question card turning face up.
         Effect(key: "cardReveal",    file: "sfx_card_reveal",    ext: "caf", volume: 0.19, lead: 0.010),
         // The thick double card appearing, and the doubled score landing.
         Effect(key: "doubleCard",    file: "sfx_double_card",    ext: "caf", volume: 0.18, lead: 0.0),
         Effect(key: "doubleScore",   file: "sfx_double_score",   ext: "caf", volume: 0.15, lead: 0.0),
         // Half a life leaving the HUD when the flamethrower is fired.
-        Effect(key: "halfLife",      file: "sfx_half_life",      ext: "wav", volume: 0.12, lead: 0.0),
+        Effect(key: "halfLife",      file: "sfx_half_life",      ext: "caf", volume: 0.12, lead: 0.0),
         Effect(key: "lifeLost",      file: "sfx_life_lost",      ext: "caf", volume: 0.24, lead: 0.045),
         Effect(key: "flamethrower",  file: "sfx_flamethrower",   ext: "caf", volume: 0.31, lead: 0.045),
         Effect(key: "sessionStart",  file: "sfx_session_start",  ext: "caf", volume: 0.16, lead: 0.225),
@@ -179,7 +179,7 @@ final class AppAudio: NSObject, ObservableObject {
         // The header totals climbing on the menu. The sound runs for as long as
         // the counters do, where the old blip was over before they had started.
         Effect(key: "cardTotal",     file: "score_increase_main", ext: "caf", volume: 0.094, lead: 0.0),
-        Effect(key: "select",        file: "sfx_select",         ext: "wav", volume: 0.17, lead: 0.0),
+        Effect(key: "select",        file: "sfx_select",         ext: "caf", volume: 0.17, lead: 0.0),
         Effect(key: "switchOn",      file: "sfx_switch_on",      ext: "caf", volume: 0.89, lead: 0.200),
         Effect(key: "switchOff",     file: "sfx_switch_off",     ext: "caf", volume: 1.0,  lead: 0.170)
     ]
@@ -332,7 +332,7 @@ final class AppAudio: NSObject, ObservableObject {
 
     /// Builds a fully prepared player. Runs the decode/`prepareToPlay` cost on
     /// whatever (background) queue calls it.
-    private static func makePlayer(named name: String, ext: String = "mp3",
+    private static func makePlayer(named name: String, ext: String = "m4a",
                                    loops: Int, volume: Float,
                                    enableRate: Bool = false) -> AVAudioPlayer? {
         guard let url = Bundle.main.url(forResource: name, withExtension: ext),
