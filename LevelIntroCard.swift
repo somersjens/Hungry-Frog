@@ -198,6 +198,7 @@ struct LevelIntroCard: View {
                 .scrollBounceBehavior(.basedOnSize)
             }
         }
+        .currencyIcon(for: theme)
     }
 
     /// Portrait on the left; beside it the level title on a single line with
@@ -349,7 +350,7 @@ struct LevelIntroCard: View {
                         .minimumScaleFactor(0.48)
                         .allowsTightening(true)
                 } else {
-                    if feature.icon == Currency.icon {
+                    if feature.icon == Currency.icon(for: theme.id) {
                         CurrencyIcon(size: 28 * textScale * featureIconScale)
                     } else if feature.icon.hasPrefix("food_") {
                         Image(feature.icon)

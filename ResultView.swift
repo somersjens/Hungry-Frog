@@ -94,6 +94,9 @@ struct ResultView: View {
                     .allowsHitTesting(false)
             }
         }
+        // The best-score badge and the celebration swarm both count in what
+        // this character was collecting all session.
+        .currencyIcon(for: character)
         .onAppear {
             withAnimation(.spring(response: 0.46, dampingFraction: 0.82)) {
                 isPresented = true

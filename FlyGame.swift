@@ -2148,14 +2148,6 @@ private struct ActiveQuestionView: View {
     }
 }
 
-struct FlyCurrencyIcon: View {
-    let size: CGFloat
-
-    var body: some View {
-        CurrencyIcon(size: size)
-    }
-}
-
 private struct FlyCelebration: View {
     let clock: Double
     let color: Color
@@ -2163,7 +2155,7 @@ private struct FlyCelebration: View {
     var body: some View {
         GeometryReader { proxy in
             ForEach(0..<16, id: \.self) { index in
-                FlyCurrencyIcon(size: CGFloat(18 + index % 4 * 4))
+                CurrencyIcon(size: CGFloat(18 + index % 4 * 4))
                     .foregroundStyle(color)
                     .position(x: proxy.size.width * CGFloat((index * 37) % 100) / 100,
                               y: proxy.size.height * CGFloat((index * 23) % 100) / 100)

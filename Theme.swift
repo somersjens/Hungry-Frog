@@ -9,10 +9,48 @@
 
 import SwiftUI
 
-/// The game's currency. Players collect flies throughout the game. Keep the
-/// asset name in one place so every counter and reward uses the same artwork.
+/// The game's currency. What a player collects is whatever their character
+/// eats, so the counter matches the food flying around the level: the frog
+/// banks flies, the penguin fish, the fox drumsticks. The artwork lives in
+/// `fly_currency` and `currency_2`…`currency_10`, in catalog order — the frog's
+/// keeps its original asset name because it shipped first.
 enum Currency {
-    static let icon = "fly_currency"
+    /// The frog's fly. Also the icon wherever the currency is spoken of in
+    /// general rather than in one character's world — the Premium screen sells
+    /// the whole cast, so it counts in flies for all of them.
+    static let flyIcon = "fly_currency"
+
+    static func icon(for characterID: String) -> String {
+        let index = CharacterUnlocks.orderedCharacterIDs.firstIndex(of: characterID) ?? 0
+        return index == 0 ? flyIcon : "currency_\(index + 1)"
+    }
+}
+
+private struct CurrencyIconKey: EnvironmentKey {
+    static let defaultValue = Currency.flyIcon
+}
+
+extension EnvironmentValues {
+    /// Which currency artwork every `CurrencyIcon` below this point draws.
+    /// Carried in the environment rather than passed down: the counters sit
+    /// deep inside level cards, HUD chips and celebration swarms, and all of
+    /// them belong to whichever character owns the screen they are on.
+    var currencyIcon: String {
+        get { self[CurrencyIconKey.self] }
+        set { self[CurrencyIconKey.self] = newValue }
+    }
+}
+
+extension View {
+    /// Hands this screen the character's own food to count in.
+    func currencyIcon(for character: AnimalCharacter) -> some View {
+        environment(\.currencyIcon, Currency.icon(for: character.id))
+    }
+
+    /// Pins a screen back to the fly, whatever character is selected.
+    func flyCurrencyIcon() -> some View {
+        environment(\.currencyIcon, Currency.flyIcon)
+    }
 }
 
 /// The artwork used anywhere a currency count is shown. It is rendered as a
@@ -20,8 +58,10 @@ enum Currency {
 struct CurrencyIcon: View {
     let size: CGFloat
 
+    @Environment(\.currencyIcon) private var iconName
+
     var body: some View {
-        Image(Currency.icon)
+        Image(iconName)
             .renderingMode(.template)
             .resizable()
             .scaledToFit()

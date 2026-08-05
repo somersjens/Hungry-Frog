@@ -112,6 +112,10 @@ struct GameView: View {
                     .zIndex(2)
             }
         }
+        // What the level fills with is what the HUD counts and what the
+        // celebrations rain down, all the way through the start card, the
+        // playfield and the result card.
+        .currencyIcon(for: character)
         .animation(.easeInOut(duration: 0.28), value: model.isGameOver)
         .animation(.easeInOut(duration: 0.25), value: showsIntro)
         .onAppear { screenInsets = ScreenSafeArea.current }
@@ -321,10 +325,10 @@ struct GameView: View {
                 .lineLimit(1)
                 .contentTransition(.numericText(value: Double(model.cards)))
             ZStack {
-                FlyCurrencyIcon(size: hudSymbolSize)
+                CurrencyIcon(size: hudSymbolSize)
                     .foregroundStyle(.white.opacity(0.85))
                     .scaleEffect(1.22)
-                FlyCurrencyIcon(size: hudSymbolSize)
+                CurrencyIcon(size: hudSymbolSize)
             }
         }
         .padding(.horizontal, isPad ? 13 : 11)
@@ -332,7 +336,11 @@ struct GameView: View {
         .foregroundStyle(character.deepColor)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: model.cards)
         .accessibilityIdentifier("progress")
-        .accessibilityLabel(Text(verbatim: "\(model.cards) vliegen"))
+        // Named after what this character actually collects, in the app's
+        // language — the counter has not been flies-for-everyone since each
+        // animal got its own food.
+        .accessibilityLabel(Text(verbatim: "\(model.cards) "
+                                 + FoodCatalog.word(for: character.id, count: model.cards)))
     }
 
     /// The reef only ticks while the level is actually being played: never

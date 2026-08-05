@@ -171,6 +171,10 @@ struct HomeView: View {
             }
         }
         .coordinateSpace(name: "home")
+        // Every counter on the menu — the two header totals, the level cards,
+        // the summary line and the card in flight between them — counts in the
+        // selected character's own food.
+        .currencyIcon(for: character)
         .fullScreenCover(item: $selection, onDismiss: handleSessionDismissed) { item in
             GameView(request: GameSessionRequest(level: item.level,
                                                  mixedVariant: mixedVariant,
