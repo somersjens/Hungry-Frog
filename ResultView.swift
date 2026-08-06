@@ -145,10 +145,11 @@ struct ResultView: View {
 
                 scoreCapsule
                     .padding(.top, 12 * scale)
-
-                if !result.unlockedCharacterIDs.isEmpty {
-                    unlockedRow.padding(.top, 8 * scale)
-                }
+                // A character earned this session is deliberately not announced
+                // here. The unlock has its own celebration, and it belongs to
+                // the menu the player returns to — after the cards have flown
+                // into the totals and counted up. Showing the animal on this
+                // card as well spent the surprise before that ever ran.
             }
             .frame(maxWidth: .infinity)
 
@@ -339,31 +340,6 @@ struct ResultView: View {
         }
         .clipShape(Capsule())
         .accessibilityIdentifier("new-best")
-    }
-
-    private var unlockedRow: some View {
-        VStack(spacing: 8) {
-            Text("result.unlocked")
-                .font(.system(size: 15 * textScale, weight: .heavy, design: .rounded))
-                .foregroundStyle(character.deepColor)
-            HStack(spacing: 14) {
-                ForEach(result.unlockedCharacterIDs, id: \.self) { id in
-                    let animal = CharacterCatalog.character(id: id)
-                    VStack(spacing: 4) {
-                        animal.artwork
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 50 * scale, height: 50 * scale)
-                        Text(verbatim: animal.localizedName)
-                            .font(.system(size: 11 * textScale, weight: .bold, design: .rounded))
-                            .foregroundStyle(character.deepColor)
-                    }
-                }
-            }
-        }
-        .padding(12 * scale)
-        .frame(maxWidth: .infinity)
-        .background(.white.opacity(0.6), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private var buttons: some View {

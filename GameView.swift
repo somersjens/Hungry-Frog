@@ -163,15 +163,6 @@ struct GameView: View {
         let topInset = max(screenInsets.top, isPad ? 24 : 16)
 
         return GeometryReader { proxy in
-            // On an iPad held in portrait the HUD row and the sum card both
-            // want the top-right corner: the row is wide (bigger controls,
-            // bigger type) and the sum card is pinned to the right regardless
-            // of width. Splitting the double-points chip onto a row of its
-            // own keeps the primary row short enough to leave the card clear,
-            // rather than letting the two fight over the same strip.
-            let isPortraitPad = isPad && proxy.size.height > proxy.size.width
-            let hudExtraReserve: CGFloat = isPortraitPad ? hudControlSize + hudRowSpacing : 0
-
             ZStack(alignment: .top) {
                 FlyPlayfield(rounds: model.visibleRounds,
                               maximumRounds: model.maximumRounds,
@@ -184,9 +175,8 @@ struct GameView: View {
                               reduceMotion: reduceMotion,
                               // The HUD's own height, so the swarm's ceiling is
                               // the underside of the HUD and never the status bar
-                              // or the Dynamic Island behind it. Taller still when
-                              // the double-points chip drops to its own row.
-                              topReserve: topInset + (isPad ? 64 : 50) + hudExtraReserve,
+                              // or the Dynamic Island behind it.
+                              topReserve: topInset + (isPad ? 64 : 50),
                               bottomReserve: screenInsets.bottom,
                               onHit: { model.select(optionID: $0) },
                               onImpact: { AppAudio.shared.playSplash() },
@@ -194,18 +184,26 @@ struct GameView: View {
                               onFishEntranceComplete: finishFishEntrance,
                               onLevelCompletionFinished: finishLevelCompletion)
 
-                hud(isPortraitPad: isPortraitPad)
+                hud
                     .padding(.horizontal, isPad ? 28 : 16)
-                    .padding(.top, topInset + (isPad ? 12 : 6))
+                    .padding(.top, hudTop(below: topInset))
                     .opacity(playsLevelCompletion ? 0 : 1)
                     .animation(.easeOut(duration: 0.22), value: playsLevelCompletion)
                     .allowsHitTesting(!playsLevelCompletion)
+
+                // The double-points chip is its own layer rather than a member
+                // of the HUD row: it belongs in the middle of the screen, at
+                // the same height on every device, and the row it used to sit
+                // in grows and shrinks with the score.
+                doublePointsLayer(below: topInset, width: proxy.size.width)
+                    .opacity(playsLevelCompletion ? 0 : 1)
+                    .animation(.easeOut(duration: 0.22), value: playsLevelCompletion)
 
                 if model.comboAnnouncementID > 0 {
                     ComboFlyBanner(token: model.comboAnnouncementID,
                                    character: character,
                                    isPad: isPad)
-                        .padding(.top, topInset + (isPad ? 116 : 88) + hudExtraReserve)
+                        .padding(.top, topInset + (isPad ? 116 : 88))
                         .allowsHitTesting(false)
                 }
             }
@@ -227,32 +225,45 @@ struct GameView: View {
 
     // MARK: - HUD
 
-    /// On every layout but an iPad in portrait, the double-points chip shares
-    /// the top row with the pause button, the counter and the hearts. An iPad
-    /// in portrait doesn't have the width to spare — that row is pinned next
-    /// to the sum card — so the chip drops to a row of its own underneath.
-    private func hud(isPortraitPad: Bool) -> some View {
+    /// The pause button, the counter and the hearts, from the leading edge in.
+    /// The double-points chip is deliberately not part of this row; it has its
+    /// own centred layer.
+    private var hud: some View {
+        HStack(spacing: hudRowSpacing) {
+            primaryHudRow
+            Spacer(minLength: 0)
+        }
+    }
+
+    /// Where the top row starts, so the chip's own layer lines up with it
+    /// rather than floating at a height of its own.
+    private func hudTop(below topInset: CGFloat) -> CGFloat {
+        topInset + (isPad ? 12 : 6)
+    }
+
+    /// The double-points chip, centred on the screen and level with the rest of
+    /// the HUD, so it reads the same on an iPad as on a phone.
+    ///
+    /// The band it is given is what keeps it clear of its two neighbours: the
+    /// row of controls on the leading edge and the sum card on the trailing
+    /// one. Both are a good deal narrower than a fifth of the screen from their
+    /// own edge, and when a longer translation will not fit the band the chip's
+    /// own `ViewThatFits` drops to the short wording rather than growing into
+    /// them.
+    private func doublePointsLayer(below topInset: CGFloat, width: CGFloat) -> some View {
         Group {
-            if isPortraitPad {
-                VStack(alignment: .leading, spacing: hudRowSpacing) {
-                    primaryHudRow
-                    if let deadline = model.boostDeadline {
-                        HStack(spacing: 0) {
-                            doublePointsChip(deadline: deadline)
-                            Spacer(minLength: 0)
-                        }
-                    }
-                }
-            } else {
-                HStack(spacing: hudRowSpacing) {
-                    primaryHudRow
-                    if let deadline = model.boostDeadline {
-                        doublePointsChip(deadline: deadline)
-                    }
-                    Spacer(minLength: 0)
-                }
+            if let deadline = model.boostDeadline {
+                DoublePointsChip(deadline: deadline,
+                                 token: model.streakAnnouncementID,
+                                 character: character,
+                                 isPad: isPad,
+                                 height: hudControlSize)
+                    .transition(.scale(scale: 0.4).combined(with: .opacity))
             }
         }
+        .frame(maxWidth: max(0, width * 0.2))
+        .padding(.top, hudTop(below: topInset))
+        .allowsHitTesting(false)
         .animation(.spring(response: 0.34, dampingFraction: 0.62),
                    value: model.boostDeadline)
     }
@@ -267,15 +278,6 @@ struct GameView: View {
                   glyphSize: hudHeartSize,
                   rowHeight: hudControlSize)
             .padding(.horizontal, isPad ? 12 : 10)
-    }
-
-    private func doublePointsChip(deadline: Date) -> some View {
-        DoublePointsChip(deadline: deadline,
-                          token: model.streakAnnouncementID,
-                          character: character,
-                          isPad: isPad,
-                          height: hudControlSize)
-            .transition(.scale(scale: 0.4).combined(with: .opacity))
     }
 
     private var hudRowSpacing: CGFloat { isPad ? 10 : 8 }

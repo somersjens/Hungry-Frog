@@ -393,24 +393,37 @@ final class GameViewModel: ObservableObject {
 
     /// Copies the engine's state onto the published properties in one pass, so
     /// a single tap causes exactly one SwiftUI update rather than eight.
+    ///
+    /// Every assignment goes through `set`, which drops the ones that would
+    /// announce a value the view already has. `@Published` has no opinion about
+    /// that: assigning the same number still fires `objectWillChange`, and the
+    /// whole game screen — the playfield included — is rebuilt behind it. A
+    /// single answer runs this three times (the tap, the combo bonus, the round
+    /// turning over) and almost every field is unchanged on all three.
     private func sync() {
-        state = engine.state
-        round = engine.round
-        roundNumber = engine.roundNumber
-        cards = engine.cards
-        livesRemaining = engine.livesRemaining
-        selectedOptionID = engine.selectedOptionID
+        set(\.state, engine.state)
+        set(\.round, engine.round)
+        set(\.roundNumber, engine.roundNumber)
+        set(\.cards, engine.cards)
+        set(\.livesRemaining, engine.livesRemaining)
+        set(\.selectedOptionID, engine.selectedOptionID)
         // Publish the completed result before the game-over flag. GameView
         // uses its reason to decide whether to play the reef finale first.
-        if engine.state == .gameOver { result = engine.result }
-        isGameOver = engine.state == .gameOver
-        correctStreak = engine.correctStreak
-        isStreakBoostActive = engine.isStreakBoostActive
-        boostDeadline = isStreakBoostActive ? engine.boostDeadline : nil
-        isHeartFishAvailable = engine.isHeartFishAvailable
-        visibleRounds = engine.visibleRounds
+        if engine.state == .gameOver { set(\.result, engine.result) }
+        set(\.isGameOver, engine.state == .gameOver)
+        set(\.correctStreak, engine.correctStreak)
+        set(\.isStreakBoostActive, engine.isStreakBoostActive)
+        set(\.boostDeadline, isStreakBoostActive ? engine.boostDeadline : nil)
+        set(\.isHeartFishAvailable, engine.isHeartFishAvailable)
+        set(\.visibleRounds, engine.visibleRounds)
         AppAudio.shared.setGameplayRate(isStreakBoostActive
                                         ? Float(GameConfig.streakSpeedMultiplier) : 1)
+    }
+
+    private func set<Value: Equatable>(_ keyPath: ReferenceWritableKeyPath<GameViewModel, Value>,
+                                       _ value: Value) {
+        guard self[keyPath: keyPath] != value else { return }
+        self[keyPath: keyPath] = value
     }
 
     /// Runs `work` after a delay, unless the session moved on in the meantime.
@@ -444,29 +457,44 @@ final class GameViewModel: ObservableObject {
         switch kind {
         case .light:
             lightGenerator.impactOccurred()
-            lightGenerator.prepare()
+            rearm { $0.lightGenerator }
         case .rigid:
             rigidGenerator.impactOccurred()
-            rigidGenerator.prepare()
+            rearm { $0.rigidGenerator }
         case .success:
             notificationGenerator.notificationOccurred(.success)
-            notificationGenerator.prepare()
+            rearm { $0.notificationGenerator }
         case .error:
             notificationGenerator.notificationOccurred(.error)
-            notificationGenerator.prepare()
+            rearm { $0.notificationGenerator }
         case .wrongAnswer:
             // The system's error pattern on its own is a polite little stutter,
             // easy to miss with the device flat on a table or in a thick case.
             // A full-strength knock in front of it gives the mistake a body,
             // and the gap is what keeps the two from merging into one buzz.
             heavyGenerator.impactOccurred(intensity: 1)
-            heavyGenerator.prepare()
+            rearm { $0.heavyGenerator }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
                 guard let self else { return }
                 self.notificationGenerator.notificationOccurred(.error)
-                self.notificationGenerator.prepare()
+                self.rearm { $0.notificationGenerator }
             }
         }
 #endif
     }
+
+#if canImport(UIKit)
+    /// Keeps a generator warm for the next answer without doing it here.
+    /// `prepare()` wakes the Taptic engine, and the frame it was being called on
+    /// is the frame a catch lands: the answer's sound, its verdict mark, the
+    /// score and the whole swarm all change on that same frame. A warm-up is the
+    /// one part of that with no deadline, so it waits for the next turn of the
+    /// run loop and leaves the frame alone.
+    private func rearm(_ generator: @escaping (GameViewModel) -> UIFeedbackGenerator) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            generator(self).prepare()
+        }
+    }
+#endif
 }

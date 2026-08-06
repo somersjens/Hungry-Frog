@@ -75,7 +75,9 @@ final class PlaytimeTracker: ObservableObject {
             forName: UIApplication.willResignActiveNotification, object: nil, queue: .main
         ) { [weak self] _ in
             self?.appActive = false
-            self?.pauseAccrual()
+            // Leaving the app is the one moment with no later frame to write
+            // in, so this write is not handed to the background queue.
+            self?.pauseAccrual(synchronous: true)
         }
         NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
@@ -160,7 +162,7 @@ final class PlaytimeTracker: ObservableObject {
         lastAccrual = now
     }
 
-    private func pauseAccrual(saveImmediately: Bool = true) {
+    private func pauseAccrual(saveImmediately: Bool = true, synchronous: Bool = false) {
         if challengeActive, let last = lastAccrual {
             let delta = Date().timeIntervalSince(last)
             if delta > 0 && delta <= idleLimit {
@@ -169,7 +171,7 @@ final class PlaytimeTracker: ObservableObject {
         }
         lastAccrual = nil
         if saveImmediately {
-            save(force: true)
+            save(force: true, synchronous: synchronous)
         }
     }
 
@@ -323,11 +325,31 @@ final class PlaytimeTracker: ObservableObject {
         invalidateCaches()
     }
 
-    private func save(force: Bool) {
+    /// Encoding the record and handing it to `UserDefaults` is not free, and the
+    /// only thing that ever triggers it mid-level is an answer — so once every
+    /// half minute of play the cost landed squarely on the frame a child had
+    /// just caught something on. The snapshot is taken here, on the main thread
+    /// where the record lives, and written on a queue of its own.
+    ///
+    /// `synchronous` is for the ways a session can end (backgrounding, leaving
+    /// the app) where there may be no later moment to write in.
+    private func save(force: Bool, synchronous: Bool = false) {
         guard force || unsavedSeconds >= saveInterval else { return }
-        if let data = try? JSONEncoder().encode(days) {
-            UserDefaults.standard.set(data, forKey: daysKey)
-        }
         unsavedSeconds = 0
+        let snapshot = days
+        let key = daysKey
+        guard !synchronous else {
+            Self.write(snapshot, forKey: key)
+            return
+        }
+        Self.saveQueue.async { Self.write(snapshot, forKey: key) }
+    }
+
+    private static let saveQueue = DispatchQueue(label: "com.elephantchallenge.playtime.save",
+                                                 qos: .utility)
+
+    private static func write(_ days: [String: DayRecord], forKey key: String) {
+        guard let data = try? JSONEncoder().encode(days) else { return }
+        UserDefaults.standard.set(data, forKey: key)
     }
 }

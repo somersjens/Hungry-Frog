@@ -207,6 +207,11 @@ private struct AnswerFly: Identifiable {
     var age: Double = 0
     var isLocked = false
     var isRetiring = false
+    /// True from the frame the sticky pad lands on this fly until the strike
+    /// lets go of it. The swarm stops drawing it then — the tongue is carrying
+    /// its own copy home. Held on the fly rather than looked up on the strike so
+    /// the swarm never has to observe the tongue.
+    var isCaptured = false
     /// Non-nil only while the fly is still swooping in.
     var entry: FlyEntry? = nil
     /// Seconds since this fly was scattered, driving its tumble away.
@@ -231,8 +236,12 @@ private struct AnswerFly: Identifiable {
         return CGFloat(min(1, exitAge / FlyConfig.scatterRamp))
     }
 
-    /// A fly that has not begun its swoop must not be drawn hanging off screen.
+    /// A fly that has not begun its swoop must not be drawn hanging off screen,
+    /// and one the pad already has is drawn by the tongue instead. The struck
+    /// fly keeps flying until the pad actually reaches it: hiding it on tap made
+    /// it blink away well before the tongue arrived.
     var isVisible: Bool {
+        guard !isCaptured else { return false }
         guard let entry else { return true }
         return entry.hasStarted
     }
@@ -395,13 +404,55 @@ private final class FlyEngineTicker: NSObject {
     }
 }
 
+/// One observable value, and nothing else in the same object.
+///
+/// The engine used to be a single `ObservableObject` with five `@Published`
+/// properties. Combine has no idea which of them a given view reads: any change
+/// to any one of them wakes every view observing the engine. The clock alone
+/// ticks sixty times a second, so the tongue layer and the head-mark layer were
+/// rebuilt on every frame of the game — including the great majority of frames
+/// where there is no tongue and no mark to draw.
+///
+/// Splitting the state into separate boxes is what makes "only the layers that
+/// actually changed" true rather than merely intended.
 @MainActor
-private final class FlyEngine: ObservableObject {
-    @Published private(set) var flies: [AnswerFly] = []
-    @Published private(set) var tongue: TongueCatch?
-    @Published private(set) var poops: [PoopDrop] = []
-    @Published private(set) var praise: HeadPraise?
-    @Published private(set) var clock: Double = 0
+private final class FlyChannel<Value>: ObservableObject {
+    @Published fileprivate(set) var value: Value
+
+    init(_ value: Value) {
+        self.value = value
+    }
+}
+
+/// Everything the swarm layer draws, handed over in one publish per frame.
+private struct SwarmFrame {
+    var clock: Double = 0
+    var flies: [AnswerFly] = []
+}
+
+/// The verdict marks over the character's head. Empty on all but a fraction of
+/// the frames in a session, which is the point of keeping them in their own box.
+private struct HeadMarks {
+    var poops: [PoopDrop] = []
+    var praise: HeadPraise?
+
+    var isEmpty: Bool { poops.isEmpty && praise == nil }
+}
+
+@MainActor
+private final class FlyEngine {
+    /// The swarm and the clock it flies on: new every frame, by definition.
+    let swarm = FlyChannel(SwarmFrame())
+    /// The strike, published only while one is in the air.
+    let strike = FlyChannel<TongueCatch?>(nil)
+    /// The droppings and the tick, published only while one of them exists.
+    let marks = FlyChannel(HeadMarks())
+
+    private var flies: [AnswerFly] = []
+    private var tongue: TongueCatch?
+    private var poops: [PoopDrop] = []
+    private var praise: HeadPraise?
+    private var clock: Double = 0
 
     var onHit: ((UUID) -> Bool)?
     /// The frame the sticky pad lands on a piece of food, right or wrong.
@@ -444,6 +495,19 @@ private final class FlyEngine: ObservableObject {
 
     deinit { displayLink?.invalidate() }
 
+    // MARK: - Publishing
+
+    /// Hands this frame's state to the layers that draw it. The swarm goes out
+    /// every time; the other two only when there is something to say, so a view
+    /// with nothing on screen is never invalidated.
+    private func publish() {
+        swarm.value = SwarmFrame(clock: clock, flies: flies)
+        if tongue != nil || strike.value != nil { strike.value = tongue }
+        if !poops.isEmpty || praise != nil || !marks.value.isEmpty {
+            marks.value = HeadMarks(poops: poops, praise: praise)
+        }
+    }
+
     // MARK: - Layout
 
     func layout(size: CGSize, topReserve: CGFloat,
@@ -462,6 +526,7 @@ private final class FlyEngine: ObservableObject {
         // The first real layout is usually what a swarm dealt on the very first
         // frame was waiting for.
         dealPendingSwarm()
+        publish()
     }
 
     // MARK: - Question changes
@@ -482,6 +547,7 @@ private final class FlyEngine: ObservableObject {
             poops.removeAll()
             praise = nil
             scatter { _ in true }
+            publish()
             return
         }
 
@@ -509,11 +575,15 @@ private final class FlyEngine: ObservableObject {
         }
         pendingSpecs = specs
         dealPendingSwarm()
+        publish()
     }
 
     func setLive(_ live: Bool) {
         isLive = live
-        if live { dealPendingSwarm() }
+        if live {
+            dealPendingSwarm()
+            publish()
+        }
     }
 
     func setRunning(_ running: Bool) {
@@ -546,10 +616,16 @@ private final class FlyEngine: ObservableObject {
         let elapsed = lastFrameTime == 0 ? FlyConfig.tick : timestamp - lastFrameTime
         lastFrameTime = timestamp
         stepAccumulator += min(max(0, elapsed), FlyConfig.tick * 3)
+        var stepped = false
         while stepAccumulator >= FlyConfig.tick {
             stepAccumulator -= FlyConfig.tick
             tick()
+            stepped = true
         }
+        // Once per frame, not once per step: catching up after a stall runs the
+        // simulation two or three times, and only the state it ends on is ever
+        // drawn.
+        if stepped { publish() }
     }
 
     func catchFly(_ id: UUID, mouth: CGPoint) {
@@ -576,6 +652,7 @@ private final class FlyEngine: ObservableObject {
                              optionID: fly.optionID, text: fly.text,
                              isCorrect: fly.isCorrect, flyPhase: fly.phase,
                              start: mouth, target: fly.position)
+        publish()
     }
 
     // MARK: - Simulation
@@ -589,25 +666,24 @@ private final class FlyEngine: ObservableObject {
     }
 
     private func moveFlies() {
-        // Stepped on a copy and published once. Writing straight into the
-        // `@Published` array would announce a change per fly per property —
-        // dozens of notifications a frame for one visible update.
-        var swarm = flies
-        for index in swarm.indices {
-            if swarm[index].isRetiring {
-                advanceScatter(&swarm[index])
-            } else if swarm[index].entry != nil {
-                advanceEntry(&swarm[index])
-            } else if !swarm[index].isLocked {
-                advanceFlight(&swarm[index])
+        // `flies` is plain storage now rather than a `@Published` array, so the
+        // swarm is stepped in place: no per-fly change notification, and no
+        // copy of the whole array on every frame to avoid one.
+        for index in flies.indices {
+            if flies[index].isRetiring {
+                advanceScatter(&flies[index])
+            } else if flies[index].entry != nil {
+                advanceEntry(&flies[index])
+            } else if !flies[index].isLocked {
+                advanceFlight(&flies[index])
             }
         }
-        swarm.removeAll {
+        let bounds = outerRouteBounds
+        flies.removeAll {
             $0.isRetiring
                 && ($0.exitAge >= FlyConfig.scatterLifetime
-                    || !outerRouteBounds.contains($0.position))
+                    || !bounds.contains($0.position))
         }
-        flies = swarm
     }
 
     /// The swoop in from off screen. The whole of the fly's position is driven
@@ -695,6 +771,11 @@ private final class FlyEngine: ObservableObject {
         if !catchState.didReportContact,
            catchState.elapsed >= FlyConfig.extensionTime {
             catchState.didReportContact = true
+            // The pad has it: the swarm stops drawing this fly and the tongue
+            // carries its own copy home from here.
+            if let index = flies.firstIndex(where: { $0.id == catchState.flyID }) {
+                flies[index].isCaptured = true
+            }
             // The splat belongs to the collision, not to the answer: it sounds
             // the same whether the food that was hit was the right one or not.
             onImpact?()
@@ -716,6 +797,7 @@ private final class FlyEngine: ObservableObject {
                 // fly was never eaten: it resumes if its sum still stands, and
                 // otherwise leaves after the swarm it belonged to.
                 flies[index].isLocked = false
+                flies[index].isCaptured = false
                 if flies[index].roundID != activeRoundID {
                     scatter { $0.id == catchState.flyID }
                 }
@@ -733,6 +815,7 @@ private final class FlyEngine: ObservableObject {
         guard let tongue else { return }
         if let index = flies.firstIndex(where: { $0.id == tongue.flyID }) {
             flies[index].isLocked = false
+            flies[index].isCaptured = false
         }
         self.tongue = nil
     }
@@ -1095,13 +1178,15 @@ struct FlyPlayfield: View {
     let onLevelCompletionFinished: () -> Void
 
     /// The engine is held through a box that never publishes anything, so this
-    /// view is *not* re-run sixty times a second. Only the layers that actually
-    /// move observe the engine directly (see `FlySwarmLayer` and friends);
-    /// everything else here — the pond, the character, the sum — is laid out
-    /// once and left alone.
+    /// view is *not* re-run sixty times a second. Each moving layer observes one
+    /// channel of the engine and nothing else (see `FlySwarmLayer` and friends),
+    /// so a frame invalidates only the layer whose contents changed; everything
+    /// else here — the pond, the character, the sum — is laid out once and left
+    /// alone.
     @StateObject private var box = FlyEngineBox()
     @State private var entranceToken = 0
     @State private var completionToken = 0
+    @Environment(\.displayScale) private var displayScale
 
     private var engine: FlyEngine { box.engine }
 
@@ -1143,11 +1228,14 @@ struct FlyPlayfield: View {
                                   horizon: PlayStage.horizon(in: proxy.size),
                                   reduceMotion: reduceMotion)
 
-                FlySwarmLayer(engine: engine,
+                FlySwarmLayer(frames: engine.swarm,
                               foodImageName: foodImageName,
                               isPad: isPad,
                               isLive: isLive,
-                              mouth: mouth)
+                              mouth: mouth,
+                              size: proxy.size,
+                              scale: displayScale,
+                              onCatch: { engine.catchFly($0, mouth: mouth) })
 
                 // The pose is drawn once and never moved. The mouth the tongue
                 // is anchored on is a fixed point measured in the artwork, so
@@ -1164,7 +1252,7 @@ struct FlyPlayfield: View {
 
                 // Drawn after the character: a tongue that emerges from behind
                 // the head reads as coming out of the back of the animal.
-                TongueLayer(engine: engine,
+                TongueLayer(strike: engine.strike,
                             foodImageName: foodImageName,
                             isPad: isPad,
                             headSize: headSize,
@@ -1174,7 +1262,7 @@ struct FlyPlayfield: View {
 
                 // Above the character, so a mark arcing over the head is never
                 // cut in half by the artwork it came out of.
-                HeadMarkLayer(engine: engine, head: headTop, praiseRest: praiseRest)
+                HeadMarkLayer(marks: engine.marks, head: headTop, praiseRest: praiseRest)
 
                 if let active = rounds.first {
                     ActiveQuestionView(prompt: active.question.prompt,
@@ -1185,7 +1273,7 @@ struct FlyPlayfield: View {
                 }
 
                 if playsLevelCompletion {
-                    FlyCelebrationLayer(engine: engine, color: character.deepColor)
+                    FlyCelebrationLayer(frames: engine.swarm, color: character.deepColor)
                 }
             }
             .clipped()
@@ -1208,12 +1296,39 @@ struct FlyPlayfield: View {
             .onChange(of: topReserve) { _, _ in applyLayout(in: proxy.size) }
             .onChange(of: bottomReserve) { _, _ in applyLayout(in: proxy.size) }
         }
-        .onChange(of: rounds.map(\.id)) { _, _ in engine.sync(rounds: rounds) }
+        // Only the standing sum can deal a swarm, and this view's body is
+        // re-run on every published change in the session — so the trigger is
+        // the one id that matters rather than a freshly built array of all
+        // three on each of those evaluations.
+        .onChange(of: rounds.first?.id) { _, _ in engine.sync(rounds: rounds) }
+        // The session generates two sums beyond the one being played, so every
+        // answer that is going to be flown is known a good two rounds before it
+        // arrives. Baking their artwork here spends that time instead of the
+        // frame the swarm is dealt on — which is the frame right after an
+        // answer, where a child playing quickly is least able to afford it.
+        .task(id: rounds.first?.id) { await warmFoodGlyphs() }
         .onChange(of: isLive) { _, value in engine.setLive(value) }
         .onChange(of: isRunning) { _, value in engine.setRunning(value) }
         .onChange(of: playsFishEntrance) { _, value in if value { beginEntrance() } }
         .onChange(of: playsLevelCompletion) { _, value in if value { beginCompletion() } }
         .onDisappear { engine.setRunning(false) }
+    }
+
+    /// Bakes the food for every answer the session has already generated. It
+    /// yields before each one, so the work never lands in the frame that asked
+    /// for it and a slow device spreads fifteen answers over as many turns of
+    /// the run loop instead of paying for them all at once.
+    private func warmFoodGlyphs() async {
+        let food = FoodCatalog.imageName(for: character.id)
+        let size = FlyConfig.flySize(isPad: isPad) * FlyConfig.foodVisualScale
+        for round in rounds {
+            for option in round.options {
+                await Task.yield()
+                guard !Task.isCancelled else { return }
+                FoodGlyphCache.warm([option.text], food: food,
+                                    size: size, scale: displayScale)
+            }
+        }
     }
 
     private func applyLayout(in size: CGSize) {
@@ -1295,9 +1410,9 @@ struct FlyPlayfield: View {
     }
 }
 
-/// Holds the engine without ever announcing anything itself. `@StateObject` on
-/// the engine directly would subscribe `FlyPlayfield` to every frame of the
-/// simulation, whether or not it reads a single moving value.
+/// Gives the engine a lifetime tied to the scene without putting it in the way
+/// of one. The engine publishes nothing itself — its three channels do — so
+/// `FlyPlayfield` owns it here and is never woken by the simulation.
 @MainActor
 private final class FlyEngineBox: ObservableObject {
     let engine = FlyEngine()
@@ -1311,35 +1426,44 @@ private final class FlyEngineBox: ObservableObject {
 
 /// The swarm itself: every answer currently in the air.
 private struct FlySwarmLayer: View {
-    @ObservedObject var engine: FlyEngine
+    @ObservedObject var frames: FlyChannel<SwarmFrame>
     let foodImageName: String
     let isPad: Bool
     let isLive: Bool
     /// Where a strike leaves from, in this layer's own coordinates.
     let mouth: CGPoint
+    /// The scene the swarm flies in. Positions arrive in its coordinates, and
+    /// having the size here is what lets a fly be placed with an `offset` — a
+    /// transform the render server applies — instead of a `position`, which is a
+    /// layout modifier and re-proposes a size to the fly on every frame.
+    let size: CGSize
+    let scale: CGFloat
+    let onCatch: (UUID) -> Void
 
     var body: some View {
         let tapSize = FlyConfig.flySize(isPad: isPad) * 1.32
+        let frame = frames.value
         ZStack {
-            ForEach(engine.flies) { fly in
-                // The struck fly keeps flying until the pad actually
-                // reaches it. Hiding it on tap made it blink away well
-                // before the tongue arrived.
-                if fly.isVisible,
-                   engine.tongue?.flyID != fly.id
-                    || engine.tongue?.hasLanded == false {
+            ForEach(frame.flies) { fly in
+                if fly.isVisible {
                     AnswerFlyView(fly: fly, foodImageName: foodImageName,
-                                  isPad: isPad, clock: engine.clock)
+                                  isPad: isPad, clock: frame.clock, scale: scale)
                         .frame(width: tapSize, height: tapSize)
                         // A plain tap rather than a `Button`: the swarm is
                         // rebuilt every frame, and a button carries a press
                         // state and gesture of its own to be rebuilt with it.
                         .contentShape(Circle())
-                        .onTapGesture { engine.catchFly(fly.id, mouth: mouth) }
+                        .onTapGesture { onCatch(fly.id) }
                         .allowsHitTesting(isLive && fly.isFlying)
-                        .accessibilityElement(children: .combine)
-                        .accessibilityAction { engine.catchFly(fly.id, mouth: mouth) }
-                        .position(fly.position)
+                        // One flat element per fly, labelled here. Combining the
+                        // children instead walked and merged the whole subtree of
+                        // every fly on every frame of the game.
+                        .accessibilityElement()
+                        .accessibilityLabel(Text(verbatim: fly.text))
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityAction { onCatch(fly.id) }
+                        .offset(x: fly.position.x - size.width * 0.5,
+                                y: fly.position.y - size.height * 0.5)
                 }
             }
         }
@@ -1349,7 +1473,7 @@ private struct FlySwarmLayer: View {
 
 /// The strike: the tongue on its way out and back.
 private struct TongueLayer: View {
-    @ObservedObject var engine: FlyEngine
+    @ObservedObject var strike: FlyChannel<TongueCatch?>
     let foodImageName: String
     let isPad: Bool
     let headSize: CGFloat
@@ -1359,7 +1483,7 @@ private struct TongueLayer: View {
 
     var body: some View {
         ZStack {
-            if let tongue = engine.tongue {
+            if let tongue = strike.value {
                 TongueView(catchState: tongue, foodImageName: foodImageName, isPad: isPad,
                            headSize: headSize, mouthOpening: mouthOpening,
                            mouth: mouth,
@@ -1375,15 +1499,16 @@ private struct TongueLayer: View {
 /// three droppings for a wrong one, a tick for a right one. Both are measured
 /// from the one point given here.
 private struct HeadMarkLayer: View {
-    @ObservedObject var engine: FlyEngine
+    @ObservedObject var marks: FlyChannel<HeadMarks>
     /// Top of the head, in this layer's own coordinates, and the spot beside it
     /// the tick hops out to.
     let head: CGPoint
     let praiseRest: CGPoint
 
     var body: some View {
-        ZStack {
-            ForEach(engine.poops) { poop in
+        let state = marks.value
+        return ZStack {
+            ForEach(state.poops) { poop in
                 Image("poop")
                     .resizable()
                     .scaledToFit()
@@ -1395,7 +1520,7 @@ private struct HeadMarkLayer: View {
                               y: head.y + poop.offset.height)
             }
 
-            if let praise = engine.praise {
+            if let praise = state.praise {
                 let travel = praise.travel
                 PraiseTickView(size: praise.size)
                     .scaleEffect(praise.scale)
@@ -1436,11 +1561,11 @@ private struct PraiseTickView: View {
 
 /// The end-of-level bloom, which drifts off the simulation's own clock.
 private struct FlyCelebrationLayer: View {
-    @ObservedObject var engine: FlyEngine
+    @ObservedObject var frames: FlyChannel<SwarmFrame>
     let color: Color
 
     var body: some View {
-        FlyCelebration(clock: engine.clock, color: color)
+        FlyCelebration(clock: frames.value.clock, color: color)
             .allowsHitTesting(false)
     }
 }
@@ -1525,6 +1650,9 @@ private struct AnswerFlyView: View {
     let foodImageName: String
     let isPad: Bool
     let clock: Double
+    /// The screen's pixel density, so the baked food is made at the resolution
+    /// it will actually be shown at.
+    let scale: CGFloat
 
     /// A swooping fly arrives leaning into its own approach, and a dismissed
     /// one tumbles as it whirls away. Both are read straight off the fly's own
@@ -1562,7 +1690,7 @@ private struct AnswerFlyView: View {
             // the tap size and then blown up a third would arrive soft; made
             // at its final size it is pixel-for-pixel what it was before.
             FoodGlyph(foodImageName: foodImageName, text: fly.text,
-                      size: size * FlyConfig.foodVisualScale)
+                      size: size * FlyConfig.foodVisualScale, scale: scale)
         }
         // The food is drawn a third larger than the tap target it sits in: it
         // needs to be big enough that the number still has room to breathe at
@@ -1583,24 +1711,21 @@ private struct AnswerFlyView: View {
     }
 }
 
-/// One food and the answer written on it. Everything here is fixed for the
-/// life of a fly, so SwiftUI can skip it entirely on the frames where only the
-/// fly's position changed.
+/// One food and the answer written on it, as it is drawn.
 ///
-/// It is also flattened into a single rendered texture. The drop shadow under
-/// the artwork has no shape to follow — it is cast by the food's own alpha —
-/// so every fly carrying one costs a separate render pass on every frame it is
-/// in the air, and a full swarm is up to ten of them at once. Rasterizing the
-/// food, its shadow and its number together turns all of that into one flat
-/// image per fly, made once when the fly is dealt and then only moved.
-private struct FoodGlyph: View {
+/// The drop shadow under the artwork has no shape to follow — it is cast by the
+/// food's own alpha — so drawing this live costs a render pass of its own per
+/// fly, and a full swarm is up to ten of them at once. It is therefore never
+/// drawn live: `FoodGlyphCache` bakes it into a flat image, once, and the swarm
+/// carries copies of that.
+private struct FoodGlyphArtwork: View {
     let foodImageName: String
     let text: String
     let size: CGFloat
 
     /// Room around the artwork for the shadow to fall into. Without it the
     /// raster is cut to the food itself and the shadow is clipped off.
-    private var shadowMargin: CGFloat { size * 0.16 }
+    fileprivate static func margin(for size: CGFloat) -> CGFloat { size * 0.16 }
 
     var body: some View {
         ZStack {
@@ -1613,8 +1738,81 @@ private struct FoodGlyph: View {
                 .shadow(color: .black.opacity(0.18), radius: 5, y: 3)
             answerBadge(text: text, foodImageName: foodImageName, size: size * 0.5)
         }
-        .padding(shadowMargin)
-        .drawingGroup()
+        .padding(Self.margin(for: size))
+    }
+}
+
+/// The baked foods, kept for the life of the app.
+///
+/// A level asks for a small, repeating set of numbers on a single food at a
+/// single size, so after the first few rounds this is very nearly all hits —
+/// and a hit is a plain image, with no shadow to blur, no text to lay out and
+/// no buffer of its own for the compositor to manage. The swarm used to carry
+/// ten live `drawingGroup`s, each of which is exactly such a buffer.
+///
+/// Baking is not free, so it is kept off the frame a swarm arrives on:
+/// `warm(_:)` is called for the sums the session has already generated, two
+/// rounds before they are ever flown.
+@MainActor
+private enum FoodGlyphCache {
+    private struct Key: Hashable {
+        let food: String
+        let text: String
+        let size: CGFloat
+        let scale: CGFloat
+    }
+
+    private static var images: [Key: Image] = [:]
+    /// Answers are short and repeat, but a long Supermix run meets a lot of
+    /// them. Past this the oldest are dropped rather than kept for good.
+    private static let limit = 160
+    private static var order: [Key] = []
+
+    /// The baked glyph, or nil if this platform declined to render it — in
+    /// which case the caller draws the live view instead.
+    static func image(food: String, text: String,
+                      size: CGFloat, scale: CGFloat) -> Image? {
+        let key = Key(food: food, text: text, size: size, scale: scale)
+        if let cached = images[key] { return cached }
+        let renderer = ImageRenderer(
+            content: FoodGlyphArtwork(foodImageName: food, text: text, size: size)
+        )
+        renderer.scale = scale
+        guard let rendered = renderer.uiImage else { return nil }
+        let image = Image(uiImage: rendered)
+        if order.count >= limit {
+            images.removeValue(forKey: order.removeFirst())
+        }
+        images[key] = image
+        order.append(key)
+        return image
+    }
+
+    /// Bakes a set of answers ahead of the round that will fly them.
+    static func warm(_ texts: [String], food: String,
+                     size: CGFloat, scale: CGFloat) {
+        for text in texts {
+            _ = image(food: food, text: text, size: size, scale: scale)
+        }
+    }
+}
+
+/// A fly's food: the baked glyph where there is one, and the live drawing as a
+/// fallback so the swarm can never come up empty.
+private struct FoodGlyph: View {
+    let foodImageName: String
+    let text: String
+    let size: CGFloat
+    let scale: CGFloat
+
+    var body: some View {
+        if let baked = FoodGlyphCache.image(food: foodImageName, text: text,
+                                            size: size, scale: scale) {
+            baked
+        } else {
+            FoodGlyphArtwork(foodImageName: foodImageName, text: text, size: size)
+                .drawingGroup()
+        }
     }
 }
 
@@ -1759,9 +1957,19 @@ private struct TongueView: View {
             // Two overlapping opaque shapes rather than one boolean-combined
             // path: a mask adds up what is drawn into it, so this is the same
             // union without running a path union on every frame of a strike.
+            //
+            // A mask is the most expensive thing on screen during a strike: its
+            // contents are rendered into a buffer of their own before they can
+            // be applied. The cone is the only part of it that moves, and it is
+            // handed a heading rounded to a degree and a half — small enough
+            // that nothing shows (its edges live inside the mouth, and the
+            // ribbon itself still swings smoothly), large enough that a whole
+            // strike is covered by a handful of distinct masks instead of one
+            // per frame.
             .mask {
                 ZStack {
-                    MouthOutwardClip(opening: mouthOpening, heading: angle)
+                    MouthOutwardClip(opening: mouthOpening,
+                                     heading: MouthOutwardClip.settled(angle))
                     MouthLipClip(opening: mouthOpening)
                 }
             }
@@ -1810,25 +2018,65 @@ private struct TongueView: View {
     }
 }
 
-/// Everything outside the head, plus the painted mouth itself — and nothing
-/// else. Masking the ribbon with this is what keeps its root from spilling onto
-/// the chin: the stub that lives inside the head shows through the opening the
-/// artist drew and is cut off exactly at the lip. The cut runs across the
-/// tongue's own direction, so the ribbon meets the lip flush at every angle
-/// instead of leaving a gap on one side.
+/// Everything the tongue may cover on its way out of the head, from the mouth
+/// outwards. Masking the ribbon with this is what keeps its root from spilling
+/// onto the chin: the stub that lives inside the head shows through the opening
+/// the artist drew and is cut off exactly at the lip.
+///
+/// It is a cone rather than a half-plane. A half-plane cut across the tongue's
+/// direction let the ribbon leave at its full girth from the moment it passed
+/// the middle of the mouth — and the ribbon is sized to squeeze through a slot,
+/// so on a wide, shallow mouth like the frog's that girth is taller than the
+/// opening. The overhang showed as a squared-off corner of tongue poking out
+/// of the lip, above and below the mouth, whenever the strike ran sideways.
+///
+/// The cone starts exactly as wide as the opening measured across the tongue's
+/// own direction — the aperture the ribbon really has to fit through — and
+/// widens from there, so the ribbon emerges from inside the mouth and nowhere
+/// else. At the mouth the cone and the lip ellipse are the same width, so the
+/// two still meet flush at every angle instead of pinching or leaving a gap.
 private struct MouthOutwardClip: Shape {
     let opening: CGRect
     /// Direction the tongue is travelling, in radians.
     let heading: CGFloat
 
+    /// A heading snapped to the nearest step, so consecutive frames of a strike
+    /// hand this shape the same value and the mask behind it can be reused
+    /// rather than rebuilt and re-rendered. Two structs that compare equal are
+    /// what lets SwiftUI skip the work.
+    static func settled(_ heading: CGFloat) -> CGFloat {
+        let step = CGFloat.pi / 120        // one and a half degrees
+        return (heading / step).rounded() * step
+    }
+
     func path(in rect: CGRect) -> Path {
-        // A half-plane starting at the mouth and running outwards forever.
+        let lip = mouthLipRect(opening)
         let reach = (rect.width + rect.height) * 2
-        var outward = Path(CGRect(x: 0, y: -reach, width: reach, height: reach * 2))
-        outward = outward.applying(CGAffineTransform(rotationAngle: heading))
-        outward = outward.applying(CGAffineTransform(translationX: opening.midX,
-                                                    y: opening.midY))
-        return outward
+        // Half the lip's chord through its centre, taken across the heading.
+        // For a strike straight out to the side that is half the mouth's
+        // height; for one straight up or down, half its width.
+        let semiX = max(0.5, lip.width / 2)
+        let semiY = max(0.5, lip.height / 2)
+        let across = hypot(sin(heading) / semiX, cos(heading) / semiY)
+        let aperture = 1 / max(0.0001, across)
+        // Just under half a point of flare for every point travelled. Opening
+        // faster than that puts the ribbon back at full girth while it is still
+        // over the lip, which is the overhang this shape exists to cut; opening
+        // slower would start shaving the ribbon's outer edge mid-flight, where
+        // the sideways bend and the lash after impact swing it widest.
+        let flare: CGFloat = 0.45
+        let far = aperture + reach * flare
+
+        var cone = Path()
+        cone.move(to: CGPoint(x: 0, y: -aperture))
+        cone.addLine(to: CGPoint(x: reach, y: -far))
+        cone.addLine(to: CGPoint(x: reach, y: far))
+        cone.addLine(to: CGPoint(x: 0, y: aperture))
+        cone.closeSubpath()
+
+        cone = cone.applying(CGAffineTransform(rotationAngle: heading))
+        return cone.applying(CGAffineTransform(translationX: opening.midX,
+                                               y: opening.midY))
     }
 }
 
@@ -1839,9 +2087,15 @@ private struct MouthLipClip: Shape {
     let opening: CGRect
 
     func path(in rect: CGRect) -> Path {
-        Path(ellipseIn: opening.insetBy(dx: -opening.width * 0.04,
-                                        dy: -opening.height * 0.04))
+        Path(ellipseIn: mouthLipRect(opening))
     }
+}
+
+/// The painted opening plus that hair of margin. Both halves of the mask work
+/// from the same rectangle, so the cone leaves the mouth at exactly the width
+/// the lip lets through.
+private func mouthLipRect(_ opening: CGRect) -> CGRect {
+    opening.insetBy(dx: -opening.width * 0.04, dy: -opening.height * 0.04)
 }
 
 /// A soft ribbon following a quadratic curve, broad where it leaves the mouth
