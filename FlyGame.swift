@@ -404,6 +404,166 @@ private final class FlyEngineTicker: NSObject {
     }
 }
 
+#if PERF_WATCH
+/// Counts the frames the game actually got, and files the ones it missed under
+/// whatever was on screen at the time.
+///
+/// This exists so a stutter can be attributed rather than guessed at. The
+/// display link is handed a frame at a fixed rate; a gap wider than one refresh
+/// means the main thread did not finish its work in time and the system skipped
+/// a frame. Grouping those gaps by what the simulation was doing is what tells
+/// the difference between "the swoop-in is expensive" and "the swoop-in happens
+/// to be when something else is expensive".
+///
+/// Debug only — it never reaches a shipped build.
+@MainActor
+final class FlyFrameWatch {
+    static let shared = FlyFrameWatch()
+
+    private struct Tally {
+        var dropped = 0
+        var hitches = 0
+        var worst = 0
+    }
+
+    /// The link is asked for 60, so a well-fed frame is one sixtieth apart.
+    private let expected = 1.0 / 60.0
+    private let reportEvery = 5.0
+
+    private var last: CFTimeInterval = 0
+    private var windowStart: CFTimeInterval = 0
+    private var drawn = 0
+    private var byPhase: [String: Tally] = [:]
+
+    /// How long the main thread is actually busy each turn of the run loop —
+    /// the display-link callback, the SwiftUI update behind it and the Core
+    /// Animation commit at the end, all together.
+    ///
+    /// This is the number that decides what a dropped frame means. Sixteen
+    /// milliseconds of work and dropped frames is our problem to fix. Two
+    /// milliseconds of work and dropped frames is something below us — a
+    /// simulator rendering through the host, most likely — and no amount of
+    /// tuning up here would move it.
+    private var observer: CFRunLoopObserver?
+    private var busyStart: CFTimeInterval = 0
+    /// Wall time says how long the turn took; CPU time says how much of that
+    /// was this thread actually working. A wide gap between them means the main
+    /// thread is blocked — waiting on the render server, most likely — rather
+    /// than computing, and no amount of tuning our own code would close it.
+    private var cpuStart: Double = 0
+    private var cpuTotal: Double = 0
+
+    fileprivate static func threadCPUSeconds() -> Double {
+        Double(clock_gettime_nsec_np(CLOCK_THREAD_CPUTIME_ID)) / 1_000_000_000
+    }
+    private var busyTotal: Double = 0
+    private var busyPeak: Double = 0
+    private var busySamples = 0
+
+    private func watchRunLoop() {
+        guard observer == nil else { return }
+        let activities = CFRunLoopActivity.afterWaiting.rawValue
+            | CFRunLoopActivity.beforeWaiting.rawValue
+        let created = CFRunLoopObserverCreateWithHandler(
+            kCFAllocatorDefault, activities, true, 0
+        ) { _, activity in
+            MainActor.assumeIsolated {
+                let watch = FlyFrameWatch.shared
+                if activity == .afterWaiting {
+                    watch.busyStart = CACurrentMediaTime()
+                    watch.cpuStart = FlyFrameWatch.threadCPUSeconds()
+                } else if watch.busyStart > 0 {
+                    let busy = CACurrentMediaTime() - watch.busyStart
+                    watch.busyTotal += busy
+                    watch.busyPeak = max(watch.busyPeak, busy)
+                    watch.cpuTotal += FlyFrameWatch.threadCPUSeconds() - watch.cpuStart
+                    watch.busySamples += 1
+                    watch.busyStart = 0
+                }
+            }
+        }
+        CFRunLoopAddObserver(CFRunLoopGetMain(), created, .commonModes)
+        observer = created
+    }
+
+    /// Called once per display frame. `phase` is only built when a frame was
+    /// actually missed, so a healthy frame costs a subtraction.
+    func frame(at timestamp: CFTimeInterval, phase: @autoclosure () -> String) {
+        defer { last = timestamp }
+        guard last > 0 else {
+            windowStart = timestamp
+            return
+        }
+        drawn += 1
+        let missed = Int(((timestamp - last) / expected).rounded()) - 1
+        if missed > 0 {
+            let key = phase()
+            var tally = byPhase[key] ?? Tally()
+            tally.dropped += missed
+            tally.hitches += 1
+            tally.worst = max(tally.worst, missed)
+            byPhase[key] = tally
+        }
+        if timestamp - windowStart >= reportEvery {
+            let window = timestamp - windowStart
+            let tallies = byPhase
+            let frames = drawn
+            let busy = Busy(average: busySamples > 0 ? busyTotal / Double(busySamples) : 0,
+                            peak: busyPeak, turns: busySamples,
+                            cpu: busySamples > 0 ? cpuTotal / Double(busySamples) : 0)
+            windowStart = timestamp
+            drawn = 0
+            byPhase.removeAll()
+            busyTotal = 0
+            busyPeak = 0
+            busySamples = 0
+            cpuTotal = 0
+            // Printing is not free, and doing it here would inflate the very
+            // frame the next reading starts from.
+            DispatchQueue.main.async { Self.report(frames, tallies, busy, over: window) }
+        }
+    }
+
+    /// Wipes the running figures, so a report covers play rather than the
+    /// transition into it.
+    func reset() {
+        watchRunLoop()
+        last = 0
+        drawn = 0
+        byPhase.removeAll()
+        busyTotal = 0
+        busyPeak = 0
+        busySamples = 0
+        cpuTotal = 0
+    }
+
+    private struct Busy {
+        let average: Double
+        let peak: Double
+        let turns: Int
+        let cpu: Double
+    }
+
+    private static func report(_ drawn: Int, _ byPhase: [String: Tally],
+                               _ busy: Busy, over seconds: Double) {
+        let dropped = byPhase.values.reduce(0) { $0 + $1.dropped }
+        let total = drawn + dropped
+        let share = total > 0 ? Double(dropped) / Double(total) * 100 : 0
+        print(String(format: "[frames] %.0fs — drew %d, dropped %d (%.1f%%)",
+                     seconds, drawn, dropped, share))
+        print(String(format: "[frames]   main thread busy %.1fms avg, %.1fms peak, over %d turns"
+                     + "  (a 60fps frame allows 16.7ms)",
+                     busy.average * 1000, busy.peak * 1000, busy.turns))
+        print(String(format: "[frames]   of which actual CPU %.1fms — the rest is the main "
+                     + "thread blocked, not working", busy.cpu * 1000))
+        for (phase, tally) in byPhase.sorted(by: { $0.value.dropped > $1.value.dropped }) {
+            print("[frames]   \(phase): \(tally.dropped) dropped "
+                  + "over \(tally.hitches) hitches, worst \(tally.worst) in a row")
+        }
+    }
+}
+#endif
+
 /// One observable value, and nothing else in the same object.
 ///
 /// The engine used to be a single `ObservableObject` with five `@Published`
@@ -415,13 +575,24 @@ private final class FlyEngineTicker: NSObject {
 ///
 /// Splitting the state into separate boxes is what makes "only the layers that
 /// actually changed" true rather than merely intended.
+/// Three concrete boxes rather than one generic one. A generic
+/// `ObservableObject` reads better, but its `deinit` crashes the Swift
+/// optimizer outright — the whole-module Release build fails with an
+/// `EarlyPerfInliner` assertion, which is to say the app cannot be archived at
+/// all. Written out long-hand it compiles, and there are only ever three.
 @MainActor
-private final class FlyChannel<Value>: ObservableObject {
-    @Published fileprivate(set) var value: Value
+private final class SwarmChannel: ObservableObject {
+    @Published fileprivate(set) var value = SwarmFrame()
+}
 
-    init(_ value: Value) {
-        self.value = value
-    }
+@MainActor
+private final class StrikeChannel: ObservableObject {
+    @Published fileprivate(set) var value: TongueCatch?
+}
+
+@MainActor
+private final class MarkChannel: ObservableObject {
+    @Published fileprivate(set) var value = HeadMarks()
 }
 
 /// Everything the swarm layer draws, handed over in one publish per frame.
@@ -442,11 +613,11 @@ private struct HeadMarks {
 @MainActor
 private final class FlyEngine {
     /// The swarm and the clock it flies on: new every frame, by definition.
-    let swarm = FlyChannel(SwarmFrame())
+    let swarm = SwarmChannel()
     /// The strike, published only while one is in the air.
-    let strike = FlyChannel<TongueCatch?>(nil)
+    let strike = StrikeChannel()
     /// The droppings and the tick, published only while one of them exists.
-    let marks = FlyChannel(HeadMarks())
+    let marks = MarkChannel()
 
     private var flies: [AnswerFly] = []
     private var tongue: TongueCatch?
@@ -573,8 +744,14 @@ private final class FlyEngine {
         if let index = specs.firstIndex(where: { $0.option.isCorrect }), index > 1 {
             specs.swapAt(index, Int.random(in: 0...1))
         }
+        // Queued, not dealt. The frame a round turns over on is already the
+        // fattest in the game — the session advances, a sum is generated, the
+        // whole game screen is rebuilt behind it, the score starts animating and
+        // the old swarm is sent packing, all at once — and it is also the first
+        // frame of the swoop the child is watching. Placing and spawning the new
+        // answers waits for the next tick, a sixtieth later: nobody can see the
+        // difference, and the two lots of work stop sharing a frame.
         pendingSpecs = specs
-        dealPendingSwarm()
         publish()
     }
 
@@ -592,6 +769,11 @@ private final class FlyEngine {
             guard displayLink == nil else { return }
             lastFrameTime = 0
             stepAccumulator = 0
+#if PERF_WATCH
+            // Starting play is itself a heavy frame; it is not what is being
+            // measured, so the count begins after it.
+            FlyFrameWatch.shared.reset()
+#endif
             let link = CADisplayLink(target: FlyEngineTicker(engine: self),
                                      selector: #selector(FlyEngineTicker.step(_:)))
             // The swarm is authored at 60 steps a second; asking a 120 Hz
@@ -613,6 +795,9 @@ private final class FlyEngine {
     /// cannot be paid back as one enormous jump.
     fileprivate func step(_ timestamp: CFTimeInterval) {
         guard isRunning else { return }
+#if PERF_WATCH
+        FlyFrameWatch.shared.frame(at: timestamp, phase: framePhase)
+#endif
         let elapsed = lastFrameTime == 0 ? FlyConfig.tick : timestamp - lastFrameTime
         lastFrameTime = timestamp
         stepAccumulator += min(max(0, elapsed), FlyConfig.tick * 3)
@@ -626,6 +811,39 @@ private final class FlyEngine {
         // simulation two or three times, and only the state it ends on is ever
         // drawn.
         if stepped { publish() }
+    }
+
+#if PERF_WATCH
+    /// What the simulation had on screen, for the frame watch to file a dropped
+    /// frame under. Only built when a frame was actually missed.
+    private var framePhase: String {
+        var parts: [String] = []
+        let swooping = flies.reduce(into: 0) { $0 += $1.entry != nil ? 1 : 0 }
+        let sweeping = flies.reduce(into: 0) { $0 += $1.isRetiring ? 1 : 0 }
+        parts.append("\(flies.count) flies")
+        if swooping > 0 { parts.append("\(swooping) swooping in") }
+        if sweeping > 0 { parts.append("\(sweeping) sweeping out") }
+        if tongue != nil { parts.append("tongue") }
+        if !poops.isEmpty { parts.append("droppings") }
+        if praise != nil { parts.append("tick") }
+        return parts.joined(separator: " + ")
+    }
+#endif
+
+    /// A tap on the playing field. The swarm is drawn rather than laid out, so
+    /// the hit test is done here against the positions the simulation already
+    /// holds — the same circle each fly used to carry as its own tap target,
+    /// tried from the top of the pile down so the answer the child can see is
+    /// the one that is caught.
+    func catchFly(at point: CGPoint, mouth: CGPoint) {
+        guard isLive, tongue == nil else { return }
+        let reach = FlyConfig.flySize(isPad: isPad) * 1.32 * 0.5
+        for fly in flies.reversed() where fly.isFlying && fly.isVisible {
+            if hypot(fly.position.x - point.x, fly.position.y - point.y) <= reach {
+                catchFly(fly.id, mouth: mouth)
+                return
+            }
+        }
     }
 
     func catchFly(_ id: UUID, mouth: CGPoint) {
@@ -660,6 +878,9 @@ private final class FlyEngine {
     private func tick() {
         guard isRunning else { return }
         clock += FlyConfig.tick
+        // A swarm queued by the last round change is dealt here rather than on
+        // the frame that queued it (see `sync`).
+        dealPendingSwarm()
         moveFlies()
         advanceTongue()
         advanceHeadMarks()
@@ -1157,6 +1378,20 @@ private final class FlyEngine {
     }
 }
 
+#if PERF_WATCH
+/// Answers by itself, for measurement only.
+///
+/// Human tapping cannot be repeated exactly, and a stutter that only shows up
+/// under fast consecutive answers has to be reproduced the same way twice to be
+/// attributed to anything. This drives a strike every `interval` seconds at the
+/// fly *furthest* from the mouth, which is both the longest ribbon the tongue
+/// ever draws and the widest sweep of its mask — the worst case on purpose.
+enum PerfAuto {
+    static let enabled = ProcessInfo.processInfo.arguments.contains("-autoAnswer")
+    static let interval = 0.45
+}
+#endif
+
 struct FlyPlayfield: View {
     let rounds: [GameRound]
     let maximumRounds: Int
@@ -1227,14 +1462,13 @@ struct FlyPlayfield: View {
                                   stage: stage,
                                   horizon: PlayStage.horizon(in: proxy.size),
                                   reduceMotion: reduceMotion)
+                    .equatable()
 
                 FlySwarmLayer(frames: engine.swarm,
                               foodImageName: foodImageName,
                               isPad: isPad,
-                              isLive: isLive,
-                              mouth: mouth,
-                              size: proxy.size,
                               scale: displayScale,
+                              onTap: { engine.catchFly(at: $0, mouth: mouth) },
                               onCatch: { engine.catchFly($0, mouth: mouth) })
 
                 // The pose is drawn once and never moved. The mouth the tongue
@@ -1262,7 +1496,8 @@ struct FlyPlayfield: View {
 
                 // Above the character, so a mark arcing over the head is never
                 // cut in half by the artwork it came out of.
-                HeadMarkLayer(marks: engine.marks, head: headTop, praiseRest: praiseRest)
+                HeadMarkLayer(marks: engine.marks, head: headTop,
+                              praiseRest: praiseRest, scale: displayScale)
 
                 if let active = rounds.first {
                     ActiveQuestionView(prompt: active.question.prompt,
@@ -1277,6 +1512,20 @@ struct FlyPlayfield: View {
                 }
             }
             .clipped()
+#if PERF_WATCH
+            .onReceive(Timer.publish(every: PerfAuto.interval, on: .main, in: .common)
+                .autoconnect()) { _ in
+                guard PerfAuto.enabled else { return }
+                let candidates = engine.swarm.value.flies.filter { $0.isFlying && $0.isVisible }
+                // The right answer, so the session keeps running instead of
+                // ending after three mistakes. Its distance from the mouth
+                // varies round to round by itself, so the long reaches still
+                // get measured — they just do not cost a life.
+                guard let target = candidates.first(where: \.isCorrect)
+                        ?? candidates.first else { return }
+                engine.catchFly(at: target.position, mouth: mouth)
+            }
+#endif
             .onAppear {
                 engine.onHit = onHit
                 engine.onImpact = onImpact
@@ -1285,6 +1534,7 @@ struct FlyPlayfield: View {
                 engine.sync(rounds: rounds)
                 engine.setLive(isLive)
                 engine.setRunning(isRunning)
+                warmFoodGlyphs(for: rounds)
                 if playsFishEntrance { beginEntrance() }
             }
             .onChange(of: proxy.size) { _, size in applyLayout(in: size) }
@@ -1300,13 +1550,15 @@ struct FlyPlayfield: View {
         // re-run on every published change in the session — so the trigger is
         // the one id that matters rather than a freshly built array of all
         // three on each of those evaluations.
-        .onChange(of: rounds.first?.id) { _, _ in engine.sync(rounds: rounds) }
-        // The session generates two sums beyond the one being played, so every
-        // answer that is going to be flown is known a good two rounds before it
-        // arrives. Baking their artwork here spends that time instead of the
-        // frame the swarm is dealt on — which is the frame right after an
-        // answer, where a child playing quickly is least able to afford it.
-        .task(id: rounds.first?.id) { await warmFoodGlyphs() }
+        .onChange(of: rounds.first?.id) { _, _ in
+            engine.sync(rounds: rounds)
+            // The session generates two sums beyond the one being played, so
+            // every answer that will be flown is known a good two rounds before
+            // it arrives. Baking their artwork over that time spends it instead
+            // of the frame the swarm is dealt on — which is the frame right
+            // after an answer, where a child playing quickly can least afford it.
+            warmFoodGlyphs(for: rounds)
+        }
         .onChange(of: isLive) { _, value in engine.setLive(value) }
         .onChange(of: isRunning) { _, value in engine.setRunning(value) }
         .onChange(of: playsFishEntrance) { _, value in if value { beginEntrance() } }
@@ -1314,19 +1566,44 @@ struct FlyPlayfield: View {
         .onDisappear { engine.setRunning(false) }
     }
 
-    /// Bakes the food for every answer the session has already generated. It
-    /// yields before each one, so the work never lands in the frame that asked
-    /// for it and a slow device spreads fifteen answers over as many turns of
-    /// the run loop instead of paying for them all at once.
-    private func warmFoodGlyphs() async {
+    /// Bakes the food for every answer the session has already generated, well
+    /// before the round that will fly it.
+    ///
+    /// One bake at a time with a gap between them, rather than a burst: baking
+    /// is the one piece of work in a round with no deadline whatsoever — the
+    /// answers being prepared are two sums away — so it is spread thin enough
+    /// that no single frame can notice it, wherever in the round it lands.
+    ///
+    /// It is deliberately not a `.task(id:)`. That form cancels itself whenever
+    /// the sum changes, which would have meant a child answering quickly — the
+    /// one this exists for — never getting a single glyph baked ahead, and
+    /// paying for all five on the frame the swarm is dealt. Nothing here needs
+    /// cancelling: a repeat is a dictionary lookup, and the cache outlives any
+    /// one level anyway.
+    private func warmFoodGlyphs(for rounds: [GameRound]) {
         let food = FoodCatalog.imageName(for: character.id)
         let size = FlyConfig.flySize(isPad: isPad) * FlyConfig.foodVisualScale
-        for round in rounds {
-            for option in round.options {
-                await Task.yield()
-                guard !Task.isCancelled else { return }
-                FoodGlyphCache.warm([option.text], food: food,
-                                    size: size, scale: displayScale)
+        let scale = displayScale
+
+        // The sum being played is wanted on the very next frame, so it is baked
+        // here and now rather than queued. Only the first round of a level ever
+        // pays for it, and that lands behind the start card where nothing is
+        // moving; from the second round on these were baked two rounds ago and
+        // this is five dictionary lookups.
+        //
+        // Leaving them to the queue below was worth about eighty milliseconds
+        // on the frame the first swarm was dealt — the one stall left in a
+        // level, and right at its opening.
+        if let active = rounds.first {
+            FoodGlyphCache.warm(active.options.map(\.text), food: food,
+                                size: size, scale: scale)
+        }
+
+        let later = rounds.dropFirst().flatMap { $0.options.map(\.text) }
+        Task { @MainActor in
+            for text in later {
+                try? await Task.sleep(nanoseconds: 40_000_000)
+                FoodGlyphCache.warm([text], food: food, size: size, scale: scale)
             }
         }
     }
@@ -1424,56 +1701,183 @@ private final class FlyEngineBox: ObservableObject {
 // only the layer whose contents actually changed. The pond, the character
 // artwork and the sum card sit outside them and are never rebuilt mid-round.
 
-/// The swarm itself: every answer currently in the air.
+/// The swarm itself: every answer currently in the air, drawn in a single pass.
+///
+/// A `ForEach` of ten little views is ten SwiftUI subtrees, each with layers of
+/// its own, a tap gesture of its own and an accessibility element of its own —
+/// and all of that is built and torn down twice per question, because a swarm
+/// change deliberately puts five new answers in the air while five old ones are
+/// still leaving. Updating an existing view is cheap; *creating* one is not, and
+/// the creations landed one per swoop across exactly the stretch a swarm arrives
+/// in. That is the hitch that was left on the fly-in.
+///
+/// A canvas has no per-fly identity at all: one view, one draw pass, and nothing
+/// created or destroyed when the swarm turns over. What the little views used to
+/// carry besides their picture is provided here instead — a single tap gesture
+/// for the whole layer, resolved against the simulation that owns the positions,
+/// and accessibility elements built only when something is actually reading them.
 private struct FlySwarmLayer: View {
-    @ObservedObject var frames: FlyChannel<SwarmFrame>
+    @ObservedObject var frames: SwarmChannel
     let foodImageName: String
     let isPad: Bool
-    let isLive: Bool
-    /// Where a strike leaves from, in this layer's own coordinates.
-    let mouth: CGPoint
-    /// The scene the swarm flies in. Positions arrive in its coordinates, and
-    /// having the size here is what lets a fly be placed with an `offset` — a
-    /// transform the render server applies — instead of a `position`, which is a
-    /// layout modifier and re-proposes a size to the fly on every frame.
-    let size: CGSize
     let scale: CGFloat
+    /// A tap anywhere on the playing field, in this layer's own coordinates.
+    let onTap: (CGPoint) -> Void
+    /// One named answer, for assistive technology only.
     let onCatch: (UUID) -> Void
 
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+    @Environment(\.accessibilitySwitchControlEnabled) private var switchControlEnabled
+
     var body: some View {
-        let tapSize = FlyConfig.flySize(isPad: isPad) * 1.32
         let frame = frames.value
-        ZStack {
-            ForEach(frame.flies) { fly in
+        let size = FlyConfig.flySize(isPad: isPad)
+        // Baked once and looked up here, on the main actor, so the drawing
+        // itself only has to resolve an image it has already been handed.
+        let glyphs = glyphs(for: frame.flies, size: size)
+
+        Canvas(rendersAsynchronously: false) { context, _ in
+            // Resolving is the step a canvas is meant to have done before it
+            // starts drawing, so it happens once per distinct answer rather
+            // than once per fly — the outgoing and incoming swarms overlap, and
+            // two flies can be carrying the same number.
+            var resolved: [String: GraphicsContext.ResolvedImage] = [:]
+            resolved.reserveCapacity(glyphs.count)
+            for (text, image) in glyphs { resolved[text] = context.resolve(image) }
+
+            for fly in frame.flies where fly.isVisible {
+                draw(fly, size: size, clock: frame.clock,
+                     glyph: resolved[fly.text], into: context)
+            }
+        }
+        // A canvas paints; it has no shape of its own for a touch to land on, so
+        // without this the whole swarm is untappable.
+        .contentShape(Rectangle())
+        .onTapGesture(coordinateSpace: .local) { onTap($0) }
+        .overlay {
+            // Nothing but an assistive reader ever visits these, and building
+            // them costs the same as the per-fly views this layer exists to
+            // avoid — so they are built when there is a reader and not before.
+            if voiceOverEnabled || switchControlEnabled {
+                assistiveTargets(frame.flies, size: size)
+            }
+        }
+    }
+
+    private func glyphs(for flies: [AnswerFly], size: CGFloat) -> [String: Image] {
+        var table: [String: Image] = [:]
+        let glyphSize = size * FlyConfig.foodVisualScale
+        for fly in flies where fly.isVisible {
+            guard table[fly.text] == nil else { continue }
+            guard let image = FoodGlyphCache.image(food: foodImageName, text: fly.text,
+                                                   size: glyphSize, scale: scale)
+            else { continue }
+            table[fly.text] = image
+        }
+        return table
+    }
+
+    /// One fly. `GraphicsContext` is a value type, so each nested copy carries
+    /// its own transform and none of them leak into the next — the same scoping
+    /// the view modifiers used to give, without the views.
+    private func draw(_ fly: AnswerFly, size: CGFloat, clock: Double,
+                      glyph: GraphicsContext.ResolvedImage?,
+                      into context: GraphicsContext) {
+        var body = context
+        body.translateBy(x: fly.position.x, y: fly.position.y)
+        // The swoop lands with a touch of scale behind it and the sweep out
+        // pulls back a little into the distance, which keeps a swarm change
+        // reading as one movement rather than two sets of flies swapping.
+        let growth: CGFloat = fly.isRetiring
+            ? 1 - 0.1 * fly.scatterProgress
+            : 0.82 + 0.18 * (fly.entry?.progress ?? 1)
+        body.scaleBy(x: growth, y: growth)
+        body.rotate(by: .degrees(tilt(of: fly)))
+
+        // The fly's own artwork already carries its wings; painting a second
+        // pair on top of it would double up. Every other food needs them drawn
+        // in, anchored to that food's own silhouette.
+        if !foodPaintsOwnWings(foodImageName) {
+            let wings = wingLayout(for: foodImageName)
+            let flap = sin(clock * 35 + fly.phase)
+            let width = size * 0.48 * wings.scale
+            let height = size * 0.30 * wings.scale
+            let capsule = Path(roundedRect: CGRect(x: -width * 0.5, y: -height * 0.5,
+                                                   width: width, height: height),
+                               cornerRadius: min(width, height) * 0.5,
+                               style: .circular)
+            var pair = body
+            pair.scaleBy(x: FlyConfig.foodVisualScale, y: FlyConfig.foodVisualScale)
+            let beat = 32 - flap * 9
+            var left = pair
+            left.translateBy(x: size * (wings.dx - wings.spread), y: size * wings.dy)
+            left.rotate(by: .degrees(-beat))
+            left.fill(capsule, with: .color(.white.opacity(0.78)))
+            var right = pair
+            right.translateBy(x: size * (wings.dx + wings.spread), y: size * wings.dy)
+            right.rotate(by: .degrees(beat))
+            right.fill(capsule, with: .color(.white.opacity(0.78)))
+        }
+
+        // The enlargement is folded into the size the glyph was baked at rather
+        // than applied over it: a raster made at the tap size and then blown up
+        // a third would arrive soft.
+        if let glyph {
+            body.draw(glyph, at: .zero, anchor: .center)
+        } else {
+            // Only reachable if the bake was refused. The food and its number
+            // are drawn straight, without the shadow the baked one carries —
+            // a swarm missing its drop shadows beats a swarm of bare wings.
+            drawUnbaked(fly, size: size, into: body, resolving: context)
+        }
+    }
+
+    private func drawUnbaked(_ fly: AnswerFly, size: CGFloat,
+                             into context: GraphicsContext,
+                             resolving base: GraphicsContext) {
+        let side = size * FlyConfig.foodVisualScale
+        let box = CGRect(x: -side * 0.5, y: -side * 0.5, width: side, height: side)
+        context.draw(base.resolve(Image(foodImageName)), in: box)
+        let badge = Text(verbatim: fly.text)
+            .font(.system(size: side * 0.22, weight: .black, design: .rounded))
+            .foregroundStyle(answerNumberColor(for: foodImageName))
+        context.draw(base.resolve(badge), at: .zero, anchor: .center)
+    }
+
+    /// A swooping fly arrives leaning into its own approach, and a dismissed one
+    /// tumbles as it whirls away. Both are read straight off the fly's own
+    /// simulated state, so they stay in step with where it actually is.
+    private func tilt(of fly: AnswerFly) -> Double {
+        if fly.isRetiring { return fly.spin * fly.exitAge }
+        guard let entry = fly.entry, entry.hasStarted else { return 0 }
+        let remaining = 1 - Double(entry.progress)
+        return Double(entry.heading) * 57.29578 * 0.16 * max(0, remaining)
+    }
+
+    private func assistiveTargets(_ flies: [AnswerFly], size: CGFloat) -> some View {
+        let tapSize = size * 1.32
+        return ZStack {
+            ForEach(flies) { fly in
                 if fly.isVisible {
-                    AnswerFlyView(fly: fly, foodImageName: foodImageName,
-                                  isPad: isPad, clock: frame.clock, scale: scale)
+                    Color.clear
                         .frame(width: tapSize, height: tapSize)
-                        // A plain tap rather than a `Button`: the swarm is
-                        // rebuilt every frame, and a button carries a press
-                        // state and gesture of its own to be rebuilt with it.
-                        .contentShape(Circle())
-                        .onTapGesture { onCatch(fly.id) }
-                        .allowsHitTesting(isLive && fly.isFlying)
-                        // One flat element per fly, labelled here. Combining the
-                        // children instead walked and merged the whole subtree of
-                        // every fly on every frame of the game.
                         .accessibilityElement()
                         .accessibilityLabel(Text(verbatim: fly.text))
                         .accessibilityAddTraits(.isButton)
                         .accessibilityAction { onCatch(fly.id) }
-                        .offset(x: fly.position.x - size.width * 0.5,
-                                y: fly.position.y - size.height * 0.5)
+                        .position(fly.position)
                 }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // The tap itself belongs to the canvas underneath; these exist to be
+        // read and activated, never to swallow a touch.
+        .allowsHitTesting(false)
     }
 }
 
 /// The strike: the tongue on its way out and back.
 private struct TongueLayer: View {
-    @ObservedObject var strike: FlyChannel<TongueCatch?>
+    @ObservedObject var strike: StrikeChannel
     let foodImageName: String
     let isPad: Bool
     let headSize: CGFloat
@@ -1498,40 +1902,65 @@ private struct TongueLayer: View {
 /// The verdict on a swallowed answer, played out over the character's head:
 /// three droppings for a wrong one, a tick for a right one. Both are measured
 /// from the one point given here.
+/// Drawn rather than laid out, for the same reason the swarm is: a verdict
+/// appears on *every* answer and is gone about a second later, so as views it
+/// was a build and a teardown per answer — landing squarely in the stretch the
+/// next swarm swoops in on. On a canvas a verdict costs a transform and a blit,
+/// and an answer with no mark on screen costs nothing at all.
 private struct HeadMarkLayer: View {
-    @ObservedObject var marks: FlyChannel<HeadMarks>
+    @ObservedObject var marks: MarkChannel
     /// Top of the head, in this layer's own coordinates, and the spot beside it
     /// the tick hops out to.
     let head: CGPoint
     let praiseRest: CGPoint
+    let scale: CGFloat
 
     var body: some View {
         let state = marks.value
-        return ZStack {
-            ForEach(state.poops) { poop in
-                Image("poop")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: poop.size, height: poop.size)
-                    .rotationEffect(.degrees(poop.rotation))
-                    .scaleEffect(poop.scale)
-                    .opacity(poop.opacity)
-                    .position(x: head.x + poop.offset.width,
-                              y: head.y + poop.offset.height)
+        // The tick's artwork never changes for a given character size, so like
+        // the food it is baked once instead of being re-drawn — gradient, rim,
+        // drop shadow and all — on every frame of the second it is up.
+        let tick = state.praise.flatMap {
+            PraiseTickCache.image(size: $0.size, scale: scale)
+        }
+        Canvas(rendersAsynchronously: false) { context, _ in
+            if !state.poops.isEmpty {
+                let dropping = context.resolve(Image("poop"))
+                for poop in state.poops {
+                    var g = context
+                    g.opacity = poop.opacity
+                    g.translateBy(x: head.x + poop.offset.width,
+                                  y: head.y + poop.offset.height)
+                    g.scaleBy(x: poop.scale, y: poop.scale)
+                    g.rotate(by: .degrees(poop.rotation))
+                    g.draw(dropping, in: fitted(dropping.size, into: poop.size))
+                }
             }
 
-            if let praise = state.praise {
+            if let praise = state.praise, let tick {
                 let travel = praise.travel
-                PraiseTickView(size: praise.size)
-                    .scaleEffect(praise.scale)
-                    .opacity(praise.opacity)
-                    .position(x: head.x + (praiseRest.x - head.x) * travel,
+                var g = context
+                g.opacity = praise.opacity
+                g.translateBy(x: head.x + (praiseRest.x - head.x) * travel,
                               y: head.y + (praiseRest.y - head.y) * travel)
+                g.scaleBy(x: praise.scale, y: praise.scale)
+                g.draw(context.resolve(tick), at: .zero, anchor: .center)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+
+    /// The artwork's own proportions inside a square box, centred on the origin
+    /// — what `scaledToFit` in a fixed frame used to give.
+    private func fitted(_ natural: CGSize, into side: CGFloat) -> CGRect {
+        guard natural.width > 0, natural.height > 0 else {
+            return CGRect(x: -side * 0.5, y: -side * 0.5, width: side, height: side)
+        }
+        let fit = min(side / natural.width, side / natural.height)
+        let width = natural.width * fit
+        let height = natural.height * fit
+        return CGRect(x: -width * 0.5, y: -height * 0.5, width: width, height: height)
     }
 }
 
@@ -1540,6 +1969,10 @@ private struct HeadMarkLayer: View {
 /// than being a bare glyph laid over whatever happens to be behind it.
 private struct PraiseTickView: View {
     let size: CGFloat
+
+    /// Room for the drop shadow to fall into. A shadow does not enlarge the
+    /// view it belongs to, so without this the bake would cut it off.
+    fileprivate static func margin(for size: CGFloat) -> CGFloat { size * 0.3 }
 
     var body: some View {
         Image(systemName: "checkmark")
@@ -1556,12 +1989,36 @@ private struct PraiseTickView: View {
             .overlay(Circle().stroke(.white.opacity(0.92), lineWidth: size * 0.075))
             .shadow(color: Color(red: 0.06, green: 0.28, blue: 0.10).opacity(0.34),
                     radius: size * 0.13, y: size * 0.07)
+            .padding(Self.margin(for: size))
+    }
+}
+
+/// The baked tick. One character size per session, so this holds a single image
+/// in practice — but it is keyed properly so a rotation or a different device
+/// cannot hand back a stale one.
+@MainActor
+private enum PraiseTickCache {
+    private struct Key: Hashable {
+        let size: CGFloat
+        let scale: CGFloat
+    }
+
+    private static var images: [Key: Image?] = [:]
+
+    static func image(size: CGFloat, scale: CGFloat) -> Image? {
+        let key = Key(size: size, scale: scale)
+        if let cached = images[key] { return cached }
+        let renderer = ImageRenderer(content: PraiseTickView(size: size))
+        renderer.scale = scale
+        let image = renderer.uiImage.map { Image(uiImage: $0) }
+        images[key] = image
+        return image
     }
 }
 
 /// The end-of-level bloom, which drifts off the simulation's own clock.
 private struct FlyCelebrationLayer: View {
-    @ObservedObject var frames: FlyChannel<SwarmFrame>
+    @ObservedObject var frames: SwarmChannel
     let color: Color
 
     var body: some View {
@@ -1642,75 +2099,6 @@ private func wingLayout(for foodImageName: String) -> WingLayout {
     }
 }
 
-private struct AnswerFlyView: View {
-    let fly: AnswerFly
-    /// This character's own food, so a bunny's level fills with carrots while
-    /// a penguin's fills with fish — the answer number always rides on top of
-    /// whatever is currently flying.
-    let foodImageName: String
-    let isPad: Bool
-    let clock: Double
-    /// The screen's pixel density, so the baked food is made at the resolution
-    /// it will actually be shown at.
-    let scale: CGFloat
-
-    /// A swooping fly arrives leaning into its own approach, and a dismissed
-    /// one tumbles as it whirls away. Both are read straight off the fly's own
-    /// simulated state, so they stay in step with where it actually is.
-    private var tilt: Double {
-        if fly.isRetiring { return fly.spin * fly.exitAge }
-        guard let entry = fly.entry, entry.hasStarted else { return 0 }
-        let remaining = 1 - Double(entry.progress)
-        return Double(entry.heading) * 57.29578 * 0.16 * max(0, remaining)
-    }
-
-    var body: some View {
-        let size = FlyConfig.flySize(isPad: isPad)
-        let scatter = Double(fly.scatterProgress)
-        return ZStack {
-            // The fly's own artwork already carries its wings; painting a
-            // second pair on top of it would double up. Every other food
-            // needs them drawn in, anchored to that food's own silhouette.
-            if !foodPaintsOwnWings(foodImageName) {
-                FoodWings(foodImageName: foodImageName, size: size,
-                          flap: sin(clock * 35 + fly.phase))
-                    // The wings keep taking the enlargement as a transform:
-                    // they are two plain capsules, and their flap angle
-                    // changes every frame anyway.
-                    .scaleEffect(FlyConfig.foodVisualScale)
-            }
-            // The artwork and the number on it never change while the fly is
-            // in the air, so they live in a view of their own: the swarm is
-            // rebuilt every frame, and this way only the flap and the
-            // transforms below are actually recomputed.
-            //
-            // The enlargement below is folded into the size the glyph is
-            // built at rather than applied as a `scaleEffect` over it. The
-            // glyph rasterizes itself (see `FoodGlyph`), and a raster made at
-            // the tap size and then blown up a third would arrive soft; made
-            // at its final size it is pixel-for-pixel what it was before.
-            FoodGlyph(foodImageName: foodImageName, text: fly.text,
-                      size: size * FlyConfig.foodVisualScale, scale: scale)
-        }
-        // The food is drawn a third larger than the tap target it sits in: it
-        // needs to be big enough that the number still has room to breathe at
-        // its centre, without also growing the hitbox or the spacing the swarm
-        // is laid out with. The frame is what holds the hitbox at the tap
-        // size while the artwork overflows it.
-        .frame(width: size, height: size)
-        .rotationEffect(.degrees(tilt))
-        // The swoop lands with a touch of scale behind it and the sweep out
-        // pulls back a little into the distance, which keeps a swarm change
-        // reading as one movement rather than two sets of flies swapping.
-        // Neither end fades: they fly on and off at full strength.
-        .scaleEffect(fly.isRetiring
-                     ? 1 - 0.1 * scatter
-                     : 0.82 + 0.18 * Double(fly.entry?.progress ?? 1))
-        .accessibilityLabel(Text(verbatim: fly.text))
-        .accessibilityAddTraits(.isButton)
-    }
-}
-
 /// One food and the answer written on it, as it is drawn.
 ///
 /// The drop shadow under the artwork has no shape to follow — it is cast by the
@@ -1762,14 +2150,17 @@ private enum FoodGlyphCache {
         let scale: CGFloat
     }
 
-    private static var images: [Key: Image] = [:]
+    /// A stored `nil` is a refusal that has already been tried. Without it a
+    /// glyph that will not bake would be attempted again on every frame it is
+    /// on screen, which is far worse than the thing it failed to save.
+    private static var images: [Key: Image?] = [:]
     /// Answers are short and repeat, but a long Supermix run meets a lot of
     /// them. Past this the oldest are dropped rather than kept for good.
     private static let limit = 160
     private static var order: [Key] = []
 
     /// The baked glyph, or nil if this platform declined to render it — in
-    /// which case the caller draws the live view instead.
+    /// which case the caller draws the food and its number directly.
     static func image(food: String, text: String,
                       size: CGFloat, scale: CGFloat) -> Image? {
         let key = Key(food: food, text: text, size: size, scale: scale)
@@ -1778,8 +2169,7 @@ private enum FoodGlyphCache {
             content: FoodGlyphArtwork(foodImageName: food, text: text, size: size)
         )
         renderer.scale = scale
-        guard let rendered = renderer.uiImage else { return nil }
-        let image = Image(uiImage: rendered)
+        let image = renderer.uiImage.map { Image(uiImage: $0) }
         if order.count >= limit {
             images.removeValue(forKey: order.removeFirst())
         }
@@ -1793,50 +2183,6 @@ private enum FoodGlyphCache {
                      size: CGFloat, scale: CGFloat) {
         for text in texts {
             _ = image(food: food, text: text, size: size, scale: scale)
-        }
-    }
-}
-
-/// A fly's food: the baked glyph where there is one, and the live drawing as a
-/// fallback so the swarm can never come up empty.
-private struct FoodGlyph: View {
-    let foodImageName: String
-    let text: String
-    let size: CGFloat
-    let scale: CGFloat
-
-    var body: some View {
-        if let baked = FoodGlyphCache.image(food: foodImageName, text: text,
-                                            size: size, scale: scale) {
-            baked
-        } else {
-            FoodGlyphArtwork(foodImageName: foodImageName, text: text, size: size)
-                .drawingGroup()
-        }
-    }
-}
-
-/// The pair of beating wings on the foods that are not already drawn with
-/// them. `flap` is the only thing that moves, once per frame.
-private struct FoodWings: View {
-    let foodImageName: String
-    let size: CGFloat
-    /// −1…1, straight off the fly's own wingbeat.
-    let flap: Double
-
-    var body: some View {
-        let wings = wingLayout(for: foodImageName)
-        ZStack {
-            Capsule()
-                .fill(.white.opacity(0.78))
-                .frame(width: size * 0.48 * wings.scale, height: size * 0.30 * wings.scale)
-                .rotationEffect(.degrees(-32 + flap * 9))
-                .offset(x: size * (wings.dx - wings.spread), y: size * wings.dy)
-            Capsule()
-                .fill(.white.opacity(0.78))
-                .frame(width: size * 0.48 * wings.scale, height: size * 0.30 * wings.scale)
-                .rotationEffect(.degrees(32 - flap * 9))
-                .offset(x: size * (wings.dx + wings.spread), y: size * wings.dy)
         }
     }
 }

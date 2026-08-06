@@ -162,7 +162,15 @@ private struct Planted<Content: View>: View {
 // MARK: - Dispatcher
 
 /// The backdrop a level is played against, chosen by character.
-struct CharacterBackdrop: View {
+///
+/// `Equatable`, and used through `.equatable()`, because a scene is a hundred
+/// or so shapes and none of them move on their own — everything that does is a
+/// repeating animation the render server owns. The playfield around it is
+/// rebuilt whenever anything in the session changes, several times per answer,
+/// and without an explicit comparison this whole tree was liable to be rebuilt
+/// with it. The four values below are the entire input; when they match, there
+/// is provably nothing to redraw.
+struct CharacterBackdrop: View, Equatable {
     let character: AnimalCharacter
     let stage: CGRect
     let horizon: CGFloat
@@ -230,7 +238,7 @@ private struct PondScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -540,7 +548,7 @@ private struct PolarScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -720,7 +728,7 @@ private struct MeadowScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -949,7 +957,7 @@ private struct GardenScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -1174,7 +1182,7 @@ private struct SavannahScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -1405,7 +1413,7 @@ private struct ReefScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -1621,7 +1629,7 @@ private struct BeachScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -1872,7 +1880,7 @@ private struct ZooScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -2100,7 +2108,7 @@ private struct ForestScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
@@ -2348,7 +2356,7 @@ private struct AutumnScene: View {
     var body: some View {
         ZStack {
             still.drawingGroup()
-            if showsMotion { motion }
+            if showsMotion { motion.drawingGroup() }
         }
     }
 
