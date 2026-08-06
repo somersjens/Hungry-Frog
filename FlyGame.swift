@@ -1432,11 +1432,26 @@ private struct FlyCelebrationLayer: View {
     }
 }
 
+/// The pond the level is played over. Nothing in it ever moves, but it is not
+/// cheap to draw: two soft-edged clouds, a blurred sun, two lily pads and a
+/// waterline, each carrying its own blur or drop shadow. Left as ordinary
+/// layers those blurs and shadows are re-blended behind the swarm on every
+/// frame, and the frame budget the swarm needs goes to a picture that is
+/// identical to the one drawn a sixtieth of a second earlier.
+///
+/// `drawingGroup` flattens the whole backdrop into a single rendered texture.
+/// It is produced once, at the size the pond is laid out at, and reused
+/// untouched for the rest of the level — the artwork is unchanged, and the
+/// per-frame cost of it drops to compositing one flat image.
 private struct PondBackdrop: View {
     let tint: Color
     let isPad: Bool
 
     var body: some View {
+        pond.drawingGroup()
+    }
+
+    private var pond: some View {
         GeometryReader { proxy in
             let waterline = proxy.size.height * FlyConfig.waterlineShare
             ZStack {
@@ -1654,18 +1669,29 @@ private struct AnswerFlyView: View {
             if !foodPaintsOwnWings(foodImageName) {
                 FoodWings(foodImageName: foodImageName, size: size,
                           flap: sin(clock * 35 + fly.phase))
+                    // The wings keep taking the enlargement as a transform:
+                    // they are two plain capsules, and their flap angle
+                    // changes every frame anyway.
+                    .scaleEffect(FlyConfig.foodVisualScale)
             }
             // The artwork and the number on it never change while the fly is
             // in the air, so they live in a view of their own: the swarm is
             // rebuilt every frame, and this way only the flap and the
             // transforms below are actually recomputed.
-            FoodGlyph(foodImageName: foodImageName, text: fly.text, size: size)
+            //
+            // The enlargement below is folded into the size the glyph is
+            // built at rather than applied as a `scaleEffect` over it. The
+            // glyph rasterizes itself (see `FoodGlyph`), and a raster made at
+            // the tap size and then blown up a third would arrive soft; made
+            // at its final size it is pixel-for-pixel what it was before.
+            FoodGlyph(foodImageName: foodImageName, text: fly.text,
+                      size: size * FlyConfig.foodVisualScale)
         }
-        // Rendered a third larger than the tap target it sits in: the food
-        // needs to be big enough that the number still has room to breathe
-        // at its centre, without also growing the hitbox or the spacing the
-        // swarm is laid out with.
-        .scaleEffect(FlyConfig.foodVisualScale)
+        // The food is drawn a third larger than the tap target it sits in: it
+        // needs to be big enough that the number still has room to breathe at
+        // its centre, without also growing the hitbox or the spacing the swarm
+        // is laid out with. The frame is what holds the hitbox at the tap
+        // size while the artwork overflows it.
         .frame(width: size, height: size)
         .rotationEffect(.degrees(tilt))
         // The swoop lands with a touch of scale behind it and the sweep out
@@ -1683,10 +1709,21 @@ private struct AnswerFlyView: View {
 /// One food and the answer written on it. Everything here is fixed for the
 /// life of a fly, so SwiftUI can skip it entirely on the frames where only the
 /// fly's position changed.
+///
+/// It is also flattened into a single rendered texture. The drop shadow under
+/// the artwork has no shape to follow — it is cast by the food's own alpha —
+/// so every fly carrying one costs a separate render pass on every frame it is
+/// in the air, and a full swarm is up to ten of them at once. Rasterizing the
+/// food, its shadow and its number together turns all of that into one flat
+/// image per fly, made once when the fly is dealt and then only moved.
 private struct FoodGlyph: View {
     let foodImageName: String
     let text: String
     let size: CGFloat
+
+    /// Room around the artwork for the shadow to fall into. Without it the
+    /// raster is cut to the food itself and the shadow is clipped off.
+    private var shadowMargin: CGFloat { size * 0.16 }
 
     var body: some View {
         ZStack {
@@ -1699,6 +1736,8 @@ private struct FoodGlyph: View {
                 .shadow(color: .black.opacity(0.18), radius: 5, y: 3)
             answerBadge(text: text, foodImageName: foodImageName, size: size * 0.5)
         }
+        .padding(shadowMargin)
+        .drawingGroup()
     }
 }
 
