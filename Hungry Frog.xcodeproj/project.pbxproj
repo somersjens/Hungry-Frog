@@ -53,6 +53,8 @@
 		F9F3C64A301E409F00464555 /* ScreenSafeArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C603301E409F00464555 /* ScreenSafeArea.swift */; };
 		F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FF301E409F00464555 /* PremiumView.swift */; };
 		F9F3C64C301E409F00464555 /* MenuMeadowBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */; };
+		F9F3CBCDC239647255BAA080 /* CharacterScenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */; };
+		F9F37AAC613AA631585C80BE /* Scenery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F35835B756794F5322B5BF /* Scenery.swift */; };
 		F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E6301E409F00464555 /* PausedSessionStore.swift */; };
 		F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C601301E409F00464555 /* ProgressSync.swift */; };
 		F9F3C64F301E409F00464555 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EF301E409F00464555 /* GameView.swift */; };
@@ -80,6 +82,8 @@
 		F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wrong_answer.caf; sourceTree = "<group>"; };
 		F9F3C5CA301E405E00464555 /* Hungry Frog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hungry Frog.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMeadowBackground.swift; sourceTree = "<group>"; };
+		F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterScenes.swift; sourceTree = "<group>"; };
+		F9F35835B756794F5322B5BF /* Scenery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scenery.swift; sourceTree = "<group>"; };
 		F9F3C5DB301E409F00464555 /* AppAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAudio.swift; sourceTree = "<group>"; };
 		F9F3C5DC301E409F00464555 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		F9F3C5DD301E409F00464555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -158,6 +162,8 @@
 			children = (
 				F9F3C9AC301F3CBE00464555 /* frog_music.m4a */,
 				F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */,
+				F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */,
+				F9F35835B756794F5322B5BF /* Scenery.swift */,
 				F9F3C5DB301E409F00464555 /* AppAudio.swift */,
 				F9F3C5DC301E409F00464555 /* AppSettings.swift */,
 				F9F3C5DD301E409F00464555 /* Assets.xcassets */,
@@ -364,6 +370,8 @@
 				FA11F00131A1000000000001 /* FlyGame.swift in Sources */,
 				F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */,
 				F9F3C64C301E409F00464555 /* MenuMeadowBackground.swift in Sources */,
+				F9F3CBCDC239647255BAA080 /* CharacterScenes.swift in Sources */,
+				F9F37AAC613AA631585C80BE /* Scenery.swift in Sources */,
 				F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */,
 				F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */,
 				F9F3C64F301E409F00464555 /* GameView.swift in Sources */,

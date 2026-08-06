@@ -135,6 +135,16 @@ private enum FlyConfig {
     }
 }
 
+/// The one measurement the scenery has to agree with the game about. A scene is
+/// handed the frame the reclining pose is drawn in directly; the height its
+/// ground line sits at belongs to the simulation, and a scene that guessed at it
+/// would leave the lounger standing on nothing.
+enum PlayStage {
+    static func horizon(in size: CGSize) -> CGFloat {
+        size.height * FlyConfig.waterlineShare
+    }
+}
+
 private enum FlyPattern: CaseIterable {
     case wander
     case wave
@@ -1128,7 +1138,10 @@ struct FlyPlayfield: View {
             ), in: stage)
 
             ZStack {
-                PondBackdrop(tint: character.color, isPad: isPad)
+                CharacterBackdrop(character: character,
+                                  stage: stage,
+                                  horizon: PlayStage.horizon(in: proxy.size),
+                                  reduceMotion: reduceMotion)
 
                 FlySwarmLayer(engine: engine,
                               foodImageName: foodImageName,
@@ -1429,142 +1442,6 @@ private struct FlyCelebrationLayer: View {
     var body: some View {
         FlyCelebration(clock: engine.clock, color: color)
             .allowsHitTesting(false)
-    }
-}
-
-/// The pond the level is played over. Nothing in it ever moves, but it is not
-/// cheap to draw: two soft-edged clouds, a blurred sun, two lily pads and a
-/// waterline, each carrying its own blur or drop shadow. Left as ordinary
-/// layers those blurs and shadows are re-blended behind the swarm on every
-/// frame, and the frame budget the swarm needs goes to a picture that is
-/// identical to the one drawn a sixtieth of a second earlier.
-///
-/// `drawingGroup` flattens the whole backdrop into a single rendered texture.
-/// It is produced once, at the size the pond is laid out at, and reused
-/// untouched for the rest of the level — the artwork is unchanged, and the
-/// per-frame cost of it drops to compositing one flat image.
-private struct PondBackdrop: View {
-    let tint: Color
-    let isPad: Bool
-
-    var body: some View {
-        pond.drawingGroup()
-    }
-
-    private var pond: some View {
-        GeometryReader { proxy in
-            let waterline = proxy.size.height * FlyConfig.waterlineShare
-            ZStack {
-                LinearGradient(colors: [Color(red: 0.62, green: 0.87, blue: 0.98),
-                                        Color(red: 0.86, green: 0.95, blue: 0.83)],
-                               startPoint: .top, endPoint: .bottom)
-
-                Circle()
-                    .fill(Color(red: 1.0, green: 0.91, blue: 0.48).opacity(0.78))
-                    .frame(width: isPad ? 112 : 76)
-                    .blur(radius: 1)
-                    .position(x: proxy.size.width * 0.18, y: proxy.size.height * 0.17)
-
-                PondCloud(scale: isPad ? 1.35 : 0.9)
-                    .position(x: proxy.size.width * 0.72, y: proxy.size.height * 0.17)
-                PondCloud(scale: isPad ? 1.0 : 0.68)
-                    .opacity(0.72)
-                    .position(x: proxy.size.width * 0.30, y: proxy.size.height * 0.32)
-
-                Ellipse()
-                    .fill(Color(red: 0.25, green: 0.58, blue: 0.25))
-                    .frame(width: proxy.size.width * 1.35, height: isPad ? 190 : 120)
-                    .position(x: proxy.size.width * 0.5, y: waterline + (isPad ? 35 : 24))
-
-                Rectangle()
-                    .fill(LinearGradient(colors: [Color(red: 0.27, green: 0.72, blue: 0.78),
-                                                   Color(red: 0.08, green: 0.47, blue: 0.64)],
-                                         startPoint: .top, endPoint: .bottom))
-                    .frame(height: proxy.size.height - waterline)
-                    .position(x: proxy.size.width * 0.5,
-                              y: waterline + (proxy.size.height - waterline) * 0.5)
-
-                Ellipse()
-                    .fill(Color(red: 0.47, green: 0.86, blue: 0.88).opacity(0.72))
-                    .frame(width: proxy.size.width * 1.16, height: isPad ? 72 : 46)
-                    .position(x: proxy.size.width * 0.5, y: waterline)
-
-                ForEach(0..<5, id: \.self) { index in
-                    Capsule()
-                        .fill(Color.white.opacity(0.22))
-                        .frame(width: isPad ? 100 : 62, height: isPad ? 7 : 5)
-                        .position(x: proxy.size.width * CGFloat(0.12 + Double(index) * 0.19),
-                                  y: waterline + CGFloat(index % 2) * (isPad ? 54 : 34))
-                }
-
-                LilyPad(color: tint)
-                    .frame(width: isPad ? 150 : 96, height: isPad ? 64 : 42)
-                    .position(x: proxy.size.width * 0.20, y: waterline + (isPad ? 82 : 54))
-                LilyPad(color: tint)
-                    .frame(width: isPad ? 120 : 78, height: isPad ? 52 : 34)
-                    .position(x: proxy.size.width * 0.82, y: waterline + (isPad ? 42 : 29))
-
-                PondReeds()
-                    .frame(width: isPad ? 125 : 82, height: isPad ? 190 : 128)
-                    .position(x: isPad ? 60 : 40, y: waterline - (isPad ? 48 : 31))
-            }
-        }
-        .ignoresSafeArea()
-        .allowsHitTesting(false)
-    }
-}
-
-private struct PondCloud: View {
-    let scale: CGFloat
-
-    var body: some View {
-        ZStack {
-            Capsule().frame(width: 116, height: 35).offset(y: 11)
-            Circle().frame(width: 54).offset(x: -27)
-            Circle().frame(width: 68).offset(x: 14, y: -7)
-            Circle().frame(width: 44).offset(x: 44, y: 6)
-        }
-        .foregroundStyle(.white.opacity(0.72))
-        .scaleEffect(scale)
-        .shadow(color: .white.opacity(0.28), radius: 9)
-    }
-}
-
-private struct LilyPad: View {
-    let color: Color
-
-    var body: some View {
-        Ellipse()
-            .fill(LinearGradient(colors: [Color(red: 0.28, green: 0.66, blue: 0.25),
-                                          color.opacity(0.88)],
-                                 startPoint: .topLeading, endPoint: .bottomTrailing))
-            .overlay(alignment: .topTrailing) {
-                Circle().fill(Color.white.opacity(0.34)).frame(width: 12, height: 7)
-                    .padding(.trailing, 18).padding(.top, 8)
-            }
-            .rotationEffect(.degrees(-5))
-            .shadow(color: .black.opacity(0.13), radius: 3, y: 3)
-    }
-}
-
-private struct PondReeds: View {
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            ForEach(0..<6, id: \.self) { index in
-                Capsule()
-                    .fill(Color(red: 0.17, green: 0.48, blue: 0.16))
-                    .frame(width: 6, height: CGFloat(62 + index * 12))
-                    .rotationEffect(.degrees(Double(index - 3) * 5))
-                    .offset(x: CGFloat(index - 3) * 10)
-            }
-            ForEach([1, 3, 5], id: \.self) { index in
-                Capsule()
-                    .fill(Color(red: 0.34, green: 0.18, blue: 0.08))
-                    .frame(width: 13, height: 32)
-                    .offset(x: CGFloat(index - 3) * 10,
-                            y: -CGFloat(52 + index * 12))
-            }
-        }
     }
 }
 
