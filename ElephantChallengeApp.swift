@@ -96,6 +96,7 @@ struct ElephantChallengeApp: App {
                     deepColor: character.deepColor,
                     onApproved: { promotedPurchase.approveDeferredPurchase() }
                 )
+                .gameEnvironment()
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
             }

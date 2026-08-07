@@ -1669,6 +1669,17 @@ struct FlyPlayfield: View {
                 y: stage.minY + stage.height * unit.y)
     }
 
+    /// Which way the app reads. The playfield's own coordinates stay
+    /// left-to-right whatever the language — a fly sits where the simulation
+    /// put it, and the tongue leaves from a mouth painted at a fixed spot — but
+    /// the two cards laid over it are interface, and they share the top of the
+    /// screen with a HUD that does swap sides. Read rather than observed: the
+    /// language cannot change from inside a running game, and this view is
+    /// deliberately kept off the sixty-times-a-second path.
+    private var isRightToLeft: Bool {
+        LanguageManager.shared.effective.layoutDirection == .rightToLeft
+    }
+
     private func questionRect(in size: CGSize) -> CGRect {
         let inset: CGFloat = isPad ? 28 : 16
         let sharesTopRow = size.width >= 700
@@ -1684,21 +1695,22 @@ struct FlyPlayfield: View {
         let minY = sharesTopRow
             ? topReserve - (isPad ? 42 : 36)
             : topReserve + (isPad ? 12 : 8)
-        return CGRect(x: size.width - inset - width, y: minY,
-                      width: width, height: height)
+        let x = isRightToLeft ? inset : size.width - inset - width
+        return CGRect(x: x, y: minY, width: width, height: height)
     }
 
     /// The band a tutorial message occupies: a fixed one, on the leading side
     /// directly under the HUD, whatever the message says. Fixed because the
     /// swarm is told to steer around it — a band that grew and shrank with the
     /// translation would move the airspace under the flies each time the lesson
-    /// moved on. The sum keeps the trailing corner it always has.
+    /// moved on. The sum keeps the corner opposite it.
     private func tutorialRect(in size: CGSize) -> CGRect {
         let inset: CGFloat = isPad ? 28 : 16
         let width = min(isPad ? 520 : 396,
                         max(230, size.width * (isPad ? 0.46 : 0.47)))
         let height: CGFloat = isPad ? 96 : 74
-        return CGRect(x: inset, y: topReserve + (isPad ? 16 : 10),
+        let x = isRightToLeft ? size.width - inset - width : inset
+        return CGRect(x: x, y: topReserve + (isPad ? 16 : 10),
                       width: width, height: height)
     }
 

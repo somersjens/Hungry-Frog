@@ -201,17 +201,23 @@ struct HomeView: View {
                         celebratedUnlockCharacterID: celebratedUnlockID)
                 .premiumSheetPresentation()
         }
-        .sheet(isPresented: $showNameEditor) {
-            NameEditorSheet(theme: character, name: $nameDraft) {
-                let trimmed = nameDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-                playerName = trimmed
-            }
-            // A short sheet that rises over the menu, tinted to the character.
-            .presentationDetents([.height(300)])
-            .presentationDragIndicator(.visible)
-            .presentationBackground {
-                LinearGradient(colors: [character.skyColor, character.tintColor],
-                               startPoint: .top, endPoint: .bottom)
+        // Renaming happens over the menu, not instead of it: a card this small
+        // has no business taking the whole screen, and seeing the menu behind
+        // it makes plain whose name is being changed.
+        .overlay {
+            if showNameEditor {
+                NameEditorCard(
+                    theme: character,
+                    name: $nameDraft,
+                    onSave: {
+                        playerName = nameDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+                        withAnimation(.easeOut(duration: 0.2)) { showNameEditor = false }
+                    },
+                    onCancel: {
+                        withAnimation(.easeOut(duration: 0.2)) { showNameEditor = false }
+                    }
+                )
+                .transition(.opacity)
             }
         }
         .task {

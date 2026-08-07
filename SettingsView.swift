@@ -210,7 +210,7 @@ struct SettingsView: View {
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.primary)
                 if isLocked, let cards = CharacterUnlockStore.requirement(for: animal.id) {
-                    Text(verbatim: "\(cards)")
+                    Text(verbatim: LNumber(cards))
                         .font(.system(size: 10, weight: .heavy, design: .rounded))
                         .foregroundStyle(.secondary)
                 }

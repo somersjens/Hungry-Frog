@@ -209,6 +209,13 @@ struct GameView: View {
                               onSwallow: { model.reportCatchOutcome(isCorrect: $0) },
                               onFishEntranceComplete: finishFishEntrance,
                               onLevelCompletionFinished: finishLevelCompletion)
+                    // The playing field is a simulation, not a page: every fly
+                    // sits where the physics put it, and the tongue leaves from
+                    // a mouth painted into the artwork at a fixed spot. Mirror
+                    // it for a right-to-left language and the two stop agreeing
+                    // — the flies flip but the tongue still reaches for where
+                    // they were. It reads the same either way, so it is pinned.
+                    .environment(\.layoutDirection, .leftToRight)
 
                 hud
                     .padding(.horizontal, isPad ? 28 : 16)

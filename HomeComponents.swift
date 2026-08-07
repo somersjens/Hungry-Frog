@@ -175,94 +175,121 @@ struct DailyGoalPicker: View {
 /// Themed sheet for editing the player's name, styled to match the app rather
 /// than a plain system alert. Deliberately a short, self-sizing sheet that
 /// rises over the menu — a full navigation stack reads far heavier here.
-struct NameEditorSheet: View {
-    @Environment(\.dismiss) private var dismiss
+/// Renaming the player: a small card that floats over the menu rather than a
+/// sheet that swallows it. The app is landscape, so a 300pt sheet took three
+/// quarters of the height for one text field — this keeps the menu visible
+/// behind a soft dim, which also makes it obvious what is being renamed.
+struct NameEditorCard: View {
     let theme: AnimalCharacter
     @Binding var name: String
     let onSave: () -> Void
+    let onCancel: () -> Void
+
     @FocusState private var focused: Bool
-    @State private var hasRequestedInitialFocus = false
+    @State private var appeared = false
+
+    private var isPad: Bool { AppLayout.isPad }
+    private var scale: CGFloat { isPad ? 1.2 : 1 }
+
+    private var trimmed: String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     private func save() {
+        guard !trimmed.isEmpty else { return }
         onSave()
-        dismiss()
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            Spacer(minLength: 0)
+        ZStack {
+            // Tapping beside the card is the quickest way out, and the dim is
+            // what keeps the menu readable but clearly out of reach.
+            Color.black.opacity(appeared ? 0.42 : 0)
+                .ignoresSafeArea()
+                .contentShape(Rectangle())
+                .onTapGesture(perform: onCancel)
 
-            VStack(spacing: 6) {
-                theme.artwork
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 54, height: 54)
+            card
+                .scaleEffect(appeared ? 1 : 0.92)
+                .opacity(appeared ? 1 : 0)
+        }
+        .animation(.spring(response: 0.32, dampingFraction: 0.84), value: appeared)
+        .onAppear {
+            appeared = true
+            focused = true
+        }
+    }
 
+    private var card: some View {
+        HStack(spacing: 16 * scale) {
+            theme.artwork
+                .resizable()
+                .scaledToFit()
+                .frame(width: 64 * scale, height: 64 * scale)
+
+            VStack(alignment: .leading, spacing: 10 * scale) {
                 Text("name.whatsYourName")
-                    .font(.system(size: 24, weight: .heavy, design: .rounded))
+                    .font(.system(size: 17 * scale, weight: .heavy, design: .rounded))
                     .foregroundStyle(theme.deepColor)
+
+                TextField(String(), text: $name, prompt: Text("name.placeholder"))
+                    .font(.system(size: 18 * scale, weight: .bold, design: .rounded))
+                    .foregroundStyle(theme.deepColor)
+                    .focused($focused)
+                    .textContentType(.name)
+                    .submitLabel(.done)
+                    .onSubmit(save)
+                    .padding(.horizontal, 12 * scale)
+                    .padding(.vertical, 9 * scale)
+                    .background(.white.opacity(0.85),
+                                in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(focused ? theme.color : theme.deepColor.opacity(0.16),
+                                    lineWidth: focused ? 2 : 1)
+                    )
+                    .animation(.snappy(duration: 0.18), value: focused)
+                    .frame(width: 190 * scale)
             }
 
-            TextField(String(), text: $name, prompt: Text("name.placeholder"))
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .multilineTextAlignment(.center)
-                .focused($focused)
-                .textContentType(.name)
-                .submitLabel(.done)
-                .onSubmit(save)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 13)
-                .background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(focused ? theme.color : theme.deepColor.opacity(0.15),
-                                lineWidth: focused ? 2 : 1)
-                )
-                .animation(.snappy(duration: 0.2), value: focused)
-
-            HStack(spacing: 12) {
-                Button { dismiss() } label: {
-                    Text("common.cancel")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
-                        .background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(theme.deepColor.opacity(0.15), lineWidth: 1)
-                        )
-                        .foregroundStyle(theme.deepColor)
-                }
-
+            VStack(spacing: 8 * scale) {
                 Button(action: save) {
-                    Text("common.save")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 17 * scale, weight: .heavy))
+                        .frame(width: 44 * scale, height: 40 * scale)
                         .background(
                             LinearGradient(colors: [theme.color, theme.deepColor],
                                            startPoint: .top, endPoint: .bottom),
-                            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                         )
                         .foregroundStyle(.white)
+                        .opacity(trimmed.isEmpty ? 0.4 : 1)
+                }
+                .disabled(trimmed.isEmpty)
+
+                Button(action: onCancel) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15 * scale, weight: .bold))
+                        .frame(width: 44 * scale, height: 34 * scale)
+                        .background(.white.opacity(0.8),
+                                    in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .foregroundStyle(theme.deepColor.opacity(0.7))
                 }
             }
             .buttonStyle(.plain)
-
-            Spacer(minLength: 0)
         }
-        .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .task {
-            // Requesting focus during the sheet's own presentation makes iOS
-            // animate the sheet and keyboard in competing passes. Waiting for
-            // that transition to settle gives the keyboard one smooth entry.
-            guard !hasRequestedInitialFocus else { return }
-            hasRequestedInitialFocus = true
-            try? await Task.sleep(for: .milliseconds(280))
-            guard !Task.isCancelled else { return }
-            focused = true
-        }
+        .padding(18 * scale)
+        .background(
+            LinearGradient(colors: [theme.skyColor, .white],
+                           startPoint: .top, endPoint: .bottom),
+            in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(.white.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.22), radius: 22, y: 10)
+        .fixedSize()
     }
 }
 

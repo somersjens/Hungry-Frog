@@ -178,6 +178,7 @@ struct PremiumView: View {
                     startPurchase()
                 }
             )
+            .gameEnvironment()
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
@@ -445,7 +446,7 @@ struct PremiumView: View {
                                          isUnlocked: true,
                                          size: metrics.tileBadge)
         } else if let cards = CharacterUnlockStore.requirement(for: animal.id) {
-            Text(verbatim: "\(cards)")
+            Text(verbatim: LNumber(cards))
                 .characterTileBadgeStyle(character: character,
                                          isUnlocked: false,
                                          size: metrics.tileBadge)
@@ -800,11 +801,13 @@ extension View {
     func premiumSheetPresentation() -> some View {
         if #available(iOS 18.0, *) {
             self
+                .gameEnvironment()
                 .presentationSizing(.page)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         } else {
             self
+                .gameEnvironment()
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
