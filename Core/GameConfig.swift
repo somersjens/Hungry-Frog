@@ -68,6 +68,10 @@ public enum GameConfig {
     /// but only costs half a life instead of a full one.
     public static let streakWrongAnswerCostHalves = 1
 
+    /// Two correct answers inside a second earn this on top of the catch. The
+    /// banner announcing it reads the same number, so the two cannot drift.
+    public static let flyComboBonus = 1
+
     /// A 2x fish swims across the level this many times. Catching it doubles
     /// the next correct answer; a missed fish simply leaves the screen.
     public static let bonusFishCount = 1...3
@@ -163,5 +167,5 @@ public enum GameConfig {
     // MARK: Storage
 
     /// Bumped whenever the persisted shape changes; drives migration.
-    public static let storageVersion = 4
+    public static let storageVersion = 5
 }

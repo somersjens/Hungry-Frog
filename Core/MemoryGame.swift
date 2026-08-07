@@ -342,15 +342,15 @@ public final class MemoryGame {
         return lifeHalves - previous
     }
 
-    /// Adds the fly game's one-point speed bonus without bypassing the normal
-    /// result and persistence totals. The caller has already established that
-    /// this was a second correct catch inside the combo window.
+    /// Adds the fly game's speed bonus without bypassing the normal result and
+    /// persistence totals. The caller has already established that this was a
+    /// second correct catch inside the combo window.
     public func awardFlyComboBonus() {
         guard state == .resolving,
               case .correct? = lastOutcome else { return }
-        cards += 1
-        result.cardsEarned += 1
-        result.bonusCards += 1
+        cards += GameConfig.flyComboBonus
+        result.cardsEarned += GameConfig.flyComboBonus
+        result.bonusCards += GameConfig.flyComboBonus
     }
 
     /// Pushes a running double-points window forward by the time the session

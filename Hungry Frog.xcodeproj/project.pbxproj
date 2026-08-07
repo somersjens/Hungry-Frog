@@ -46,7 +46,6 @@
 		F9F3C643301E409F00464555 /* LevelIntroCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5F4301E409F00464555 /* LevelIntroCard.swift */; };
 		F9F3C644301E409F00464555 /* EmphasizedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EE301E409F00464555 /* EmphasizedText.swift */; };
 		F9F3C645301E409F00464555 /* SeededGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EB301E409F00464555 /* SeededGenerator.swift */; };
-		F9F3C646301E409F00464555 /* SpokenMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C61B301E409F00464555 /* SpokenMath.swift */; };
 		F9F3C647301E409F00464555 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DC301E409F00464555 /* AppSettings.swift */; };
 		F9F3C648301E409F00464555 /* ReviewRequestCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */; };
 		F9F3C649301E409F00464555 /* AppAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DB301E409F00464555 /* AppAudio.swift */; };
@@ -73,6 +72,7 @@
 		F9F3C65D301E409F00464555 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E8301E409F00464555 /* ProgressStore.swift */; };
 		F9F3C9AD301F3CBE00464555 /* frog_music.m4a in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C9AC301F3CBE00464555 /* frog_music.m4a */; };
 		FA11F00131A1000000000001 /* FlyGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00231A1000000000001 /* FlyGame.swift */; };
+		FA11F00331A1000000000003 /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00431A1000000000004 /* Tutorial.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -140,10 +140,10 @@
 		F9F3C617301E409F00464555 /* sfx_switch_off.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_off.caf; sourceTree = "<group>"; };
 		F9F3C618301E409F00464555 /* sfx_switch_on.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_switch_on.caf; sourceTree = "<group>"; };
 		F9F3C619301E409F00464555 /* sfx_wrong.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sfx_wrong.caf; sourceTree = "<group>"; };
-		F9F3C61B301E409F00464555 /* SpokenMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenMath.swift; sourceTree = "<group>"; };
 		F9F3C61C301E409F00464555 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		F9F3C9AC301F3CBE00464555 /* frog_music.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = frog_music.m4a; sourceTree = "<group>"; };
 		FA11F00231A1000000000001 /* FlyGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGame.swift; sourceTree = "<group>"; };
+		FA11F00431A1000000000004 /* Tutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,6 +189,7 @@
 				F9F3C602301E409F00464555 /* PromotedPurchaseCoordinator.swift */,
 				F9F3C603301E409F00464555 /* ScreenSafeArea.swift */,
 				FA11F00231A1000000000001 /* FlyGame.swift */,
+				FA11F00431A1000000000004 /* Tutorial.swift */,
 				F9F3C604301E409F00464555 /* ResultView.swift */,
 				F9F3C605301E409F00464555 /* ReviewRequestCoordinator.swift */,
 				F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */,
@@ -213,7 +214,6 @@
 				F9F3C617301E409F00464555 /* sfx_switch_off.caf */,
 				F9F3C618301E409F00464555 /* sfx_switch_on.caf */,
 				F9F3C619301E409F00464555 /* sfx_wrong.caf */,
-				F9F3C61B301E409F00464555 /* SpokenMath.swift */,
 				F9F3C61C301E409F00464555 /* Theme.swift */,
 				F9F3C5CB301E405E00464555 /* Products */,
 			);
@@ -293,8 +293,84 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
+				af,
+				am,
+				ar,
+				as,
+				az,
 				Base,
+				be,
+				bg,
+				bn,
+				bo,
+				bs,
+				ca,
+				cs,
+				cy,
+				da,
+				de,
+				el,
+				en,
+				es,
+				et,
+				eu,
+				fa,
+				fi,
+				fo,
+				fr,
+				ga,
+				gl,
+				gu,
+				he,
+				hi,
+				hr,
+				hu,
+				hy,
+				id,
+				is,
+				it,
+				ja,
+				ka,
+				kk,
+				km,
+				kn,
+				ko,
+				lo,
+				lt,
+				lv,
+				mk,
+				ml,
+				mn,
+				mr,
+				ms,
+				my,
+				ne,
+				nl,
+				no,
+				or,
+				pa,
+				pl,
+				pt,
+				ro,
+				ru,
+				si,
+				sk,
+				sl,
+				sq,
+				sr,
+				sv,
+				sw,
+				ta,
+				te,
+				th,
+				tr,
+				ug,
+				uk,
+				ur,
+				uz,
+				vi,
+				zh,
+				zu,
 			);
 			mainGroup = F9F3C5C1301E405E00464555;
 			minimizedProjectReferenceProxies = 1;
@@ -362,12 +438,12 @@
 				F9F3C643301E409F00464555 /* LevelIntroCard.swift in Sources */,
 				F9F3C644301E409F00464555 /* EmphasizedText.swift in Sources */,
 				F9F3C645301E409F00464555 /* SeededGenerator.swift in Sources */,
-				F9F3C646301E409F00464555 /* SpokenMath.swift in Sources */,
 				F9F3C647301E409F00464555 /* AppSettings.swift in Sources */,
 				F9F3C648301E409F00464555 /* ReviewRequestCoordinator.swift in Sources */,
 				F9F3C649301E409F00464555 /* AppAudio.swift in Sources */,
 				F9F3C64A301E409F00464555 /* ScreenSafeArea.swift in Sources */,
 				FA11F00131A1000000000001 /* FlyGame.swift in Sources */,
+				FA11F00331A1000000000003 /* Tutorial.swift in Sources */,
 				F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */,
 				F9F3C64C301E409F00464555 /* MenuMeadowBackground.swift in Sources */,
 				F9F3CBCDC239647255BAA080 /* CharacterScenes.swift in Sources */,

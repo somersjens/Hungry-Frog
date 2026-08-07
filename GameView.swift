@@ -25,6 +25,9 @@ struct GameSessionRequest: Identifiable {
     var mixedVariant: MixedVariant = .all
     /// Which of the three order buttons was chosen. Supermix ignores it.
     var mode: PracticeMode = .mixed
+    /// Set by the welcome flow: the level's start card opens with the tutorial
+    /// already switched on, so one tap on Start tutorial begins the guided run.
+    var startsGuided = false
     var id: String { "\(level.id).\(mixedVariant.rawValue).\(mode.rawValue)" }
 
     /// The scoreboard this session plays on.
@@ -60,12 +63,22 @@ struct GameView: View {
     /// card appears. Other endings (no lives, or leaving) remain immediate.
     @State private var playsLevelCompletion = false
     @State private var showsResult = false
+    /// The tutorial switch on the start card. It only decides what the start
+    /// button says and does; the run itself is driven by the view model.
+    @State private var isTutorialArmed = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(request: GameSessionRequest) {
         self.request = request
         _model = StateObject(wrappedValue: GameViewModel(request: request))
+        // The welcome flow hands over with the tutorial already switched on, so
+        // its start card opens saying Start tutorial. The card itself stays:
+        // it is what tells the player which level they are about to play, and
+        // the whole pond — scenery, artwork, the first swarm's food — is built
+        // behind it. Opening straight into the level meant paying for all of
+        // that on the first frame of the game, in full view.
+        _isTutorialArmed = State(initialValue: request.startsGuided)
     }
 
     private var character: AnimalCharacter { CharacterCatalog.current(isPremium: premium.isPremium) }
@@ -106,6 +119,7 @@ struct GameView: View {
                 LevelIntroCard(board: request.board,
                                theme: character,
                                isPauseCard: showsPauseCard,
+                               isTutorialArmed: $isTutorialArmed,
                                onStart: startSession,
                                onExit: { dismiss() })
                     .transition(.opacity)
@@ -141,6 +155,12 @@ struct GameView: View {
             model.resume()
         } else {
             showsPauseCard = false
+            if isTutorialArmed {
+                model.armTutorial()
+                // However this run ends — taught out, finished early, or left
+                // at the first sum — the menu owes the player its last step.
+                TutorialCenter.shared.guidedRunStarted()
+            }
             playsFishEntrance = true
         }
     }
@@ -178,6 +198,12 @@ struct GameView: View {
                               // or the Dynamic Island behind it.
                               topReserve: topInset + (isPad ? 64 : 50),
                               bottomReserve: screenInsets.bottom,
+                              // What the tutorial is saying, and which fly it is
+                              // pointing at. Both are nil in a normal session,
+                              // and the playing field costs nothing for them.
+                              tutorialMessage: tutorialMessage,
+                              tutorialSymbol: model.tutorialStep?.symbolName,
+                              tutorialPointer: model.tutorialPointer,
                               onHit: { model.select(optionID: $0) },
                               onImpact: { AppAudio.shared.playSplash() },
                               onSwallow: { model.reportCatchOutcome(isCorrect: $0) },
@@ -209,6 +235,11 @@ struct GameView: View {
             }
         }
         .ignoresSafeArea()
+    }
+
+    /// The line the guided run is on, resolved in the language being read.
+    private var tutorialMessage: String? {
+        model.tutorialStep.map { L(key: $0.messageKey) }
     }
 
     private func finishLevelCompletion() {
@@ -305,7 +336,6 @@ struct GameView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("pause")
-        .accessibilityLabel(Text("game.pause"))
     }
 
     /// Every status capsule shares one comfortable touch height, while the
@@ -341,8 +371,6 @@ struct GameView: View {
         // Named after what this character actually collects, in the app's
         // language — the counter has not been flies-for-everyone since each
         // animal got its own food.
-        .accessibilityLabel(Text(verbatim: "\(model.cards) "
-                                 + FoodCatalog.word(for: character.id, count: model.cards)))
     }
 
     /// The reef only ticks while the level is actually being played: never
@@ -360,7 +388,7 @@ private struct ComboFlyBanner: View {
     @State private var visible = false
 
     var body: some View {
-        Text("Combo! +1")
+        Text("game.combo \(GameConfig.flyComboBonus)")
             .font(.system(size: isPad ? 22 : 17, weight: .black, design: .rounded))
             .foregroundStyle(character.deepColor)
             .padding(.horizontal, isPad ? 18 : 14)
@@ -450,9 +478,6 @@ private struct DoublePointsChip: View {
                 .opacity(Double(1 - flash))
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("game.streakBoost.title"))
-        .accessibilityValue(Text(verbatim:
-            "\(Int(ceil(max(0, deadline.timeIntervalSinceNow))))s"))
         .onAppear { pulse(); armEndingPulse() }
         .onChange(of: token) { _, _ in pulse() }
         // A window renewed while it is still running pushes the closing pulse
@@ -630,13 +655,6 @@ struct LivesView: View {
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: lives)
         .accessibilityElement()
         .accessibilityIdentifier("lives")
-        .accessibilityLabel(Text(L("game.livesRemaining \(livesText)")))
-        .accessibilityValue(Text(verbatim: livesText))
-    }
-
-    private var livesText: String {
-        // Halves read as "2.5"; whole lives never show a decimal tail.
-        lives == lives.rounded() ? "\(Int(lives))" : String(format: "%.1f", lives)
     }
 
     /// A full, half or empty heart. The half heart is the full glyph masked to

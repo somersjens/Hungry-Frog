@@ -12,7 +12,6 @@ struct SettingsView: View {
     @AppStorage(GameSettings.characterKey) private var characterID = CharacterCatalog.freeCharacterID
     @AppStorage(GameSettings.gameSoundsEnabledKey) private var gameSounds = true
     @AppStorage(GameSettings.musicEnabledKey) private var music = true
-    @AppStorage(GameSettings.spokenSumsEnabledKey) private var spokenSums = true
     @ObservedObject private var premium = PremiumStore.shared
     @ObservedObject private var tracker = PlaytimeTracker.shared
     @ObservedObject private var language = LanguageManager.shared
@@ -87,20 +86,6 @@ struct SettingsView: View {
                     .font(.subheadline.weight(.semibold))
             }
             .tint(character.color)
-
-            if AppAudio.shared.isSpokenMathAvailable {
-                Toggle(isOn: Binding(
-                    get: { spokenSums },
-                    set: { newValue in
-                        spokenSums = newValue
-                        AppAudio.shared.toggleSpokenSums()
-                    }
-                )) {
-                    Label("settings.spokenSums", systemImage: "text.bubble.fill")
-                        .font(.subheadline.weight(.semibold))
-                }
-                .tint(character.color)
-            }
 
             Text("settings.soundInfo")
                 .font(.footnote)

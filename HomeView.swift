@@ -13,6 +13,9 @@ import UIKit
 
 struct LevelSelection: Identifiable {
     let level: MathLevel
+    /// True only for the run the welcome flow hands straight over to: the level
+    /// opens playing, with the tutorial already running.
+    var startsGuided = false
     var id: String { level.id }
 }
 
@@ -84,6 +87,8 @@ struct HomeView: View {
     /// is replaced in a single pop instead of ticking down with the total.
     @State private var unlockPrompt: NextCharacterPrompt?
     @State private var unlockPreviewTrigger = 0
+    /// The level card left lit by the tutorial's closing step, or nil.
+    @State private var tutorialSpotlightLevelID: String?
 
     private var character: AnimalCharacter { CharacterCatalog.current(isPremium: premium.isPremium) }
     private var topic: MathTopic { MathTopic(rawValue: topicRaw) ?? MathTopic.allCases[0] }
@@ -168,6 +173,9 @@ struct HomeView: View {
                         CardFlightView(flight: flight)
                     }
                 }
+                // Last, so the wash lies over the whole menu — the card it
+                // leaves lit shows through the hole cut for it.
+                .overlay { tutorialSpotlightOverlay }
             }
         }
         .coordinateSpace(name: "home")
@@ -178,7 +186,8 @@ struct HomeView: View {
         .fullScreenCover(item: $selection, onDismiss: handleSessionDismissed) { item in
             GameView(request: GameSessionRequest(level: item.level,
                                                  mixedVariant: mixedVariant,
-                                                 mode: practiceMode))
+                                                 mode: practiceMode,
+                                                 startsGuided: item.startsGuided))
                 .gameEnvironment()
         }
         .sheet(isPresented: $showPremium, onDismiss: {
@@ -209,6 +218,7 @@ struct HomeView: View {
             premium.startInitialRefresh()
             totalCards = Progress.store.totalCards
             synchronizeUnlockPrompt(animated: false)
+            startTutorialLevelIfRequested()
         }
         .onChange(of: totalCards) { _, _ in
             // A returning session banks its cards before any of the celebration
@@ -335,7 +345,6 @@ struct HomeView: View {
         // opens the character collection.
         .gesture(characterGesture)
         .accessibilityIdentifier("home-character")
-        .accessibilityLabel(Text(verbatim: character.localizedName))
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { openCharacterCollectionFromCharacter() }
     }
@@ -502,7 +511,6 @@ struct HomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("topic-\(option.rawValue)")
-        .accessibilityLabel(Text(verbatim: L(key: option.titleKey)))
         // Holding the star runs the return celebration end to end, which is the
         // only practical way to check the whole chain — card count-up, flight,
         // both totals and the unlock sheet — without playing two full levels.
@@ -574,7 +582,6 @@ struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("mode-\(mode.rawValue)")
-                .accessibilityLabel(Text(verbatim: L(key: mode.titleKey(for: topic))))
                 .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
             }
         }
@@ -632,7 +639,6 @@ struct HomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("supermix-\(variant.rawValue)")
-        .accessibilityLabel(Text(verbatim: variant.operators.joined(separator: " ")))
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 
@@ -780,6 +786,8 @@ struct HomeView: View {
             rememberBeforePlaying(level)
             selection = LevelSelection(level: level)
         }
+        // The tutorial's closing step cuts its window out of this frame.
+        .reportAnchor("levelCard.\(level.id)")
     }
 
     private func status(for level: MathLevel, recommendedID: String?) -> LevelCardStatus {
@@ -871,6 +879,19 @@ struct HomeView: View {
         holdsPreSessionValues = true
     }
 
+    /// The hand-over from the welcome flow. The menu is allowed to arrive first
+    /// and settle — the level rising over a menu that is already there reads as
+    /// one continuous movement, where opening the game on top of a cross-fade
+    /// reads as two screens fighting.
+    private func startTutorialLevelIfRequested() {
+        guard let level = TutorialCenter.shared.takeAutoStartLevel() else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.tutorialHandoverDelay) {
+            guard selection == nil else { return }
+            rememberBeforePlaying(level)
+            selection = LevelSelection(level: level, startsGuided: true)
+        }
+    }
+
     private func openCharacterCollection(initialCharacterID: String? = nil) {
         premiumInitialCharacterID = initialCharacterID
         showPremium = true
@@ -919,10 +940,68 @@ struct HomeView: View {
         return (current, current, nil)
     }
 
+    // MARK: Tutorial
+
+    /// How long the menu is given to settle before the guided level rises over
+    /// it, and how long the closing step holds the menu before the ordinary
+    /// return celebration takes over.
+    private static let tutorialHandoverDelay = 0.55
+    private static let tutorialSpotlightFade = 0.4
+    private static let tutorialSpotlightHold = 3.0
+
+    /// Back from a guided run: the menu dims around the one card the score
+    /// landed on, says where it is, and only then plays its usual celebration.
+    /// Everything the celebration counts up is already being held at its
+    /// pre-session value (see `holdsPreSessionValues`), so waiting here costs
+    /// nothing but the wait itself.
+    private func beginTutorialClosingStep(then celebrate: @escaping () -> Void) {
+        withAnimation(.easeInOut(duration: Self.tutorialSpotlightFade)) {
+            tutorialSpotlightLevelID = lastPlayedLevelID
+        }
+        let hold = Self.tutorialSpotlightFade + Self.tutorialSpotlightHold
+        DispatchQueue.main.asyncAfter(deadline: .now() + hold) {
+            withAnimation(.easeInOut(duration: 0.35)) {
+                tutorialSpotlightLevelID = nil
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: celebrate)
+        }
+    }
+
+    /// The dimmed menu and the line above it. The card the player just filled
+    /// stays lit, so "this is where your score is" has something to point at.
+    @ViewBuilder
+    private var tutorialSpotlightOverlay: some View {
+        if let levelID = tutorialSpotlightLevelID {
+            ZStack(alignment: .top) {
+                // No anchor (the card is scrolled out of sight) simply dims the
+                // lot: better than cutting a window where nothing is.
+                TutorialSpotlight(hole: controlAnchors["levelCard.\(levelID)"])
+
+                // The closing step is about the score, so it carries the same
+                // trophy the counters it is pointing at are filled with.
+                TutorialMessageCard(text: L("tutorial.score"),
+                                    symbolName: "trophy.fill",
+                                    theme: character)
+                    .frame(maxWidth: isPad ? 520 : 400)
+                    .padding(.top, isPad ? 26 : 16)
+            }
+            .transition(.opacity)
+            .allowsHitTesting(false)
+        }
+    }
+
     /// Back from a session: bank the totals and celebrate anything earned. The
     /// before-values are captured first, so the level score and the headers
     /// count up from what the player had rather than snapping to the new value.
     private func handleSessionDismissed() {
+        guard !TutorialCenter.shared.takeMenuStep() else {
+            beginTutorialClosingStep(then: recordSessionReturn)
+            return
+        }
+        recordSessionReturn()
+    }
+
+    private func recordSessionReturn() {
         let levelID = lastPlayedLevelID
         let levelStart = lastPlayedLevelBest
         let topicStart = lastPlayedTopic

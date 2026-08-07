@@ -100,13 +100,28 @@ final class ProgressSync: ObservableObject {
     }
 
     /// Progress outside the per-level scoreboards also needs to survive an app
-    /// deletion. Total cards drives character unlocks, announced unlocks stops
-    /// old rewards being presented twice, and onboarding completion lets a
-    /// restored player return directly to the game.
+    /// deletion: total cards drives character unlocks, and announced unlocks
+    /// stops old rewards being presented twice.
+    ///
+    /// Onboarding completion deliberately does **not** ride along. It used to,
+    /// and the result was that a reinstalled app opened its welcome flow — the
+    /// local flag starts false — and then threw the player out of it a moment
+    /// later, mid-question, when iCloud answered and flipped the flag under
+    /// them. It is a per-installation thing rather than progress: a fresh
+    /// install walks the three welcome screens and the tutorial behind them,
+    /// and every card, score and the player's own name still come back.
     private func reconcileDurableProfile() {
         mergeMonotonicInteger(forKey: ProgressStore.Key.totalCards)
         mergeStringSet(forKey: ProgressStore.Key.announcedUnlocks)
-        mergeTrueFlag(forKey: ProgressStore.Key.onboardingComplete)
+    }
+
+    /// Replaces a cloud value outright, rather than merging upwards. The
+    /// monotonic rule everywhere else is what keeps two devices from erasing
+    /// each other's progress; a number that was never earned is the one thing
+    /// that rule cannot fix, and this is the only caller (see
+    /// `ProgressStore.repairImplausibleCardTotal`).
+    func overwrite(_ value: Int, forKey key: String) {
+        cloudStore.set(NSNumber(value: max(0, value)), forKey: key)
     }
 
     private func mergeMonotonicInteger(forKey key: String) {
@@ -120,15 +135,6 @@ final class ProgressSync: ObservableObject {
         if local < winner {
             UserDefaults.standard.set(winner, forKey: key)
         }
-    }
-
-    private func mergeTrueFlag(forKey key: String) {
-        let local = UserDefaults.standard.bool(forKey: key)
-        let cloud = cloudStore.bool(forKey: key)
-        guard local || cloud else { return }
-
-        if !cloud { cloudStore.set(true, forKey: key) }
-        if !local { UserDefaults.standard.set(true, forKey: key) }
     }
 
     private func mergeStringSet(forKey key: String) {

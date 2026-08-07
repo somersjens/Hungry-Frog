@@ -17,6 +17,11 @@ enum Progress {
         store.cloudMerge = { key, local in
             ProgressSync.shared.mergedScore(for: key, localScore: local)
         }
+        // Wired before the migration runs: the repair of an impossible card
+        // total has to reach iCloud in the same breath as it lands locally.
+        store.cloudOverwrite = { key, value in
+            ProgressSync.shared.overwrite(value, forKey: key)
+        }
         store.migrateIfNeeded()
         return store
     }()
@@ -46,7 +51,6 @@ enum GameSettings {
         if let text = value as? String { return (text as NSString).boolValue }
         return fallback
     }
-    static let spokenSumsEnabledKey = ProgressStore.Key.spokenSumsEnabled
     static let premiumCacheKey = ProgressStore.Key.premiumCache
 
     /// Sound effects and background music.
@@ -62,10 +66,6 @@ enum GameSettings {
 
     /// Spoken sums. On by default; `AppAudio` silently ignores this when the
     /// selected language has no installed voice.
-    static var spokenSumsEnabled: Bool {
-        get { storedBool(spokenSumsEnabledKey, default: true) }
-        set { UserDefaults.standard.set(newValue, forKey: spokenSumsEnabledKey) }
-    }
 
     static var characterID: String {
         get { Progress.store.selectedCharacterID }

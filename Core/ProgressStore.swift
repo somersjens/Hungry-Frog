@@ -117,7 +117,6 @@ public final class ProgressStore {
         public static let onboardingComplete = "onboarding.complete"
         public static let gameSoundsEnabled = "settings.gameSoundsEnabled"
         public static let musicEnabled = "settings.musicEnabled"
-        public static let spokenSumsEnabled = "settings.spokenSumsEnabled"
         public static let languageOverride = "settings.languageOverride"
         public static let premiumCache = "premium.unlocked"
         public static let announcedUnlocks = "characters.announcedUnlocks"
@@ -161,6 +160,10 @@ public final class ProgressStore {
     /// Optional hook so best scores can be merged with iCloud. Left nil in
     /// tests, which keeps the store pure.
     public var cloudMerge: ((String, Int) -> Int)?
+    /// Optional hook for the one case a merge cannot express: replacing a
+    /// stored value outright, however high the cloud's copy is. Only the
+    /// repair below uses it.
+    public var cloudOverwrite: ((String, Int) -> Void)?
 
     public init(defaults: KeyValueStore) {
         self.defaults = defaults
@@ -181,10 +184,43 @@ public final class ProgressStore {
         if stored < 4 {
             migrateToFixedAnswerCount(from: stored)
         }
+        if stored < 5 {
+            repairImplausibleCardTotal()
+        }
 
         defaults.set(GameConfig.storageVersion, forKey: Key.storageVersion)
         return GameConfig.storageVersion
     }
+
+    /// A card total no amount of play can account for is a leftover — from a
+    /// test build, or from a trophy count carried over by an older migration.
+    /// It matters because the total is what unlocks characters, and because
+    /// iCloud merges it upwards only: once a wrong number is in the cloud,
+    /// nothing that plays by the rules can ever bring it back down.
+    ///
+    /// The repair falls back on the one figure that is unarguably earned: the
+    /// player's own best score on every board they have played. Filling every
+    /// board of all 99 levels holds around 64,000 cards, so the threshold below
+    /// is several complete games clear of anything reachable — a real total is
+    /// never touched.
+    private func repairImplausibleCardTotal() {
+        let stored = totalCards
+        guard stored > Self.implausibleCardTotal else { return }
+
+        let earned = MathTopic.allCases.reduce(0) { sum, topic in
+            sum + LevelCatalog.levels(for: topic).reduce(0) {
+                $0 + bestScoreAcrossBoards(level: $1)
+            }
+        }
+        totalCards = earned
+        // The corrected value has to reach iCloud as an overwrite. Left to the
+        // ordinary merge, the old number would simply win again on the next
+        // launch and the repair would undo itself.
+        cloudOverwrite?(Key.totalCards, earned)
+    }
+
+    /// Well past what the whole game can hold; see `repairImplausibleCardTotal`.
+    private static let implausibleCardTotal = 250_000
 
     /// Version 3 gave every level three scoreboards — one per answer-card
     /// count — each aiming at its own target (20, 30, 40). There is now one
@@ -279,10 +315,8 @@ public final class ProgressStore {
         // switches this game keeps.
         if defaults.object(forKey: Key.gameSoundsEnabled) == nil {
             if let raw = defaults.string(forKey: Key.Legacy.audioMode) {
-                let soundsOn = raw == "all" || raw == "musicAndEffects"
-                let speechOn = raw == "all" || raw == "speechOnly"
-                defaults.set(soundsOn, forKey: Key.gameSoundsEnabled)
-                defaults.set(speechOn, forKey: Key.spokenSumsEnabled)
+                defaults.set(raw == "all" || raw == "musicAndEffects",
+                             forKey: Key.gameSoundsEnabled)
             } else if let legacy = defaults.object(forKey: Key.Legacy.soundEnabled) as? Bool {
                 defaults.set(legacy, forKey: Key.gameSoundsEnabled)
             }

@@ -171,24 +171,6 @@
         }
       }
     },
-    "Combo! +1" : {},
-    "common.back" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Back"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terug"
-          }
-        }
-      }
-    },
     "common.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -202,23 +184,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuleren"
-          }
-        }
-      }
-    },
-    "common.close" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sluiten"
           }
         }
       }
@@ -274,6 +239,23 @@
         }
       }
     },
+    "common.ok" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oké"
+          }
+        }
+      }
+    },
     "common.save" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -291,376 +273,19 @@
         }
       }
     },
-    "food.carrot.plural" : {
+    "game.combo %lld" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "carrots"
+            "value" : "Combo! +%lld"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "wortels"
-          }
-        }
-      }
-    },
-    "food.carrot.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "carrot"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "wortel"
-          }
-        }
-      }
-    },
-    "food.chicken.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "chickens"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kippen"
-          }
-        }
-      }
-    },
-    "food.chicken.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "chicken"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kip"
-          }
-        }
-      }
-    },
-    "food.fish.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "fish"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vissen"
-          }
-        }
-      }
-    },
-    "food.fish.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "fish"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vis"
-          }
-        }
-      }
-    },
-    "food.fly.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "flies"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vliegen"
-          }
-        }
-      }
-    },
-    "food.fly.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "fly"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vlieg"
-          }
-        }
-      }
-    },
-    "food.honey.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "honey"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "honing"
-          }
-        }
-      }
-    },
-    "food.honey.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "honey"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "honing"
-          }
-        }
-      }
-    },
-    "food.kibble.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kibble"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "brokken"
-          }
-        }
-      }
-    },
-    "food.kibble.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kibble"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "brok"
-          }
-        }
-      }
-    },
-    "food.meat.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "meat"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vlees"
-          }
-        }
-      }
-    },
-    "food.meat.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "meat"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vlees"
-          }
-        }
-      }
-    },
-    "food.peanut.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "peanuts"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pinda's"
-          }
-        }
-      }
-    },
-    "food.peanut.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "peanut"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pinda"
-          }
-        }
-      }
-    },
-    "food.pearl.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pearls"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "parels"
-          }
-        }
-      }
-    },
-    "food.pearl.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pearl"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "parel"
-          }
-        }
-      }
-    },
-    "food.shrimp.plural" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "shrimp"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "garnalen"
-          }
-        }
-      }
-    },
-    "food.shrimp.singular" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "shrimp"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "garnaal"
-          }
-        }
-      }
-    },
-    "game.accessibility.scoreOutOf %lld %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld out of %lld"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld van %lld"
-          }
-        }
-      }
-    },
-    "game.bubblesCollected %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld flies collected"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld vliegen verzameld"
+            "value" : "Combo! +%lld"
           }
         }
       }
@@ -988,23 +613,6 @@
         }
       }
     },
-    "game.intro.continueFrom %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paused with %lld flies."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gepauzeerd met %lld vliegen."
-          }
-        }
-      }
-    },
     "game.intro.progressPaused" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1039,70 +647,19 @@
         }
       }
     },
-    "game.livesRemaining %@" : {
+    "game.intro.startTutorial" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ lives left"
+            "value" : "Start tutorial"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ levens over"
-          }
-        }
-      }
-    },
-    "game.pause" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pause"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pauzeren"
-          }
-        }
-      }
-    },
-    "game.question %@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Question: %@"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vraag: %@"
-          }
-        }
-      }
-    },
-    "game.streakBoost.subtitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2× flies for 10 seconds"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2× vliegen, 10 seconden lang"
+            "value" : "Start tutorial"
           }
         }
       }
@@ -1226,40 +783,6 @@
         }
       }
     },
-    "home.cardCount" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Answer cards"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Antwoordkaarten"
-          }
-        }
-      }
-    },
-    "home.cards" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "flies"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vliegen"
-          }
-        }
-      }
-    },
     "home.cardsRemaining %lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1273,176 +796,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "nog %lld"
-          }
-        }
-      }
-    },
-    "home.cardsTotal %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld flies collected"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld vliegen verzameld"
-          }
-        }
-      }
-    },
-    "home.defaultName" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frog"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kikker"
-          }
-        }
-      }
-    },
-    "home.level" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Level"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Level"
-          }
-        }
-      }
-    },
-    "home.levelAccessibility %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Level %lld"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Level %lld"
-          }
-        }
-      }
-    },
-    "home.nextCharacter %lld %@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld more flies to unlock %2$@"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nog %1$lld vliegen tot %2$@"
-          }
-        }
-      }
-    },
-    "home.pausedCards %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld flies paused"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld vliegen gepauzeerd"
-          }
-        }
-      }
-    },
-    "home.premiumLevels" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock levels 13–99"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Level 13–99 ontgrendelen"
-          }
-        }
-      }
-    },
-    "home.streakDays %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld-day streak"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld dagen op rij"
-          }
-        }
-      }
-    },
-    "home.todayGoal %lld %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld of %2$lld minutes today"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld van %2$lld minuten vandaag"
-          }
-        }
-      }
-    },
-    "home.topic" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Topic"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Onderwerp"
           }
         }
       }
@@ -1719,36 +1072,19 @@
         }
       }
     },
-    "language.select" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose language"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kies taal"
-          }
-        }
-      }
-    },
     "levelIntro.addition.intro" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sums where you |add| a number."
+            "value" : "Sums where you **add** a number."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sommen waarbij je een getal |optelt|."
+            "value" : "Sommen waarbij je een getal **optelt**."
           }
         }
       }
@@ -1770,22 +1106,185 @@
         }
       }
     },
-    "levelIntro.cardsBullet %lld %@" : {
+    "levelIntro.cardsBullet.carrot %lld" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You can collect up to |%1$lld %2$@| in this level."
+            "value" : "You can collect up to **%lld carrots** in this level."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Je kunt in dit level maximaal |%1$lld %2$@| verzamelen."
+            "value" : "Je kunt in dit level maximaal **%lld wortels** verzamelen."
           }
         }
-      }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.chicken %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld chickens** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld kippen** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.fish %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld fish** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld vissen** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.fly %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld flies** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld vliegen** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.honey %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld pots of honey** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld potjes honing** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.kibble %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld dog biscuits** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld hondenkoekjes** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.meat %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld pieces of meat** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld stukken vlees** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.peanut %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld peanuts** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld pinda's** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.pearl %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld pearls** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld parels** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
+    },
+    "levelIntro.cardsBullet.shrimp %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can collect up to **%lld shrimp** in this level."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt in dit level maximaal **%lld garnalen** verzamelen."
+          }
+        }
+      },
+      "comment" : "The count is always 20, 30, 40 or 50 (GameConfig level maximums), which every language treats alike, so this needs no other plural form."
     },
     "levelIntro.fractions.intro" : {
       "extractionState" : "manual",
@@ -1793,13 +1292,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sums where you |divide| a number."
+            "value" : "Sums where you **divide** a number."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sommen waarbij je een getal |deelt|."
+            "value" : "Sommen waarbij je een getal **deelt**."
           }
         }
       }
@@ -1827,30 +1326,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questions up to |level %lld|."
+            "value" : "Questions up to **level %lld**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vragen t/m |level %lld|."
-          }
-        }
-      }
-    },
-    "levelIntro.levelRange %lld %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Questions up to |level %1$lld|, from |%2$lld flies|."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vragen t/m |level %1$lld|, uit |%2$lld vliegen|."
+            "value" : "Vragen t/m **level %lld**."
           }
         }
       }
@@ -1861,13 +1343,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questions from |level 1|."
+            "value" : "Questions from **level 1**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vragen uit |level 1|."
+            "value" : "Vragen uit **level 1**."
           }
         }
       }
@@ -1878,13 +1360,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "|Everything mixed|: plus, minus, times, fractions and percentages."
+            "value" : "**Everything mixed**: plus, minus, times, fractions and percentages."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "|Alles door elkaar|: plus, min, keer, breuken en procenten."
+            "value" : "**Alles door elkaar**: plus, min, keer, breuken en procenten."
           }
         }
       }
@@ -1912,13 +1394,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Always a |single part| of a whole."
+            "value" : "Always a **single part** of a whole."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Altijd |één deel| van een geheel."
+            "value" : "Altijd **één deel** van een geheel."
           }
         }
       }
@@ -1929,13 +1411,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "|One or more parts| of a whole."
+            "value" : "**One or more parts** of a whole."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "|Eén of meer delen| van een geheel."
+            "value" : "**Eén of meer delen** van een geheel."
           }
         }
       }
@@ -1946,13 +1428,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questions in a |fixed order|."
+            "value" : "Questions in a **fixed order**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vragen in |vaste volgorde|."
+            "value" : "Vragen in **vaste volgorde**."
           }
         }
       }
@@ -1963,13 +1445,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Answers |without decimals|."
+            "value" : "Answers **without decimals**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Antwoorden |zonder komma|."
+            "value" : "Antwoorden **zonder komma**."
           }
         }
       }
@@ -1980,13 +1462,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Also answers |with decimals|."
+            "value" : "Also answers **with decimals**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ook antwoorden |met een komma|."
+            "value" : "Ook antwoorden **met een komma**."
           }
         }
       }
@@ -1997,13 +1479,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questions in |random order|."
+            "value" : "Questions in **random order**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vragen |door elkaar|."
+            "value" : "Vragen **door elkaar**."
           }
         }
       }
@@ -2014,13 +1496,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sums with |percentages|."
+            "value" : "Sums with **percentages**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sommen met |procenten|."
+            "value" : "Sommen met **procenten**."
           }
         }
       }
@@ -2048,13 +1530,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sums where you |take away| a number."
+            "value" : "Sums where you **take away** a number."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sommen waarbij je een getal |aftrekt|."
+            "value" : "Sommen waarbij je een getal **aftrekt**."
           }
         }
       }
@@ -2082,13 +1564,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sums where you |multiply|."
+            "value" : "Sums where you **multiply**."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sommen waarbij je |vermenigvuldigt|."
+            "value" : "Sommen waarbij je **vermenigvuldigt**."
           }
         }
       }
@@ -2110,7 +1592,6 @@
         }
       }
     },
-    "locked" : {},
     "menu.maximumCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2124,23 +1605,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "MAX"
-          }
-        }
-      }
-    },
-    "menu.maximumCount.accessibility %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum reached %lld times"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum %lld keer behaald"
           }
         }
       }
@@ -2387,15 +1851,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Only %lld trophies to go! 🏆"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Only %lld trophy to go! 🏆"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Only %lld trophies to go! 🏆"
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nog maar %lld trofeeën te gaan! 🏆"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nog maar %lld trofee te gaan! 🏆"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nog maar %lld trofeeën te gaan! 🏆"
+                }
+              }
+            }
           }
         }
       }
@@ -2404,15 +1892,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play %lld minutes today and add a few more."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Play %lld minute today and add a few more."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Play %lld minutes today and add a few more."
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speel vandaag %lld minuten en verzamel er nog een paar."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Speel vandaag %lld minuut en verzamel er nog een paar."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Speel vandaag %lld minuten en verzamel er nog een paar."
+                }
+              }
+            }
           }
         }
       }
@@ -2421,15 +1933,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld flies collected! 🪰"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld fly collected! 🪰"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld flies collected! 🪰"
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld vliegen verzameld! 🪰"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld vlieg verzameld! 🪰"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld vliegen verzameld! 🪰"
+                }
+              }
+            }
           }
         }
       }
@@ -2472,15 +2008,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start a %lld-minute session and grow your streak."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Start a %lld-minute session and grow your streak."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Start a %lld-minute session and grow your streak."
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speel %lld minuten en bouw verder aan je reeks."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Speel %lld minuut en bouw verder aan je reeks."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Speel %lld minuten en bouw verder aan je reeks."
+                }
+              }
+            }
           }
         }
       }
@@ -2517,7 +2077,8 @@
             "value" : "Met Premium open je %lld levels per onderwerp en alle tien de dieren."
           }
         }
-      }
+      },
+      "comment" : "The count is always 99 (Content.premiumLevelsPerTopic)."
     },
     "notif.premium.title" : {
       "extractionState" : "manual",
@@ -2551,7 +2112,8 @@
             "value" : "Het is %lld dagen geleden. Tijd voor wat sommen en nieuwe trofeeën!"
           }
         }
-      }
+      },
+      "comment" : "The count is always 3."
     },
     "notif.reactivate.title" : {
       "extractionState" : "manual",
@@ -2574,15 +2136,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play for %lld minutes and keep it going!"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Play for %lld minute and keep it going!"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Play for %lld minutes and keep it going!"
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speel %lld minuten en houd je reeks vast!"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Speel %lld minuut en houd je reeks vast!"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Speel %lld minuten en houd je reeks vast!"
+                }
+              }
+            }
           }
         }
       }
@@ -2591,15 +2177,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your %lld-day streak is on fire! 🔥"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your %lld-day streak is on fire! 🔥"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your %lld-day streak is on fire! 🔥"
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je reeks van %lld dagen staat in vuur en vlam! 🔥"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Je reeks van %lld dag staat in vuur en vlam! 🔥"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Je reeks van %lld dagen staat in vuur en vlam! 🔥"
+                }
+              }
+            }
           }
         }
       }
@@ -2608,15 +2218,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You have %lld flies in total. Ready for a few more?"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You have %lld fly in total. Ready for a few more?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "You have %lld flies in total. Ready for a few more?"
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je hebt in totaal %lld vliegen. Klaar voor nog een paar?"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Je hebt in totaal %lld vlieg. Klaar voor nog een paar?"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Je hebt in totaal %lld vliegen. Klaar voor nog een paar?"
+                }
+              }
+            }
           }
         }
       }
@@ -2625,21 +2259,43 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld flies this week! 🎉"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld fly this week! 🎉"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld flies this week! 🎉"
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld vliegen deze week! 🎉"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld vlieg deze week! 🎉"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld vliegen deze week! 🎉"
+                }
+              }
+            }
           }
         }
       }
     },
-    "off" : {},
-    "on" : {},
     "onboarding.level.advanced.subtitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2738,23 +2394,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Al wat geoefend"
-          }
-        }
-      }
-    },
-    "onboarding.level.subtitle %@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a starting point for %@."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kies een startpunt voor %@."
           }
         }
       }
@@ -2882,15 +2521,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hold the %@ for %lld seconds."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Hold the %1$@ for %2$lld second."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Hold the %1$@ for %2$lld seconds."
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Houd de %@ %lld seconden ingedrukt."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Houd de %1$@ %2$lld seconde ingedrukt."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Houd de %1$@ %2$lld seconden ingedrukt."
+                }
+              }
+            }
           }
         }
       }
@@ -3069,15 +2732,39 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Now tap the %2$@ %1$lld times."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Now tap the %2$@ %1$lld time."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Now tap the %2$@ %1$lld times."
+                }
+              }
+            }
           }
         },
         "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tik nu %1$lld keer op de %2$@."
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tik nu %1$lld keer op de %2$@."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tik nu %1$lld keer op de %2$@."
+                }
+              }
+            }
           }
         }
       }
@@ -3116,23 +2803,6 @@
         }
       }
     },
-    "premium.advantages" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Advantages"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voordelen"
-          }
-        }
-      }
-    },
     "premium.availableAt %lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3148,7 +2818,8 @@
             "value" : "Beschikbaar vanaf %lld vliegen"
           }
         }
-      }
+      },
+      "comment" : "The count is always 500, 1500, 3000 or 5000 (GameConfig.characterUnlockRequirements)."
     },
     "premium.availableFromStart" : {
       "extractionState" : "manual",
@@ -3184,23 +2855,6 @@
         }
       }
     },
-    "premium.characterUnlocked %@" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ unlocked"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ vrijgespeeld"
-          }
-        }
-      }
-    },
     "premium.earnedCards %lld" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3216,26 +2870,10 @@
             "value" : "Je hebt %lld vliegen verdiend"
           }
         }
-      }
+      },
+      "comment" : "The count is always 500, 1500, 3000 or 5000 (GameConfig.characterUnlockRequirements)."
     },
     "premium.exclusiveBadge" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exclusive with Premium"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exclusief met Premium"
-          }
-        }
-      }
-    },
-    "premium.exclusiveWithPremium" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3282,40 +2920,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toegang tot alle dieren"
-          }
-        }
-      }
-    },
-    "premium.feature.cards.subtitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No waiting for flies — every character is yours from the start."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Niet wachten op vliegen — elk karakter is meteen van jou."
-          }
-        }
-      }
-    },
-    "premium.feature.cards.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All ten animals right away"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle tien de dieren meteen"
           }
         }
       }
@@ -3490,23 +3094,6 @@
         }
       }
     },
-    "premium.unlockWithCards" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock with flies"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vrijspelen met vliegen"
-          }
-        }
-      }
-    },
     "premium.unlockWithPrice %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3520,91 +3107,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premium ontgrendelen · %@"
-          }
-        }
-      }
-    },
-    "premium.youHavePremium" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You have Premium!"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je hebt Premium!"
-          }
-        }
-      }
-    },
-    "profile.editName" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your name"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouw naam"
-          }
-        }
-      }
-    },
-    "result.backToMenu" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Back to menu"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terug naar het menu"
-          }
-        }
-      }
-    },
-    "result.bonusCards" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bonus flies"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bonusvliegen"
-          }
-        }
-      }
-    },
-    "result.cardsEarned" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "flies"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vliegen"
           }
         }
       }
@@ -3626,108 +3128,6 @@
         }
       }
     },
-    "result.correct" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Correct answers"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Goede antwoorden"
-          }
-        }
-      }
-    },
-    "result.doubleCards" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2× fly bonuses"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2×-vliegenbonussen"
-          }
-        }
-      }
-    },
-    "result.newRecord" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New personal best!"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieuw persoonlijk record!"
-          }
-        }
-      }
-    },
-    "result.outOfLives" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Out of lives"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geen levens meer"
-          }
-        }
-      }
-    },
-    "result.personalBest" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Personal best"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Persoonlijk record"
-          }
-        }
-      }
-    },
-    "result.playAgain" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play again"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opnieuw spelen"
-          }
-        }
-      }
-    },
     "result.stopped" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3741,40 +3141,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gepauzeerd"
-          }
-        }
-      }
-    },
-    "result.unlocked" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New character unlocked!"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nieuw karakter ontgrendeld!"
-          }
-        }
-      }
-    },
-    "result.wrong" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wrong answers"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foute antwoorden"
           }
         }
       }
@@ -3966,23 +3332,6 @@
         }
       }
     },
-    "settings.spokenSums" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Read the sums aloud"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sommen voorlezen"
-          }
-        }
-      }
-    },
     "settings.title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3996,40 +3345,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instellingen"
-          }
-        }
-      }
-    },
-    "streak.accessibility.choosePeriod" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose your play goal"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kies je speeldoel"
-          }
-        }
-      }
-    },
-    "streak.accessibility.compact %@ %lld %lld %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ goal: %2$lld of %3$lld minutes. Streak: %4$lld days."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ doel: %2$lld van %3$lld minuten. Reeks: %4$lld dagen."
           }
         }
       }
@@ -4255,7 +3570,142 @@
         }
       }
     },
-    "unlocked" : {}
+    "tutorial.notice.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are in the middle of a game. Finish it, or pick a level you have not started yet, to play the tutorial."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je zit midden in een spel. Maak het eerst af, of kies een level waar je nog niet in bezig bent, om de tutorial te spelen."
+          }
+        }
+      }
+    },
+    "tutorial.notice.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only at the start of a game"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alleen aan het begin van een spel"
+          }
+        }
+      }
+    },
+    "tutorial.score" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is where you can see your score!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier staat je score!"
+          }
+        }
+      }
+    },
+    "tutorial.step1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In the top-right corner, you can see the sum you need to solve. Click the fly with the correct answer!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts bovenin zie je de som die je moet oplossen. Klik op de vlieg met het juiste antwoord!"
+          }
+        }
+      }
+    },
+    "tutorial.step2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yes, that was correct! Now see what happens when you click the wrong fly."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yes, dat was een goed antwoord! Kijk nu maar wat er gebeurt als je op een verkeerde vlieg klikt."
+          }
+        }
+      }
+    },
+    "tutorial.step3" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get five correct answers in a row to earn a bonus!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geef vijf goede antwoorden achter elkaar voor een bonus!"
+          }
+        }
+      }
+    },
+    "tutorial.step4" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bonus! You now earn double points for ten seconds!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bonus! Je krijgt nu tien seconden lang dubbele punten!"
+          }
+        }
+      }
+    },
+    "tutorial.step5" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now you know how it works. Good luck!"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu snap je het helemaal. Succes!"
+          }
+        }
+      }
+    }
   },
   "version" : "1.0"
 }

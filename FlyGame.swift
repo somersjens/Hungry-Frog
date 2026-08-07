@@ -1404,6 +1404,11 @@ struct FlyPlayfield: View {
     let reduceMotion: Bool
     let topReserve: CGFloat
     let bottomReserve: CGFloat
+    /// What the guided run is saying, the glyph that goes with it, and which
+    /// answer it is pointing at. All nil in an ordinary session.
+    var tutorialMessage: String? = nil
+    var tutorialSymbol: String? = nil
+    var tutorialPointer: TutorialPointer? = nil
     let onHit: (UUID) -> Bool
     /// The strike landing on a piece of food, and the catch arriving in the
     /// mouth a third of a second later with the answer it was carrying.
@@ -1507,6 +1512,35 @@ struct FlyPlayfield: View {
                         .position(x: questionFrame.midX, y: questionFrame.midY)
                 }
 
+                // The line from the sum to the answer it is asking for. Drawn
+                // above the swarm so the head of the arrow lands on the fly
+                // rather than behind it.
+                if let tutorialPointer {
+                    TutorialArrowLayer(frames: engine.swarm,
+                                       target: tutorialPointer,
+                                       source: questionFrame,
+                                       color: character.deepColor,
+                                       isPad: isPad)
+                }
+
+                // Its own container, so the message arriving and leaving is the
+                // only thing the animation below applies to.
+                ZStack {
+                    if let tutorialMessage {
+                        let band = tutorialRect(in: proxy.size)
+                        TutorialMessageCard(text: tutorialMessage,
+                                            symbolName: tutorialSymbol ?? "sparkles",
+                                            theme: character,
+                                            isPad: isPad,
+                                            fixedSize: band.size)
+                            .position(x: band.midX, y: band.midY)
+                            .transition(.opacity.combined(with: .scale(scale: 0.94)))
+                            .id(tutorialMessage)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.26), value: tutorialMessage)
+                .allowsHitTesting(false)
+
                 if playsLevelCompletion {
                     FlyCelebrationLayer(frames: engine.swarm, color: character.deepColor)
                 }
@@ -1545,6 +1579,9 @@ struct FlyPlayfield: View {
             // with a Dynamic Island, behind it.
             .onChange(of: topReserve) { _, _ in applyLayout(in: proxy.size) }
             .onChange(of: bottomReserve) { _, _ in applyLayout(in: proxy.size) }
+            // A tutorial message is an obstacle for as long as it is up: the
+            // swarm has to steer around it the way it steers around the sum.
+            .onChange(of: tutorialMessage == nil) { _, _ in applyLayout(in: proxy.size) }
         }
         // Only the standing sum can deal a swarm, and this view's body is
         // re-run on every published change in the session — so the trigger is
@@ -1609,9 +1646,11 @@ struct FlyPlayfield: View {
     }
 
     private func applyLayout(in size: CGSize) {
+        var protected = [questionRect(in: size)]
+        if tutorialMessage != nil { protected.append(tutorialRect(in: size)) }
         engine.layout(size: size,
                       topReserve: flightCeiling,
-                      protectedRects: [questionRect(in: size)],
+                      protectedRects: protected,
                       characterRect: bodyRect(in: size),
                       flightFloor: flightFloor(in: size),
                       isPad: isPad)
@@ -1646,6 +1685,20 @@ struct FlyPlayfield: View {
             ? topReserve - (isPad ? 42 : 36)
             : topReserve + (isPad ? 12 : 8)
         return CGRect(x: size.width - inset - width, y: minY,
+                      width: width, height: height)
+    }
+
+    /// The band a tutorial message occupies: a fixed one, on the leading side
+    /// directly under the HUD, whatever the message says. Fixed because the
+    /// swarm is told to steer around it — a band that grew and shrank with the
+    /// translation would move the airspace under the flies each time the lesson
+    /// moved on. The sum keeps the trailing corner it always has.
+    private func tutorialRect(in size: CGSize) -> CGRect {
+        let inset: CGFloat = isPad ? 28 : 16
+        let width = min(isPad ? 520 : 396,
+                        max(230, size.width * (isPad ? 0.46 : 0.47)))
+        let height: CGFloat = isPad ? 96 : 74
+        return CGRect(x: inset, y: topReserve + (isPad ? 16 : 10),
                       width: width, height: height)
     }
 
@@ -1862,7 +1915,6 @@ private struct FlySwarmLayer: View {
                     Color.clear
                         .frame(width: tapSize, height: tapSize)
                         .accessibilityElement()
-                        .accessibilityLabel(Text(verbatim: fly.text))
                         .accessibilityAddTraits(.isButton)
                         .accessibilityAction { onCatch(fly.id) }
                         .position(fly.position)
@@ -1872,6 +1924,114 @@ private struct FlySwarmLayer: View {
         // The tap itself belongs to the canvas underneath; these exist to be
         // read and activated, never to swallow a touch.
         .allowsHitTesting(false)
+    }
+}
+
+/// The tutorial's pointer: a curved arrow from the standing sum to the fly the
+/// step is asking for.
+///
+/// It observes the swarm rather than being told a position, because the fly it
+/// points at is flying — a line drawn to where the answer was a moment ago is
+/// worse than no line at all. Like the swarm itself it is drawn rather than laid
+/// out, so following a fly costs a path per frame and nothing else.
+private struct TutorialArrowLayer: View {
+    @ObservedObject var frames: SwarmChannel
+    let target: TutorialPointer
+    /// The sum card the arrow leaves from.
+    let source: CGRect
+    let color: Color
+    let isPad: Bool
+
+    var body: some View {
+        let fly = pointedAt(in: frames.value.flies)
+        let frame = frames.value
+        let width: CGFloat = isPad ? 6 : 4.5
+        let head: CGFloat = isPad ? 22 : 17
+
+        Canvas(rendersAsynchronously: false) { context, _ in
+            guard let fly else { return }
+            let gap = FlyConfig.flySize(isPad: isPad) * 0.5 + (isPad ? 16 : 12)
+            // A gentle breathing along its own direction, so the pointer reads
+            // as alive without ever leaving the answer it is on.
+            let beat = CGFloat(sin(frame.clock * 3.4)) * (isPad ? 5 : 4)
+            let start = anchor(on: source, facing: fly.position)
+            let heading = atan2(fly.position.y - start.y, fly.position.x - start.x)
+            // An answer flying close to the sum leaves no room for a shaft. The
+            // head is still drawn, right up against the card: a pointer that
+            // vanishes whenever the fly drifts near the question would look
+            // like the step had given up on it.
+            let reach = max(6, hypot(fly.position.x - start.x,
+                                     fly.position.y - start.y) - gap - beat)
+            let end = CGPoint(x: start.x + cos(heading) * reach,
+                              y: start.y + sin(heading) * reach)
+            let drawsShaft = reach > head
+
+            // Bowed a little to one side: a straight line between two rectangles
+            // reads as a divider, a curve reads as a gesture.
+            let bend = min(reach * 0.16, isPad ? 74 : 52)
+            let control = CGPoint(x: (start.x + end.x) * 0.5 - sin(heading) * bend,
+                                  y: (start.y + end.y) * 0.5 + cos(heading) * bend)
+
+            var shaft = Path()
+            shaft.move(to: start)
+            shaft.addQuadCurve(to: end, control: control)
+
+            // The angle the curve actually arrives at, so the head sits square
+            // on the end of the shaft rather than on the straight line.
+            let approach = drawsShaft ? atan2(end.y - control.y, end.x - control.x)
+                                      : heading
+            var tip = Path()
+            for side in [approach + 2.55, approach - 2.55] {
+                tip.move(to: end)
+                tip.addLine(to: CGPoint(x: end.x + cos(side) * head,
+                                        y: end.y + sin(side) * head))
+            }
+
+            // Outlined in white first: the pond, the banks and the flies are all
+            // colour, and a bare stroke would be lost against one of them.
+            let halo = StrokeStyle(lineWidth: width + 4, lineCap: .round, lineJoin: .round)
+            let core = StrokeStyle(lineWidth: width, lineCap: .round, lineJoin: .round)
+            if drawsShaft {
+                context.stroke(shaft, with: .color(.white.opacity(0.9)), style: halo)
+            }
+            context.stroke(tip, with: .color(.white.opacity(0.9)), style: halo)
+            if drawsShaft {
+                context.stroke(shaft, with: .color(color), style: core)
+            }
+            context.stroke(tip, with: .color(color), style: core)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    /// The answer this step is pointing at.
+    ///
+    /// Deliberately forgiving about what counts as a candidate. A fly is only
+    /// "flying" once it has finished swooping in and while nothing is holding
+    /// it, and a strike — including one the tutorial refuses — locks its target
+    /// for a third of a second. Requiring that made the arrow blink out every
+    /// time the swarm turned over or a fly was tapped, which reads as the hint
+    /// giving up. Anything on its way out is still excluded: pointing at a fly
+    /// that is leaving the screen would be worse than pointing at nothing.
+    ///
+    /// The first match wins, so the arrow settles on one fly rather than
+    /// hopping between two answers that are equally wrong.
+    private func pointedAt(in flies: [AnswerFly]) -> AnswerFly? {
+        let wanted = target == .correct
+        let candidates = flies.filter {
+            !$0.isRetiring && $0.isCorrect == wanted
+                && ($0.entry?.hasStarted ?? true)
+        }
+        return candidates.first { $0.isVisible } ?? candidates.first
+    }
+
+    /// Where on the sum card the arrow leaves: the point on its edge nearest the
+    /// fly, pulled in slightly so the shaft starts on the card rather than
+    /// floating beside it.
+    private func anchor(on rect: CGRect, facing point: CGPoint) -> CGPoint {
+        let inset = rect.insetBy(dx: 6, dy: 6)
+        return CGPoint(x: min(max(point.x, inset.minX), inset.maxX),
+                       y: min(max(point.y, inset.minY), inset.maxY))
     }
 }
 
@@ -2660,7 +2820,6 @@ private struct ActiveQuestionView: View {
             .shadow(color: character.deepColor.opacity(0.18), radius: 10, y: 5)
             .animation(.spring(response: 0.34, dampingFraction: 0.82), value: prompt)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(Text(verbatim: prompt))
     }
 }
 

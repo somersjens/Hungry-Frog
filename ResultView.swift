@@ -215,6 +215,11 @@ struct ResultView: View {
             .rotationEffect(.degrees(18))
     }
 
+    /// The one line in the app whose word order is fixed by its layout: the
+    /// operation is drawn, not written (a fraction is a stacked glyph), so it
+    /// cannot travel inside a format string. A language that has to put the
+    /// verb first needs this row reversed in code — everything else can be
+    /// reordered from the catalog alone.
     private var completionTitle: some View {
         let fontSize = 38 * textScale
         return HStack(spacing: 7 * scale) {
@@ -306,7 +311,6 @@ struct ResultView: View {
                 }
             }
             .accessibilityIdentifier("score")
-            .accessibilityLabel(Text(L("game.accessibility.scoreOutOf \(levelScore) \(maximum)")))
     }
 
     /// A small pill centred above the score, detached from the box itself.
@@ -457,12 +461,11 @@ private struct CelebrationFlyView: View {
             let travel = area.height + fly.size * 2
             let wingPhase = elapsed * fly.beat * 2 * .pi + fly.phase
 
+            // Just the food itself, in the character's own colour. It used to
+            // carry an enlarged white copy behind it for legibility, which read
+            // as a halo around every single one of them.
             CurrencyIcon(size: fly.size)
-                // A white copy just behind the fly keeps it legible over both
-                // the dark scrim and the light card underneath it.
-                .foregroundStyle(.white.opacity(0.5))
-                .scaleEffect(1.2)
-                .overlay { CurrencyIcon(size: fly.size).foregroundStyle(color) }
+                .foregroundStyle(color)
                 // Wings beating: the body squeezes narrow and springs back.
                 .scaleEffect(x: 1 - 0.1 * abs(sin(wingPhase)), y: 1)
                 // It banks into each turn rather than sliding sideways flat.

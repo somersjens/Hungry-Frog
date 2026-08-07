@@ -79,8 +79,6 @@ struct StreakBar: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("streak")
-        .accessibilityLabel("streak.accessibility.compact \(goalPeriod.title) \(progressMinutes) \(goalMinutes) \(tracker.streakDays)")
-        .accessibilityHint("streak.accessibility.choosePeriod")
     }
 
     // The day count and its flame — or the day-one badge — read as one unit:
@@ -534,10 +532,6 @@ struct LevelCardView: View {
         .onAppear { animateIfCelebrating() }
         .onChange(of: celebrationStartedAt) { _, _ in animateIfCelebrating() }
         .accessibilityIdentifier("level-\(level.index)")
-        .accessibilityLabel(Text(L("home.levelAccessibility \(level.index)")))
-        .accessibilityValue(Text(verbatim: pausedCards.map {
-            "\(best), \(L("home.pausedCards \($0)"))"
-        } ?? "\(best)"))
     }
 
     /// A little kick on the glyph at the moment the number lands.
@@ -880,9 +874,6 @@ struct LevelCardView: View {
             .overlay(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .stroke(metal.opacity(0.8), lineWidth: 1 * cardScale))
             .shadow(color: metal.opacity(0.18), radius: 2, y: 1)
-            .accessibilityLabel(Text(verbatim: isCapped
-                ? L("menu.maximumCount")
-                : L("menu.maximumCount.accessibility \(maxCompletions)")))
     }
 }
 
@@ -1192,13 +1183,14 @@ struct CountingNumber: View {
                 : min(1, max(0, (elapsed - delay) / duration))
             let eased = 1 - pow(1 - progress, 3)
             let value = Int((Double(from) + Double(to - from) * eased).rounded())
-            Text(verbatim: "\(value)")
+            // Grouped in the language being read, so a five- or six-figure
+            // total stays a number a child can actually read off the screen.
+            Text(verbatim: LNumber(value))
                 .contentTransition(.numericText())
                 .monospacedDigit()
                 // A gentle swell that peaks mid-count and settles again.
                 .scaleEffect(1 + sin(progress * .pi) * 0.13)
         }
-        .accessibilityLabel(Text(verbatim: "\(to)"))
         .task(id: startedAt) {
             guard let startedAt else {
                 hasSettled = true
@@ -1312,11 +1304,10 @@ struct AlternatingCardSummary: View {
                 .scaleEffect(showsPreview ? 0.985 : 1, anchor: .leading)
                 .reportAnchor("headerTotal")
                 // Deliberately not hidden while the preview shows: the total is
-                // the authoritative reading of this line, and a slot that comes
-                // and goes would make it unfindable for VoiceOver.
+                // the authoritative reading of this line, and a slot that came
+                // and went would make it unfindable.
                 .accessibilityElement(children: .ignore)
                 .accessibilityIdentifier("card-total")
-                .accessibilityLabel(Text(L("home.cardsTotal \(totalTo)")))
 
             if let displayedPrompt {
                 promptLabel(displayedPrompt, contentScale: contentScale)
@@ -1364,7 +1355,6 @@ struct AlternatingCardSummary: View {
         .allowsHitTesting(showsPreview)
         .accessibilityElement(children: .ignore)
         .accessibilityIdentifier("next-character")
-        .accessibilityLabel(Text(L("home.nextCharacter \(prompt.remaining) \(animal.localizedName)")))
         .accessibilityHidden(!showsPreview)
     }
 

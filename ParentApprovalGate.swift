@@ -176,7 +176,6 @@ struct ParentApprovalGate: View {
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { _ in touchBegan(on: shape) }
                 .onEnded { _ in touchEnded(on: shape) })
-            .accessibilityLabel(shape.localizedName)
     }
 
     private var progressCard: some View {

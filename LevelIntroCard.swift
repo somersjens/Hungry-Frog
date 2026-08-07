@@ -50,11 +50,10 @@ enum LevelIntro {
         // order button — and picking the right card out of the ones on offer.
         let levelLine = modeLine(for: board)
 
-        // Line three: what there is to collect here — the food this
-        // character's level fills with, named in the right singular/plural
-        // form for the level's maximum.
-        let foodWord = FoodCatalog.word(for: characterID, count: board.maximum)
-        let cardsLine = L("levelIntro.cardsBullet \(board.maximum) \(foodWord)")
+        // Line three: what there is to collect here. Each food has its own
+        // whole sentence rather than a noun dropped into a shared one, so a
+        // language can decline the noun, move it, or reword around it.
+        let cardsLine = FoodCatalog.collectionLine(for: characterID, count: board.maximum)
 
         return (title, [topicLine, levelLine, cardsLine])
     }
@@ -97,10 +96,16 @@ struct LevelIntroCard: View {
     /// True when this instance was opened by the in-game pause button. A saved
     /// session also makes the card a continuation screen on a later visit.
     var isPauseCard = false
+    /// Whether the run this card starts is a guided one. Owned by the game
+    /// screen, because the card goes away and the run does not.
+    @Binding var isTutorialArmed: Bool
 
     private var level: MathLevel { board.level }
     let onStart: () -> Void
     let onExit: () -> Void
+
+    /// Raised when the tutorial is asked for on a run that is already under way.
+    @State private var showsTutorialNotice = false
 
     /// The session waiting to be continued, if the player left this level
     /// part-way through.
@@ -197,7 +202,15 @@ struct LevelIntroCard: View {
                 }
                 .scrollBounceBehavior(.basedOnSize)
             }
+
+            if showsTutorialNotice {
+                TutorialNoticeCard(theme: theme) {
+                    AppAudio.shared.playMenuTap()
+                    withAnimation(.easeOut(duration: 0.2)) { showsTutorialNotice = false }
+                }
+            }
         }
+        .animation(.easeInOut(duration: 0.2), value: showsTutorialNotice)
         .currencyIcon(for: theme)
     }
 
@@ -224,10 +237,18 @@ struct LevelIntroCard: View {
         }
     }
 
+    /// What the main button promises. A continuation always says Continue —
+    /// the tutorial cannot be switched on there — so the guided wording only
+    /// ever replaces the plain Start.
+    private var startTitleKey: LocalizedStringKey {
+        if isContinuation { return "game.intro.continue" }
+        return isTutorialArmed ? "game.intro.startTutorial" : "game.intro.start"
+    }
+
     private var actionButtons: some View {
         VStack(spacing: 10) {
             Button(action: onStart) {
-                Text(isContinuation ? "game.intro.continue" : "game.intro.start")
+                Text(startTitleKey)
                     .font(.system(size: 17 * actionScale, weight: .heavy))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14 * actionScale)
@@ -297,22 +318,53 @@ struct LevelIntroCard: View {
     private var audioControlRow: some View {
         HStack(spacing: 8 * scale) {
             audioButton(icon: "music.note",
-                        isOn: audio.musicEnabled,
-                        accessibilityLabel: L("settings.music")) {
+                        isOn: audio.musicEnabled) {
                 withAnimation(.snappy(duration: 0.2)) { audio.toggleMusic() }
             }
 
             audioButton(icon: "speaker.wave.2.fill",
-                        isOn: audio.gameSoundsEnabled,
-                        accessibilityLabel: L("settings.soundEffects")) {
+                        isOn: audio.gameSoundsEnabled) {
                 withAnimation(.snappy(duration: 0.2)) { audio.toggleGameSounds() }
             }
+
+            tutorialButton
         }
+    }
+
+    /// The third switch in the row: play this level with the tutorial. It sits
+    /// with the two audio buttons because it is the same kind of thing — a
+    /// choice about how the run about to start will play, made in the moment
+    /// before it does.
+    ///
+    /// A run already under way cannot be turned into a lesson half-way, so on a
+    /// continuation the button explains itself instead of doing nothing.
+    private var tutorialButton: some View {
+        Button {
+            AppAudio.shared.playMenuTap()
+            guard !isContinuation else {
+                withAnimation(.easeInOut(duration: 0.2)) { showsTutorialNotice = true }
+                return
+            }
+            withAnimation(.snappy(duration: 0.2)) { isTutorialArmed.toggle() }
+        } label: {
+            Image(systemName: "graduationcap.fill")
+                .font(.system(size: 16 * scale, weight: .heavy))
+                .foregroundStyle(isTutorialArmed ? .white : theme.deepColor)
+                .frame(width: 42 * scale, height: audioRowHeight)
+                .background(isTutorialArmed ? AnyShapeStyle(theme.deepColor)
+                                            : AnyShapeStyle(theme.skyColor))
+                .clipShape(RoundedRectangle(cornerRadius: 12 * scale, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 12 * scale, style: .continuous)
+                    .stroke(theme.deepColor.opacity(isTutorialArmed ? 0 : 0.15), lineWidth: 1))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("intro-tutorial")
+        .accessibilityAddTraits(isTutorialArmed ? [.isButton, .isSelected] : .isButton)
     }
 
     private func audioButton(icon: String,
                              isOn: Bool,
-                             accessibilityLabel: String,
                              action: @escaping () -> Void) -> some View {
         Button(action: action) {
             ZStack {
@@ -335,8 +387,6 @@ struct LevelIntroCard: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text(verbatim: accessibilityLabel))
-        .accessibilityValue(Text(isOn ? "on" : "off"))
     }
 
     private func featureCard(_ feature: IntroFeature) -> some View {

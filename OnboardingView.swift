@@ -104,7 +104,6 @@ struct OnboardingView: View {
                 .liquidGlassCapsule()
                 .contentShape(Capsule())
         }
-        .accessibilityLabel(Text("common.back"))
     }
 
     private var onboardingBackground: some View {
@@ -245,6 +244,11 @@ struct OnboardingView: View {
     ///
     /// The selection lands first, so the tick is visible for the moment the
     /// welcome flow fades out rather than the screen swapping out under the tap.
+    ///
+    /// This is also where the welcome flow hands over to the tutorial: the last
+    /// answer chooses the exercise, and the first level of it is opened, guided,
+    /// the moment the menu has settled — so the first thing a child does after
+    /// being asked three questions is play.
     private func select(_ mode: PracticeMode) {
         withAnimation(.snappy(duration: 0.18)) {
             practiceModeRaw = mode.rawValue
@@ -253,6 +257,7 @@ struct OnboardingView: View {
             let target = mode == .mixed ? MixedVariant.allCases.last : MixedVariant.allCases.first
             if let target { mixedVariantRaw = target.rawValue }
         }
+        TutorialCenter.shared.requestAutoStart(topic: topic)
         AppAudio.shared.playMenuTap()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
             isComplete = true
@@ -352,7 +357,6 @@ private struct OnboardingTitle: View {
         }
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
-        .accessibilityLabel(Text(verbatim: normalizedText))
     }
 
     private func titleText(_ value: String) -> some View {

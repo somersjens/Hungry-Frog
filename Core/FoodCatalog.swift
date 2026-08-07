@@ -12,8 +12,8 @@
 import Foundation
 
 public struct FoodItem: Identifiable, Equatable, Sendable {
-    /// Short identifier used to key the localized singular/plural strings
-    /// ("food.<id>.singular", "food.<id>.plural").
+    /// Short identifier used to key the localized counted name
+    /// ("food.<id> %lld").
     public let id: String
     /// Asset catalog name of the artwork ("food_1" … "food_10").
     public let imageName: String
@@ -54,12 +54,9 @@ public enum FoodCatalog {
         food(for: characterID).imageName
     }
 
-    /// The food's name, in the singular or plural form the count calls for.
-    /// Resolved through `L(key:)`, so it follows the in-app language switch
-    /// and falls back to English for any language missing a translation.
-    public static func word(for characterID: String, count: Int) -> String {
-        let id = food(for: characterID).id
-        let key = count == 1 ? "food.\(id).singular" : "food.\(id).plural"
-        return L(key: key)
+    /// "You can collect up to 12 flies in this level." — one whole sentence per
+    /// food, so every language can decline, reorder or reword it freely.
+    public static func collectionLine(for characterID: String, count: Int) -> String {
+        L(key: "levelIntro.cardsBullet.\(food(for: characterID).id) %lld", count: count)
     }
 }

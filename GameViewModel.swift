@@ -43,6 +43,10 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var streakAnnouncementID = 0
     @Published private(set) var comboAnnouncementID = 0
     @Published private(set) var visibleRounds: [GameRound] = []
+    /// The guided run, if this session is one. Both are mirrors of the director
+    /// below, published the same way the engine's state is.
+    @Published private(set) var tutorialStep: TutorialStep?
+    @Published private(set) var tutorialPointer: TutorialPointer?
 
     /// Invalidates pending timed work when a round is superseded (restart, or
     /// leaving the screen), so a late callback can never touch a newer round.
@@ -59,6 +63,11 @@ final class GameViewModel: ObservableObject {
     private var boostExpiryWork: DispatchWorkItem?
     /// When the pause card went up, so the countdown can be handed back intact.
     private var pausedAt: Date?
+    /// The guided run's state machine. It is asked what to show and which
+    /// answers count; it never touches the engine itself.
+    private let tutorial = TutorialDirector()
+    /// Set by the start card (or by the welcome flow) before the first round.
+    private var startsGuided = false
 
     var maximumRounds: Int { engine.maximumRounds }
     var acceptsInput: Bool { state == .answering && !isPaused }
@@ -68,6 +77,25 @@ final class GameViewModel: ObservableObject {
         self.engine = MemoryGame(level: request.level,
                             mixedVariant: request.mixedVariant,
                             mode: request.mode)
+        // Not seeded from the request: the welcome flow only pre-arms the start
+        // card's switch, and the player is free to turn it off there. What the
+        // card was showing when Start was pressed is what counts, and that
+        // arrives through `armTutorial`.
+        tutorial.onChange = { [weak self] in self?.syncTutorial() }
+    }
+
+    // MARK: - Tutorial
+
+    /// Arms the guided run for the session about to start. Only meaningful
+    /// before `begin()`: a run already in progress is never taken over.
+    func armTutorial() {
+        guard engine.state == .intro else { return }
+        startsGuided = true
+    }
+
+    private func syncTutorial() {
+        set(\.tutorialStep, tutorial.step)
+        set(\.tutorialPointer, tutorial.pointer)
     }
 
     // MARK: - Lifecycle
@@ -78,7 +106,7 @@ final class GameViewModel: ObservableObject {
         isPaused = false
         pausedAt = nil
         PlaytimeTracker.shared.challengeStarted()
-        AppAudio.shared.setGameplayActive(true, questionText: nil)
+        AppAudio.shared.setGameplayActive(true)
         AppAudio.shared.playSessionStart()
         if let paused = PausedSessionStore.shared.session(request.board) {
             engine.resume(from: paused)
@@ -88,6 +116,9 @@ final class GameViewModel: ObservableObject {
         }
         openRound()
         announceRound()
+        // The first message goes up with the first sum, never before it: the
+        // step it opens on is about the sum standing on screen.
+        if startsGuided { tutorial.begin() }
         sync()
     }
 
@@ -104,11 +135,12 @@ final class GameViewModel: ObservableObject {
     }
 
     func end() {
+        tutorial.cancel()
         // Leaving without finishing pauses the level rather than discarding it.
         savePausedSessionIfNeeded()
         recordResultIfNeeded()
         PlaytimeTracker.shared.challengeEnded()
-        AppAudio.shared.setGameplayActive(false, questionText: nil)
+        AppAudio.shared.setGameplayActive(false)
         AppAudio.shared.setGameplayRate(1)
         generation &+= 1
         pendingScheduledWork = nil
@@ -126,7 +158,7 @@ final class GameViewModel: ObservableObject {
         isPaused = true
         savePausedSessionIfNeeded()
         PlaytimeTracker.shared.challengeEnded()
-        AppAudio.shared.setGameplayActive(false, questionText: nil)
+        AppAudio.shared.setGameplayActive(false)
         AppAudio.shared.setGameplayRate(1)
         lastCorrectCatchTime = nil
         // The countdown stops with the game; `resume` hands back exactly what
@@ -147,7 +179,7 @@ final class GameViewModel: ObservableObject {
             scheduleBoostExpiry()
         }
         PlaytimeTracker.shared.challengeStarted()
-        AppAudio.shared.setGameplayActive(true, questionText: nil)
+        AppAudio.shared.setGameplayActive(true)
         sync()
         AppAudio.shared.setGameplayRate(isStreakBoostActive
                                         ? Float(GameConfig.streakSpeedMultiplier) : 1)
@@ -185,6 +217,9 @@ final class GameViewModel: ObservableObject {
     /// Play again always starts a clean run, so any paused record for this
     /// level is spent.
     func restart() {
+        // Play again is an ordinary run: the lesson was taught once.
+        tutorial.cancel()
+        startsGuided = false
         generation &+= 1
         hasRecordedResult = false
         isPaused = false
@@ -214,6 +249,15 @@ final class GameViewModel: ObservableObject {
     /// the reef whether to burst the bubble.
     @discardableResult
     func select(optionID: UUID) -> Bool {
+        // A guided step only counts the answer it is teaching. Refusing here,
+        // before the engine sees the tap, is what makes "nothing happens" mean
+        // nothing at all: no score, no life, no round turning over — the tongue
+        // simply comes back empty.
+        if tutorial.isRunning, let round = engine.round,
+           let option = round.options.first(where: { $0.id == optionID }),
+           !tutorial.accepts(isCorrect: option.isCorrect) {
+            return false
+        }
         let outcome = engine.select(optionID: optionID,
                                     usesBonusFish: hasBonusFishPower,
                                     now: Date())
@@ -245,8 +289,11 @@ final class GameViewModel: ObservableObject {
                 AppAudio.shared.playDoubleScore()
                 scheduleBoostExpiry()
             }
+            tutorial.didAnswer(isCorrect: true)
+            if startedStreak { tutorial.didStartBonus() }
             delay = GameConfig.nextRoundDelay.correct
         case .wrong:
+            tutorial.didAnswer(isCorrect: false)
             lastCorrectCatchTime = nil
             // Neither the verdict's sound nor its haptic fires here any more —
             // both wait for `reportCatchOutcome`. The life going is no longer
@@ -269,6 +316,7 @@ final class GameViewModel: ObservableObject {
                 // same sum in place, and play simply resumes.
                 self.announceRound()
                 self.openRound()
+                self.tutorial.didOpenRound()
             }
             self.sync()
         }
@@ -300,6 +348,8 @@ final class GameViewModel: ObservableObject {
             guard let self else { return }
             self.boostExpiryWork = nil
             self.sync()
+            // The window closing is the cue for the tutorial's last message.
+            self.tutorial.bonusDidEnd()
         }
         boostExpiryWork = work
         DispatchQueue.main.asyncAfter(
@@ -338,6 +388,9 @@ final class GameViewModel: ObservableObject {
     // MARK: - Finishing
 
     private func finishSession() {
+        // The board filling up, or the lives running out, ends the lesson with
+        // the session it was being taught in.
+        tutorial.cancel()
         AppAudio.shared.setGameplayRate(1)
         boostExpiryWork?.cancel()
         boostExpiryWork = nil
