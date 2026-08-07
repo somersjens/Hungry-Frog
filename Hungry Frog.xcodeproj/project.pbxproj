@@ -11,6 +11,7 @@
 		F9E6FB5D30234FD0001D93E4 /* splash.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5B30234FD0001D93E4 /* splash.caf */; };
 		F9E6FB5E30234FD0001D93E4 /* score_increase_main.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */; };
 		F9E6FB5F30234FD0001D93E4 /* wrong_answer.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */; };
+		F9F37AAC613AA631585C80BE /* Scenery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F35835B756794F5322B5BF /* Scenery.swift */; };
 		F9F3C620301E409F00464555 /* sfx_wrong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C619301E409F00464555 /* sfx_wrong.caf */; };
 		F9F3C621301E409F00464555 /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C600301E409F00464555 /* Products.storekit */; };
 		F9F3C622301E409F00464555 /* sfx_double_card.caf in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C60E301E409F00464555 /* sfx_double_card.caf */; };
@@ -52,8 +53,6 @@
 		F9F3C64A301E409F00464555 /* ScreenSafeArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C603301E409F00464555 /* ScreenSafeArea.swift */; };
 		F9F3C64B301E409F00464555 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5FF301E409F00464555 /* PremiumView.swift */; };
 		F9F3C64C301E409F00464555 /* MenuMeadowBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */; };
-		F9F3CBCDC239647255BAA080 /* CharacterScenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */; };
-		F9F37AAC613AA631585C80BE /* Scenery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F35835B756794F5322B5BF /* Scenery.swift */; };
 		F9F3C64D301E409F00464555 /* PausedSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E6301E409F00464555 /* PausedSessionStore.swift */; };
 		F9F3C64E301E409F00464555 /* ProgressSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C601301E409F00464555 /* ProgressSync.swift */; };
 		F9F3C64F301E409F00464555 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5EF301E409F00464555 /* GameView.swift */; };
@@ -71,6 +70,7 @@
 		F9F3C65C301E409F00464555 /* GameConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E2301E409F00464555 /* GameConfig.swift */; };
 		F9F3C65D301E409F00464555 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F3C5E8301E409F00464555 /* ProgressStore.swift */; };
 		F9F3C9AD301F3CBE00464555 /* frog_music.m4a in Resources */ = {isa = PBXBuildFile; fileRef = F9F3C9AC301F3CBE00464555 /* frog_music.m4a */; };
+		F9F3CBCDC239647255BAA080 /* CharacterScenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */; };
 		FA11F00131A1000000000001 /* FlyGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00231A1000000000001 /* FlyGame.swift */; };
 		FA11F00331A1000000000003 /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00431A1000000000004 /* Tutorial.swift */; };
 /* End PBXBuildFile section */
@@ -80,10 +80,10 @@
 		F9E6FB5A30234FD0001D93E4 /* score_increase_main.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = score_increase_main.caf; sourceTree = "<group>"; };
 		F9E6FB5B30234FD0001D93E4 /* splash.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = splash.caf; sourceTree = "<group>"; };
 		F9E6FB5C30234FD0001D93E4 /* wrong_answer.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wrong_answer.caf; sourceTree = "<group>"; };
-		F9F3C5CA301E405E00464555 /* Hungry Frog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hungry Frog.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMeadowBackground.swift; sourceTree = "<group>"; };
 		F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterScenes.swift; sourceTree = "<group>"; };
 		F9F35835B756794F5322B5BF /* Scenery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scenery.swift; sourceTree = "<group>"; };
+		F9F3C5CA301E405E00464555 /* Hungry Frog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hungry Frog.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuMeadowBackground.swift; sourceTree = "<group>"; };
 		F9F3C5DB301E409F00464555 /* AppAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAudio.swift; sourceTree = "<group>"; };
 		F9F3C5DC301E409F00464555 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		F9F3C5DD301E409F00464555 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -595,7 +595,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Number Reef.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 4283ACUG4Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -644,7 +644,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Number Reef.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 4283ACUG4Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
