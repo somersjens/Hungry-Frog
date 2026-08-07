@@ -43,6 +43,16 @@ struct AppLanguage: Identifiable, Hashable, Sendable {
 
     var id: String { code }
 
+    /// Which way this language reads. SwiftUI settles the layout direction from
+    /// the bundle at launch and never revisits it, so an in-app switch to
+    /// Arabic or Hebrew has to say this out loud — otherwise the words change
+    /// and the screen stays the wrong way round.
+    var layoutDirection: LayoutDirection {
+        Locale.characterDirection(forLanguage: baseCode) == .rightToLeft
+            ? .rightToLeft
+            : .leftToRight
+    }
+
     /// The language part of the code, with any region dropped: `pt` for `pt-BR`.
     var baseCode: String {
         code.split(separator: "-").first.map(String.init) ?? code
@@ -448,6 +458,7 @@ private struct GameEnvironment: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.locale, language.locale)
+            .environment(\.layoutDirection, language.effective.layoutDirection)
     }
 }
 

@@ -2801,6 +2801,9 @@ private struct ActiveQuestionView: View {
 
     var body: some View {
         Text(verbatim: prompt)
+            // A sum reads left to right in every language; the bidirectional
+            // algorithm would otherwise turn "3 × 1 = ?" around in Arabic.
+            .environment(\.layoutDirection, .leftToRight)
             .font(.system(size: isPad ? 40 : 31,
                           weight: .black, design: .rounded))
             .minimumScaleFactor(0.72)
