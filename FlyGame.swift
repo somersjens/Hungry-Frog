@@ -1637,12 +1637,7 @@ struct FlyPlayfield: View {
         }
 
         let later = rounds.dropFirst().flatMap { $0.options.map(\.text) }
-        Task { @MainActor in
-            for text in later {
-                try? await Task.sleep(nanoseconds: 40_000_000)
-                FoodGlyphCache.warm([text], food: food, size: size, scale: scale)
-            }
-        }
+        FoodGlyphCache.warmLater(later, food: food, size: size, scale: scale)
     }
 
     private func applyLayout(in size: CGSize) {
@@ -2330,6 +2325,14 @@ private enum FoodGlyphCache {
     /// them. Past this the oldest are dropped rather than kept for good.
     private static let limit = 160
     private static var order: [Key] = []
+    /// One serial, deduplicated warm-up queue for the whole app. A new round
+    /// used to launch another independent Task for ten glyphs; during a fast
+    /// streak those tasks overlapped and woke the main actor in bursts. The
+    /// queue keeps the same ahead-of-time rendering but performs at most one
+    /// bake per frame-sized gap and never schedules the same glyph twice.
+    private static var pending: [Key] = []
+    private static var pendingSet: Set<Key> = []
+    private static var isWarming = false
 
     /// The baked glyph, or nil if this platform declined to render it — in
     /// which case the caller draws the food and its number directly.
@@ -2355,6 +2358,27 @@ private enum FoodGlyphCache {
                      size: CGFloat, scale: CGFloat) {
         for text in texts {
             _ = image(food: food, text: text, size: size, scale: scale)
+        }
+    }
+
+    static func warmLater(_ texts: [String], food: String,
+                          size: CGFloat, scale: CGFloat) {
+        for text in texts {
+            let key = Key(food: food, text: text, size: size, scale: scale)
+            guard images[key] == nil, pendingSet.insert(key).inserted else { continue }
+            pending.append(key)
+        }
+        guard !isWarming, !pending.isEmpty else { return }
+        isWarming = true
+        Task { @MainActor in
+            while !pending.isEmpty {
+                try? await Task.sleep(nanoseconds: 32_000_000)
+                let key = pending.removeFirst()
+                pendingSet.remove(key)
+                _ = image(food: key.food, text: key.text,
+                          size: key.size, scale: key.scale)
+            }
+            isWarming = false
         }
     }
 }

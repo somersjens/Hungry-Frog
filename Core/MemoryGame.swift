@@ -86,8 +86,9 @@ public final class MemoryGame {
 
     public private(set) var state: GameState = .intro
     public private(set) var round: GameRound?
-    /// The round after this one, built ahead of time so a transition never
-    /// waits on generation.
+    /// Every round still to be played, built before the board becomes live so
+    /// a transition never shares question generation with the outgoing tongue,
+    /// score animation and incoming swarm.
     private var preparedRounds: [GameRound] = []
 
     /// The active sum followed by the two sums already generated for the fly
@@ -181,14 +182,23 @@ public final class MemoryGame {
 
     // MARK: - Session lifecycle
 
+    /// Builds the complete question runway while the start/pause card is still
+    /// covering the playfield. A board contains at most fifty small value
+    /// rounds, so keeping the sequence in memory is cheap and removes the last
+    /// generator call from every live round transition.
+    public func prepare(startingAt firstRound: Int = 1) {
+        guard state == .intro, round == nil, preparedRounds.isEmpty else { return }
+        let first = min(max(1, firstRound), maximumRounds)
+        preparedRounds = (first...maximumRounds).map { factory.makeRound(number: $0) }
+    }
+
     /// Starts the session and deals the first round's answer cards face up.
     @discardableResult
     public func start() -> Bool {
         guard state == .intro else { return false }
+        prepare(startingAt: 1)
         roundNumber = 1
-        round = factory.makeRound(number: 1)
-        preparedRounds = [factory.makeRound(number: 2),
-                          factory.makeRound(number: 3)]
+        round = preparedRounds.removeFirst()
         state = .memorising
         return true
     }
@@ -210,9 +220,11 @@ public final class MemoryGame {
         heartFishProgress = session.heartFishProgress ?? 0
         heartFishTarget = session.heartFishTarget ?? GameConfig.heartFishCorrectAnswers
         isHeartFishAvailable = session.isHeartFishAvailable ?? false
-        round = factory.makeRound(number: roundNumber)
-        preparedRounds = [factory.makeRound(number: roundNumber + 1),
-                          factory.makeRound(number: roundNumber + 2)]
+        if preparedRounds.first?.number != roundNumber {
+            preparedRounds.removeAll(keepingCapacity: true)
+            prepare(startingAt: roundNumber)
+        }
+        round = preparedRounds.removeFirst()
         state = .memorising
         return true
     }
@@ -410,13 +422,9 @@ public final class MemoryGame {
         }
 
         roundNumber += 1
-        round = preparedRounds.isEmpty
-            ? factory.makeRound(number: roundNumber)
-            : preparedRounds.removeFirst()
-        // Keep two exact future sums ready for the fly game's preview column.
-        while preparedRounds.count < 2 {
-            preparedRounds.append(factory.makeRound(number: roundNumber + preparedRounds.count + 1))
-        }
+        // The complete runway was prepared before play began, so installing a
+        // sum is only an array removal on this animation-heavy frame.
+        round = preparedRounds.removeFirst()
         selectedOptionID = nil
         lastOutcome = nil
         state = .memorising

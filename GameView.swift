@@ -132,7 +132,12 @@ struct GameView: View {
         .currencyIcon(for: character)
         .animation(.easeInOut(duration: 0.28), value: model.isGameOver)
         .animation(.easeInOut(duration: 0.25), value: showsIntro)
-        .onAppear { screenInsets = ScreenSafeArea.current }
+        .onAppear {
+            screenInsets = ScreenSafeArea.current
+            // Let the start card reach the screen first, then use the covered
+            // playfield to prepare every sum and the first visible glyphs.
+            DispatchQueue.main.async { model.prepare() }
+        }
         .onChange(of: model.isGameOver) { _, isOver in
             guard isOver else {
                 showsResult = false

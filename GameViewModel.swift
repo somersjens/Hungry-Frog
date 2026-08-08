@@ -100,6 +100,16 @@ final class GameViewModel: ObservableObject {
 
     // MARK: - Lifecycle
 
+    /// Prepares questions while the start card is still covering the field.
+    /// Publishing the first three also lets the playfield bake their food
+    /// glyphs before the display link and tongue animation start running.
+    func prepare() {
+        guard engine.state == .intro else { return }
+        let resumedRound = PausedSessionStore.shared.session(request.board)?.roundNumber ?? 1
+        engine.prepare(startingAt: resumedRound)
+        sync()
+    }
+
     /// Starts the level, resuming a paused session when one is waiting.
     func begin() {
         guard engine.state == .intro else { return }
@@ -267,8 +277,6 @@ final class GameViewModel: ObservableObject {
         // which its idle limit then discards — a whole session counting as no
         // time.
         PlaytimeTracker.shared.registerInteraction()
-        sync()
-
         let token = generation
         let delay: Double
         switch outcome {
@@ -277,7 +285,6 @@ final class GameViewModel: ObservableObject {
             if let previous = lastCorrectCatchTime, now - previous <= 1 {
                 engine.awardFlyComboBonus()
                 comboAnnouncementID &+= 1
-                sync()
             }
             lastCorrectCatchTime = now
             if usedBonusFish {
@@ -303,6 +310,11 @@ final class GameViewModel: ObservableObject {
         case .ignored:
             return false
         }
+
+        // Score, combo bonus and answer state are published together. In a
+        // fast run this avoids rebuilding the game once for the normal reward
+        // and immediately again for the combo reward.
+        sync()
 
         schedule(after: delay, token: token) { [weak self] in
             guard let self else { return }
