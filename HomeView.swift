@@ -172,6 +172,15 @@ struct HomeView: View {
                     ForEach(flights) { flight in
                         CardFlightView(flight: flight)
                     }
+                    // Both endpoints were measured with `frame(in:)`, which
+                    // reports the real, physical geometry whatever the language
+                    // — but `.position` is a layout placement and mirrors its x
+                    // in a right-to-left one. Left as-is the card launches from
+                    // the level tile's mirror image and lands on the header's,
+                    // so the whole arc plays across the wrong half of the menu.
+                    // The overlay is nothing but a moving glyph, so pinning it
+                    // costs no reading direction: it has nothing to read.
+                    .environment(\.layoutDirection, .leftToRight)
                 }
                 // Last, so the wash lies over the whole menu — the card it
                 // leaves lit shows through the hole cut for it.

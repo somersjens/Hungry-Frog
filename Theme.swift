@@ -128,6 +128,12 @@ struct AnimalCharacter: Identifiable, Equatable {
     let emoji: String
     /// Front-facing portrait: menus, the intro card, the collection, results.
     let imageName: String
+    /// The same portrait at 256 px, for the places that draw it small — the
+    /// Premium collection strip and the Settings picker. Both show the whole
+    /// cast at once, and a screen that decoded ten 768 px portraits to paint
+    /// ten 46 pt circles was doing nine times the work per tile, all of it on
+    /// the frame the sheet opens on.
+    let thumbnailName: String
     /// The reclining pose the character is played in.
     let sideImageName: String
     /// Mouth of `sideImageName`, in that artwork's own coordinates.
@@ -149,6 +155,8 @@ struct AnimalCharacter: Identifiable, Equatable {
     var tintColor: Color { Color(red: tintRGB.0, green: tintRGB.1, blue: tintRGB.2) }
 
     var artwork: Image { Image(imageName) }
+    /// Use wherever the portrait is drawn at roughly 75 pt or less.
+    var thumbnail: Image { Image(thumbnailName) }
     var playArtwork: Image { Image(sideImageName) }
 
     /// Every playing pose is drawn on the same wide canvas around the same
@@ -183,9 +191,17 @@ enum CharacterCatalog {
     /// with. Fox closes it. Each palette is taken from the artwork itself —
     /// the dog and the crab are themed on their headband rather than their
     /// fur, which is what keeps them apart from the fox and the bear.
+    ///
+    /// Every `mouth.center` is the centroid of the painted throat, measured off
+    /// the `side_*` artwork rather than judged by eye. They were judged by eye
+    /// once, and the ten drifted apart: the dog's landed a twentieth of the
+    /// canvas clear of its muzzle, so its tongue left from the cheek and the
+    /// throat shading sat beside the mouth instead of behind it. Move one and
+    /// re-measure it — the anchor and the mask both hang off this point.
     static let all: [AnimalCharacter] = [
         AnimalCharacter(id: "frog", name: "Frog", emoji: "🐸",
-                        imageName: "front_1", sideImageName: "side_1",
+                        imageName: "front_1", thumbnailName: "thumb_1",
+                        sideImageName: "side_1",
                         mouth: MouthGeometry(center: CGPoint(x: 0.212, y: 0.454),
                                              opening: CGSize(width: 0.046, height: 0.038),
                                              tongueRGB: (0.68, 0.15, 0.16),
@@ -193,72 +209,81 @@ enum CharacterCatalog {
                         primaryRGB: (0.29, 0.72, 0.22), deepRGB: (0.15, 0.43, 0.11),
                         skyRGB: (0.92, 0.99, 0.91), tintRGB: (0.82, 0.97, 0.79)),
         AnimalCharacter(id: "penguin", name: "Penguin", emoji: "🐧",
-                        imageName: "front_2", sideImageName: "side_2",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.285, y: 0.462),
+                        imageName: "front_2", thumbnailName: "thumb_2",
+                        sideImageName: "side_2",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.281, y: 0.450),
                                              opening: CGSize(width: 0.040, height: 0.035),
                                              tongueRGB: (0.82, 0.20, 0.19),
                                              throatRGB: (0.34, 0.08, 0.03)),
                         primaryRGB: (0.24, 0.48, 0.85), deepRGB: (0.11, 0.27, 0.51),
                         skyRGB: (0.91, 0.94, 0.99), tintRGB: (0.79, 0.86, 0.97)),
         AnimalCharacter(id: "bunny", name: "Bunny", emoji: "🐰",
-                        imageName: "front_3", sideImageName: "side_3",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.312, y: 0.481),
+                        imageName: "front_3", thumbnailName: "thumb_3",
+                        sideImageName: "side_3",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.286, y: 0.494),
                                              opening: CGSize(width: 0.032, height: 0.036),
                                              tongueRGB: (0.90, 0.35, 0.34),
                                              throatRGB: (0.30, 0.01, 0.01)),
                         primaryRGB: (0.96, 0.55, 0.64), deepRGB: (0.58, 0.31, 0.37),
                         skyRGB: (0.99, 0.94, 0.96), tintRGB: (0.97, 0.86, 0.89)),
         AnimalCharacter(id: "dog", name: "Dog", emoji: "🐶",
-                        imageName: "front_4", sideImageName: "side_4",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.380, y: 0.465),
+                        imageName: "front_4", thumbnailName: "thumb_4",
+                        sideImageName: "side_4",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.336, y: 0.467),
                                              opening: CGSize(width: 0.048, height: 0.055),
                                              tongueRGB: (0.78, 0.23, 0.15),
                                              throatRGB: (0.18, 0.02, 0.00)),
                         primaryRGB: (0.13, 0.70, 0.71), deepRGB: (0.05, 0.42, 0.43),
                         skyRGB: (0.90, 0.99, 0.99), tintRGB: (0.76, 0.97, 0.97)),
         AnimalCharacter(id: "lion", name: "Lion", emoji: "🦁",
-                        imageName: "front_5", sideImageName: "side_5",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.312, y: 0.479),
+                        imageName: "front_5", thumbnailName: "thumb_5",
+                        sideImageName: "side_5",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.298, y: 0.475),
                                              opening: CGSize(width: 0.045, height: 0.054),
                                              tongueRGB: (0.82, 0.21, 0.12),
                                              throatRGB: (0.18, 0.03, 0.00)),
                         primaryRGB: (0.97, 0.73, 0.10), deepRGB: (0.58, 0.43, 0.02),
                         skyRGB: (0.99, 0.97, 0.89), tintRGB: (0.97, 0.91, 0.74)),
         AnimalCharacter(id: "octopus", name: "Octopus", emoji: "🐙",
-                        imageName: "front_6", sideImageName: "side_6",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.316, y: 0.519),
+                        imageName: "front_6", thumbnailName: "thumb_6",
+                        sideImageName: "side_6",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.311, y: 0.511),
                                              opening: CGSize(width: 0.032, height: 0.044),
                                              tongueRGB: (0.91, 0.40, 0.40),
                                              throatRGB: (0.16, 0.01, 0.04)),
                         primaryRGB: (0.66, 0.38, 0.90), deepRGB: (0.38, 0.20, 0.54),
                         skyRGB: (0.96, 0.93, 0.99), tintRGB: (0.90, 0.82, 0.97)),
         AnimalCharacter(id: "crab", name: "Crab", emoji: "🦀",
-                        imageName: "front_7", sideImageName: "side_7",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.342, y: 0.488),
+                        imageName: "front_7", thumbnailName: "thumb_7",
+                        sideImageName: "side_7",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.337, y: 0.480),
                                              opening: CGSize(width: 0.035, height: 0.044),
                                              tongueRGB: (0.92, 0.23, 0.15),
                                              throatRGB: (0.31, 0.00, 0.00)),
                         primaryRGB: (0.91, 0.24, 0.16), deepRGB: (0.55, 0.11, 0.06),
                         skyRGB: (0.99, 0.91, 0.90), tintRGB: (0.97, 0.78, 0.76)),
         AnimalCharacter(id: "elephant", name: "Elephant", emoji: "🐘",
-                        imageName: "front_8", sideImageName: "side_8",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.335, y: 0.530),
+                        imageName: "front_8", thumbnailName: "thumb_8",
+                        sideImageName: "side_8",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.333, y: 0.538),
                                              opening: CGSize(width: 0.031, height: 0.031),
                                              tongueRGB: (0.82, 0.31, 0.35),
                                              throatRGB: (0.33, 0.08, 0.10)),
                         primaryRGB: (0.44, 0.59, 0.80), deepRGB: (0.25, 0.34, 0.48),
                         skyRGB: (0.94, 0.96, 0.99), tintRGB: (0.86, 0.91, 0.97)),
         AnimalCharacter(id: "bear", name: "Bear", emoji: "🐻",
-                        imageName: "front_9", sideImageName: "side_9",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.305, y: 0.522),
+                        imageName: "front_9", thumbnailName: "thumb_9",
+                        sideImageName: "side_9",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.291, y: 0.512),
                                              opening: CGSize(width: 0.038, height: 0.042),
                                              tongueRGB: (0.84, 0.22, 0.15),
                                              throatRGB: (0.44, 0.04, 0.01)),
                         primaryRGB: (0.65, 0.42, 0.22), deepRGB: (0.39, 0.24, 0.11),
                         skyRGB: (0.99, 0.95, 0.92), tintRGB: (0.97, 0.88, 0.80)),
         AnimalCharacter(id: "fox", name: "Fox", emoji: "🦊",
-                        imageName: "front_10", sideImageName: "side_10",
-                        mouth: MouthGeometry(center: CGPoint(x: 0.322, y: 0.543),
+                        imageName: "front_10", thumbnailName: "thumb_10",
+                        sideImageName: "side_10",
+                        mouth: MouthGeometry(center: CGPoint(x: 0.314, y: 0.544),
                                              opening: CGSize(width: 0.043, height: 0.048),
                                              tongueRGB: (0.81, 0.20, 0.08),
                                              throatRGB: (0.18, 0.03, 0.00)),

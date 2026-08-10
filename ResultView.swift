@@ -36,11 +36,24 @@ struct ResultView: View {
 
     private var isCompleted: Bool { result.reason == .roundsCompleted }
 
-    /// A completed board always gets the same celebratory description. When
-    /// the player runs out of lives, every three bubbles advance to the next
-    /// encouraging message, capped at the tenth message.
+    /// When the swarm flies over the card.
+    ///
+    /// A new personal best used to be the only trigger, which made the
+    /// celebration look intermittent for no reason a child could see: a best is
+    /// only ever *beaten*, so a board already sitting on its maximum can never
+    /// produce one again. Playing a level twice in a row therefore celebrated
+    /// the first run and not the second — and switching character puts a player
+    /// straight back onto boards they have already maxed. Filling the board is
+    /// the achievement being celebrated, so it now counts on its own, every
+    /// time, and beating a best still counts on a board left unfinished.
+    private var celebrates: Bool { showsNewBest || isCompleted }
+
+    /// A completed board always gets the same celebratory description, named
+    /// after the food this character eats — the bunny collected carrots, not
+    /// flies. When the player runs out of lives, every three bubbles advance to
+    /// the next encouraging message, capped at the tenth message.
     private var encouragement: String {
-        guard !isCompleted else { return L(key: "game.end.completionSubtitle") }
+        guard !isCompleted else { return FoodCatalog.completionLine(for: character.id) }
         let index = min(max(levelScore, 0) / 3, 9)
         return L(key: "game.encouragement.\(index)")
     }
@@ -101,15 +114,17 @@ struct ResultView: View {
             withAnimation(.spring(response: 0.46, dampingFraction: 0.82)) {
                 isPresented = true
             }
-            // Only a score this level has never seen before draws the swarm;
-            // matching or falling short of the old best ends quietly.
-            guard showsNewBest else { return }
+            // A finished board, or a score this level has never seen before,
+            // draws the swarm; falling short on both ends quietly.
+            guard celebrates else { return }
             if !reduceMotion {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.34) {
                     showsFlySwarm = true
                 }
             }
-            // The badge drops in after the card has settled, then glints once.
+            // The badge belongs to the best alone, and drops in after the card
+            // has settled, then glints once.
+            guard showsNewBest else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.42) {
                 withAnimation(.spring(response: 0.44, dampingFraction: 0.52)) {
                     badgeLanded = true
@@ -381,9 +396,9 @@ struct ResultView: View {
     }
 }
 
-/// A swarm of flies for a new personal best: the reward the whole game is
-/// played for rises up over the card, wandering the way flies actually do,
-/// instead of the bubble rain this used to shower.
+/// A swarm of flies for a filled board or a new personal best: the reward the
+/// whole game is played for rises up over the card, wandering the way flies
+/// actually do, instead of the bubble rain this used to shower.
 private struct FlySwarmCelebration: View {
     let color: Color
 

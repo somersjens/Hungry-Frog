@@ -421,11 +421,17 @@ final class GameViewModel: ObservableObject {
 
         let store = Progress.store
         let previousTotal = store.totalCards
-        let newTotal = store.addCards(engine.cards)
         // The score belongs to the board this session was played on: the card
         // count, and on Supermix the combination, keep separate bests.
         let board = request.board
         let best = store.recordScore(engine.cards, board: board)
+        // The grand total represents the best flies earned on each board, not
+        // the sum of every replay. Only the part that improves this board's
+        // personal best is new; reaching an already-maxed board again must not
+        // award its maximum a second time.
+        let cappedScore = min(engine.cards, board.maximum)
+        let gained = max(0, cappedScore - best.previousBest)
+        let newTotal = store.addCards(gained)
         let unlocked = CharacterUnlocks.newlyUnlocked(from: previousTotal, to: newTotal)
 
         // Reaching this board's maximum is tallied every time, which is what

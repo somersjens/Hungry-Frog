@@ -13544,6 +13544,186 @@
         }
       }
     },
+    "game.end.completionSubtitle.carrot" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the carrots"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle wortels verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.chicken" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the chickens"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle kippen verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.fish" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the fish"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle vissen verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.fly" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the flies"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle vliegen verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.honey" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the pots of honey"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle potjes honing verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.kibble" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the dog biscuits"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle hondenkoekjes verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.meat" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the pieces of meat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle stukken vlees verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.peanut" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the peanuts"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle pinda's verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.pearl" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the pearls"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle parels verzameld"
+          }
+        }
+      }
+    },
+    "game.end.completionSubtitle.shrimp" : {
+      "comment" : "Under the character on the result card when the board was filled. One sentence per food, so the noun can take whatever case, article and word order the language needs. A language that leaves these ten untranslated keeps its food-neutral \"game.end.completionSubtitle\" line instead of falling back to English.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You collected all the shrimp"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt alle garnalen verzameld"
+          }
+        }
+      }
+    },
     "game.end.completionSuffix" : {
       "extractionState" : "manual",
       "localizations" : {

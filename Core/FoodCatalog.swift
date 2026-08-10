@@ -59,4 +59,18 @@ public enum FoodCatalog {
     public static func collectionLine(for characterID: String, count: Int) -> String {
         L(key: "levelIntro.cardsBullet.\(food(for: characterID).id) %lld", count: count)
     }
+
+    /// "You collected all the carrots." — the line under the character on the
+    /// result card when the board was filled, named after what this character
+    /// was actually eating rather than after the frog's flies.
+    ///
+    /// One whole sentence per food again, for the same reason: the noun sits in
+    /// a different case, position and article in every language. A language that
+    /// has not been given the ten food sentences keeps the food-neutral line it
+    /// already has ("You earned every point"), which is a correct translation —
+    /// dropping to English for this one line would be the worse answer.
+    public static func completionLine(for characterID: String) -> String {
+        LTranslated(key: "game.end.completionSubtitle.\(food(for: characterID).id)")
+            ?? L(key: "game.end.completionSubtitle")
+    }
 }

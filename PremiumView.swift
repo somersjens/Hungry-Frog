@@ -395,7 +395,7 @@ struct PremiumView: View {
             if isAccessible { characterID = animal.id }
         } label: {
             VStack(spacing: metrics.tileSpacing) {
-                animal.artwork
+                animal.thumbnail
                     .resizable()
                     .scaledToFit()
                     .frame(width: artSide, height: artSide)
