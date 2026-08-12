@@ -48,7 +48,7 @@ struct AppLanguage: Identifiable, Hashable, Sendable {
     /// Arabic or Hebrew has to say this out loud — otherwise the words change
     /// and the screen stays the wrong way round.
     var layoutDirection: LayoutDirection {
-        Locale.characterDirection(forLanguage: baseCode) == .rightToLeft
+        Locale.Language(identifier: baseCode).characterDirection == .rightToLeft
             ? .rightToLeft
             : .leftToRight
     }
