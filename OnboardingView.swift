@@ -198,10 +198,10 @@ struct OnboardingView: View {
 
     /// The three starting points, in the same order as the buttons in the menu.
     private static let modeChoices:
-        [(mode: PracticeMode, titleKey: String, subtitleKey: String)] = [
-        (.order,  "onboarding.level.beginner.title",     "onboarding.level.beginner.subtitle"),
-        (.random, "onboarding.level.intermediate.title", "onboarding.level.intermediate.subtitle"),
-        (.mixed,  "onboarding.level.advanced.title",     "onboarding.level.advanced.subtitle")
+        [(mode: PracticeMode, titleKey: String, subtitleKey: String, startingLevel: Int)] = [
+        (.order,  "onboarding.level.beginner.title",     "onboarding.level.beginner.subtitle",     2),
+        (.random, "onboarding.level.intermediate.title", "onboarding.level.intermediate.subtitle", 5),
+        (.mixed,  "onboarding.level.advanced.title",     "onboarding.level.advanced.subtitle",    10)
     ]
 
     /// The last step: how far along the player already is. This is the same
@@ -220,7 +220,7 @@ struct OnboardingView: View {
             )
 
             ForEach(Self.modeChoices, id: \.mode) { choice in
-                Button { select(choice.mode) } label: {
+                Button { select(choice) } label: {
                     OnboardingChoiceLabel(
                         title: L(key: choice.titleKey),
                         subtitle: L(key: choice.subtitleKey),
@@ -246,10 +246,11 @@ struct OnboardingView: View {
     /// welcome flow fades out rather than the screen swapping out under the tap.
     ///
     /// This is also where the welcome flow hands over to the tutorial: the last
-    /// answer chooses the exercise, and the first level of it is opened, guided,
+    /// answer chooses the exercise and its matching starting level is opened, guided,
     /// the moment the menu has settled — so the first thing a child does after
     /// being asked three questions is play.
-    private func select(_ mode: PracticeMode) {
+    private func select(_ choice: (mode: PracticeMode, titleKey: String, subtitleKey: String, startingLevel: Int)) {
+        let mode = choice.mode
         withAnimation(.snappy(duration: 0.18)) {
             practiceModeRaw = mode.rawValue
         }
@@ -257,7 +258,9 @@ struct OnboardingView: View {
             let target = mode == .mixed ? MixedVariant.allCases.last : MixedVariant.allCases.first
             if let target { mixedVariantRaw = target.rawValue }
         }
-        TutorialCenter.shared.requestAutoStart(topic: topic)
+        TutorialCenter.shared.requestAutoStart(
+            level: MathLevel(topic: topic, index: choice.startingLevel)
+        )
         AppAudio.shared.playMenuTap()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
             isComplete = true

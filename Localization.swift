@@ -58,6 +58,20 @@ struct AppLanguage: Identifiable, Hashable, Sendable {
         code.split(separator: "-").first.map(String.init) ?? code
     }
 
+    /// The code a language is actually filed under, once the legacy spellings
+    /// have been settled: `nb` for `no`, `he` for `iw`, `fil` for `tl`.
+    ///
+    /// This matters because the toolchain quietly canonicalises too. A `no`
+    /// column in the string catalog compiles to `nb.lproj`, so asking the
+    /// bundle for `no.lproj` finds nothing, and a language with a complete
+    /// translation reads as English — a miss that looks exactly like a language
+    /// nobody has translated yet. Every code that meets a bundle or a device
+    /// preference is put through here first, so the two spellings can never
+    /// pass each other.
+    static func canonical(_ code: String) -> String {
+        Locale.canonicalLanguageIdentifier(from: code)
+    }
+
     /// The language's name in its own language — the convention for a picker.
     /// Read from the system rather than kept in a table, so seventy-odd names
     /// stay correct, in their own script, with nobody maintaining them.
@@ -144,7 +158,7 @@ struct AppLanguage: Identifiable, Hashable, Sendable {
         AppLanguage(code: "mr", flag: "\u{1F1EE}\u{1F1F3}"),  // Marathi
         AppLanguage(code: "mn", flag: "\u{1F1F2}\u{1F1F3}"),  // Mongolian
         AppLanguage(code: "ne", flag: "\u{1F1F3}\u{1F1F5}"),  // Nepali
-        AppLanguage(code: "no", flag: "\u{1F1F3}\u{1F1F4}"),  // Norwegian
+        AppLanguage(code: "nb", flag: "\u{1F1F3}\u{1F1F4}"),  // Norwegian Bokmål
         AppLanguage(code: "or", flag: "\u{1F1EE}\u{1F1F3}"),  // Odia
         AppLanguage(code: "fa", flag: "\u{1F1EE}\u{1F1F7}"),  // Persian
         AppLanguage(code: "pl", flag: "\u{1F1F5}\u{1F1F1}"),  // Polish
@@ -189,10 +203,13 @@ struct AppLanguage: Identifiable, Hashable, Sendable {
 
     /// Look up a language by its code, preferring an exact match and otherwise
     /// accepting the language without its region (`nl` for a `nl-BE` device).
+    /// Codes are compared canonically, so a device asking for `nb` and a choice
+    /// stored as `no` by an older build both land on the same entry.
     static func named(_ code: String) -> AppLanguage? {
-        if let exact = all.first(where: { $0.code == code }) { return exact }
-        let base = code.split(separator: "-").first.map(String.init) ?? code
-        return all.first { $0.baseCode == base }
+        let wanted = canonical(code)
+        if let exact = all.first(where: { canonical($0.code) == wanted }) { return exact }
+        let base = wanted.split(separator: "-").first.map(String.init) ?? wanted
+        return all.first { canonical($0.baseCode) == base }
     }
 
     /// The source language, and the fallback for every key another language has
@@ -267,9 +284,18 @@ final class LanguageManager: ObservableObject {
     /// language has not translated yet.
     static let englishBundle: Bundle? = lprojBundle(for: "en")
 
+    /// The compiled `.lproj` for a language, found under the code as written or
+    /// under its canonical spelling — `nb.lproj` answers a request for `no`.
     static func lprojBundle(for code: String) -> Bundle? {
-        guard let path = Bundle.main.path(forResource: code, ofType: "lproj") else { return nil }
-        return Bundle(path: path)
+        let canonical = AppLanguage.canonical(code)
+        let path = Bundle.main.path(forResource: code, ofType: "lproj")
+            ?? Bundle.main.path(forResource: canonical, ofType: "lproj")
+            // A regional variant is shipped as its plain language: `pt-BR` on
+            // the device, `pt.lproj` in the bundle.
+            ?? canonical.split(separator: "-").first.map(String.init).flatMap {
+                Bundle.main.path(forResource: $0, ofType: "lproj")
+            }
+        return path.flatMap(Bundle.init(path:))
     }
 
     /// Whether a language holds every key English does. Answered by reading the

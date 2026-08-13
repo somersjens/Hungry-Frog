@@ -220,10 +220,9 @@ final class TutorialCenter: ObservableObject {
         UserDefaults.standard.bool(forKey: Self.completedKey)
     }
 
-    /// Called as the welcome flow hands over: the first level of whatever the
-    /// player just chose is what they will be taught on.
-    func requestAutoStart(topic: MathTopic) {
-        autoStartLevel = MathLevel(topic: topic, index: 1)
+    /// Called as the welcome flow hands over with the selected starting level.
+    func requestAutoStart(level: MathLevel) {
+        autoStartLevel = level
     }
 
     /// Taken by the menu, once.

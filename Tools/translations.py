@@ -47,10 +47,17 @@ LANGUAGES = [
     "my", "ca", "zh", "hr", "cs", "da", "nl", "en", "et", "fo", "fi", "fr",
     "gl", "ka", "de", "el", "gu", "he", "hi", "hu", "is", "id", "ga", "it",
     "ja", "kn", "kk", "km", "ko", "lo", "lv", "lt", "mk", "ms", "ml", "mr",
-    "mn", "ne", "no", "or", "fa", "pl", "pt", "pa", "ro", "ru", "sr", "si",
+    "mn", "ne", "nb", "or", "fa", "pl", "pt", "pa", "ro", "ru", "sr", "si",
     "sk", "sl", "es", "sw", "sv", "ta", "te", "th", "bo", "tr", "uk", "ur",
     "ug", "uz", "vi", "cy", "zu",
 ]
+
+# Older spellings of a language code, and what the catalog files them under.
+# Apple canonicalises these on the way into the app: a `no` localization
+# compiles to `nb.lproj`, which the app then never finds under the name it was
+# given, and a fully translated language reads as English. A sheet that still
+# carries the old column heading is read into the code that survives.
+ALIASES = {"no": "nb", "iw": "he", "in": "id", "tl": "fil"}
 
 # The plural forms the sheet asks for. Deliberately just these two: a handful of
 # languages distinguish more (Polish few/many, Arabic zero/two), but this is a
@@ -369,7 +376,8 @@ def instruction_for(key, entry, kind, names, form):
 
 def export(args):
     catalog = load_catalog()
-    languages = args.languages.split(",") if args.languages else LANGUAGES
+    requested = args.languages.split(",") if args.languages else LANGUAGES
+    languages = [ALIASES.get(l, l) for l in requested]
     columns = FIXED_COLUMNS + [l for l in languages if l not in ("en", "nl")]
     translated = columns[len(FIXED_COLUMNS):]
 
@@ -551,8 +559,9 @@ def do_import(args):
             if any(not p.startswith("warning:") for p in found):
                 continue
             normalise(translated)
-            entry.setdefault("localizations", {})[language] = translated
-            written[language] += 1
+            code = ALIASES.get(language, language)
+            entry.setdefault("localizations", {})[code] = translated
+            written[code] += 1
 
     if problems:
         print("problems:", file=sys.stderr)

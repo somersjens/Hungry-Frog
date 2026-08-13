@@ -292,7 +292,7 @@
             "value" : "भालु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bjørn"
@@ -759,7 +759,7 @@
             "value" : "खरायो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kanin"
@@ -1226,7 +1226,7 @@
             "value" : "केकडा"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Krabbe"
@@ -1693,7 +1693,7 @@
             "value" : "कुकुर"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hund"
@@ -2160,7 +2160,7 @@
             "value" : "हात्ती"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Elefant"
@@ -2627,7 +2627,7 @@
             "value" : "स्याल"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rev"
@@ -3094,7 +3094,7 @@
             "value" : "भ्यागुतो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Frosk"
@@ -3561,7 +3561,7 @@
             "value" : "सिंह"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Løve"
@@ -4028,7 +4028,7 @@
             "value" : "अक्टोपस"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blekksprut"
@@ -4495,7 +4495,7 @@
             "value" : "पेन्गुइन"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pingvin"
@@ -4962,7 +4962,7 @@
             "value" : "रद्द"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Avbryt"
@@ -5429,7 +5429,7 @@
             "value" : "अगाडि"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fortsett"
@@ -5896,7 +5896,7 @@
             "value" : "सकियो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ferdig"
@@ -6363,7 +6363,7 @@
             "value" : "%1$lld/%2$lld मिनेट"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld/%2$lld min"
@@ -6830,7 +6830,7 @@
             "value" : "ठीक छ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -7297,7 +7297,7 @@
             "value" : "सेभ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lagre"
@@ -7764,7 +7764,7 @@
             "value" : "कम्बो! +%lld"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kombo! +%lld"
@@ -8231,7 +8231,7 @@
             "value" : "राम्रो प्रयास"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Godt forsøk"
@@ -8698,7 +8698,7 @@
             "value" : "सुरु त भयो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "En god start"
@@ -9165,7 +9165,7 @@
             "value" : "अभ्यास गरिराख"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fortsett å øve"
@@ -9632,7 +9632,7 @@
             "value" : "नराम्रो छैन"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ikke verst"
@@ -10099,7 +10099,7 @@
             "value" : "राम्रो गर्दैछौ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bra jobbet"
@@ -10566,7 +10566,7 @@
             "value" : "राम्रो प्रदर्शन"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flott innsats"
@@ -11033,7 +11033,7 @@
             "value" : "स्याबास"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Godt gjort"
@@ -11500,7 +11500,7 @@
             "value" : "एकदम राम्रो खेल्यौ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kjempebra spilt"
@@ -11967,7 +11967,7 @@
             "value" : "अन्त्य नजिकै छ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Målet er i sikte"
@@ -12434,7 +12434,7 @@
             "value" : "अब लगभग पुग्यौ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du er nesten fremme"
@@ -12901,7 +12901,7 @@
             "value" : "सबै सही!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alt riktig!"
@@ -13368,7 +13368,7 @@
             "value" : "तिमीले हरेक अङ्क कमायौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du fortjente hvert poeng."
@@ -14015,7 +14015,7 @@
             "value" : "पूरा भयो!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "fullført!"
@@ -14482,7 +14482,7 @@
             "value" : "खेल सकियो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spillet er slutt"
@@ -14949,7 +14949,7 @@
             "value" : "मुख्य मेनु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hovedmeny"
@@ -15416,7 +15416,7 @@
             "value" : "फेरि खेल"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spill igjen"
@@ -15883,7 +15883,7 @@
             "value" : "उच्च स्कोर"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rekord"
@@ -16350,7 +16350,7 @@
             "value" : "मुख्य मेनुमा फर्क"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tilbake til hovedmenyen"
@@ -16817,7 +16817,7 @@
             "value" : "जारी राख"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fortsett"
@@ -17284,7 +17284,7 @@
             "value" : "तिम्रो प्रगति रोकिएको छ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fremgangen er satt på pause."
@@ -17751,7 +17751,7 @@
             "value" : "लेभल सुरु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start nivå"
@@ -18218,7 +18218,7 @@
             "value" : "ट्युटोरियल सुरु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start veiledning"
@@ -18685,7 +18685,7 @@
             "value" : "दोब्बर अंक!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Doble poeng!"
@@ -19152,7 +19152,7 @@
             "value" : "लक्ष्य अवधि"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Målperiode"
@@ -19619,7 +19619,7 @@
             "value" : "दिनमा कति मिनेट खेल्न चाहन्छौ?"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hvor mange minutter vil du spille hver dag?"
@@ -20086,7 +20086,7 @@
             "value" : "हप्तामा कति मिनेट खेल्न चाहन्छौ?"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hvor mange minutter vil du spille hver uke?"
@@ -20553,7 +20553,7 @@
             "value" : "खेल लक्ष्य"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spillemål"
@@ -21020,7 +21020,7 @@
             "value" : "दैनिक"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Daglig"
@@ -21487,7 +21487,7 @@
             "value" : "साप्ताहिक"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ukentlig"
@@ -21954,7 +21954,7 @@
             "value" : "अझै %lld"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld til"
@@ -22421,7 +22421,7 @@
             "value" : "जम्मा"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Totalt"
@@ -22888,7 +22888,7 @@
             "value" : "भागहरू"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deler"
@@ -23355,7 +23355,7 @@
             "value" : "एक वा धेरै भाग"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Én eller flere deler"
@@ -23822,7 +23822,7 @@
             "value" : "सधैं एक भाग"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alltid én del"
@@ -24289,7 +24289,7 @@
             "value" : "क्रम"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rekkefølge"
@@ -24756,7 +24756,7 @@
             "value" : "तल्ला लेभलसँग मिसिएको"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blandet med lavere nivåer"
@@ -25223,7 +25223,7 @@
             "value" : "निश्चित क्रम"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fast rekkefølge"
@@ -25690,7 +25690,7 @@
             "value" : "दशमलवसहित"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Med desimaltall"
@@ -26157,7 +26157,7 @@
             "value" : "प्रकार"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type"
@@ -26624,7 +26624,7 @@
             "value" : "दशमलवबिना"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uten desimaltall"
@@ -27091,7 +27091,7 @@
             "value" : "अनियमित क्रम"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tilfeldig rekkefølge"
@@ -27558,7 +27558,7 @@
             "value" : "जोड, घटाउ, गुणन, भाग र प्रतिशत"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Addisjon, subtraksjon, multiplikasjon, divisjon og prosent"
@@ -28025,7 +28025,7 @@
             "value" : "जोड र घटाउ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Addisjon og subtraksjon"
@@ -28492,7 +28492,7 @@
             "value" : "जोड, घटाउ, गुणन र भाग"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Addisjon, subtraksjon, multiplikasjon og divisjon"
@@ -28959,7 +28959,7 @@
             "value" : "जोड, घटाउ र गुणन"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Addisjon, subtraksjon og multiplikasjon"
@@ -29426,7 +29426,7 @@
             "value" : "प्रश्नका प्रकार"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Typer oppgaver"
@@ -29893,7 +29893,7 @@
             "value" : "एउटा संख्या **जोड्ने** हिसाब।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver der du **legger til** et tall."
@@ -30360,7 +30360,7 @@
             "value" : "%lld जोड"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pluss %lld"
@@ -30827,7 +30827,7 @@
             "value" : "यो लेभलमा बढीमा **%lld गाजर** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld gulrøtter** på dette nivået."
@@ -31295,7 +31295,7 @@
             "value" : "यो लेभलमा बढीमा **%lld कुखुरा** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld kyllinger** på dette nivået."
@@ -31763,7 +31763,7 @@
             "value" : "यो लेभलमा बढीमा **%lld माछा** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld fisker** på dette nivået."
@@ -32231,7 +32231,7 @@
             "value" : "यो लेभलमा बढीमा **%lld झिँगा** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld fluer** på dette nivået."
@@ -32699,7 +32699,7 @@
             "value" : "यो लेभलमा बढीमा **%lld महका भाँडा** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld honningkrukker** på dette nivået."
@@ -33167,7 +33167,7 @@
             "value" : "यो लेभलमा बढीमा **%lld कुकुर बिस्कुट** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld hundekjeks** på dette nivået."
@@ -33635,7 +33635,7 @@
             "value" : "यो लेभलमा बढीमा **%lld मासुका टुक्रा** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld kjøttbiter** på dette nivået."
@@ -34103,7 +34103,7 @@
             "value" : "यो लेभलमा बढीमा **%lld बदाम** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld peanøtter** på dette nivået."
@@ -34571,7 +34571,7 @@
             "value" : "यो लेभलमा बढीमा **%lld मोती** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld perler** på dette nivået."
@@ -35039,7 +35039,7 @@
             "value" : "यो लेभलमा बढीमा **%lld साना झिँगेमाछा** जम्मा गर्न सक्छौ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du kan samle opptil **%lld reker** på dette nivået."
@@ -35507,7 +35507,7 @@
             "value" : "एउटा संख्या **भाग गर्ने** हिसाब।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver der du **deler** et tall."
@@ -35974,7 +35974,7 @@
             "value" : "%lld ले भाग"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Del på %lld"
@@ -36441,7 +36441,7 @@
             "value" : "**लेभल %lld** सम्मका प्रश्न।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver opptil **nivå %lld**."
@@ -36908,7 +36908,7 @@
             "value" : "**लेभल 1** का प्रश्न।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver fra **nivå 1**."
@@ -37375,7 +37375,7 @@
             "value" : "**सबै मिसाएर**: जोड, घटाउ, गुणा, भिन्न र प्रतिशत।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "**Alt blandet**: pluss, minus, gange, brøk og prosent."
@@ -37842,7 +37842,7 @@
             "value" : "सुपरमिक्स %lld"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supermiks %lld"
@@ -38309,7 +38309,7 @@
             "value" : "पूरैको **एउटा भाग** मात्र।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alltid **én del** av en hel."
@@ -38776,7 +38776,7 @@
             "value" : "पूरैको **एक वा बढी भाग**।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "**Én eller flere deler** av en hel."
@@ -39243,7 +39243,7 @@
             "value" : "प्रश्न **निश्चित क्रममा**।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver i **fast rekkefølge**."
@@ -39710,7 +39710,7 @@
             "value" : "उत्तर **दशमलव बिना**।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Svar **uten desimaler**."
@@ -40177,7 +40177,7 @@
             "value" : "उत्तर **दशमलवसहित पनि**।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Også svar **med desimaler**."
@@ -40644,7 +40644,7 @@
             "value" : "प्रश्न **जथाभावी क्रममा**।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver i **tilfeldig rekkefølge**."
@@ -41111,7 +41111,7 @@
             "value" : "**प्रतिशत** भएका हिसाब।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver med **prosent**."
@@ -41578,7 +41578,7 @@
             "value" : "संख्याको %@"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ av et tall"
@@ -42045,7 +42045,7 @@
             "value" : "एउटा संख्या **घटाउने** हिसाब।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver der du **trekker fra** et tall."
@@ -42512,7 +42512,7 @@
             "value" : "%lld घटाउ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Minus %lld"
@@ -42979,7 +42979,7 @@
             "value" : "**गुणा गर्ने** हिसाब।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver der du **ganger**."
@@ -43446,7 +43446,7 @@
             "value" : "%lld को पहाडा"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld-gangen"
@@ -43913,7 +43913,7 @@
             "value" : "MAX"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "MAKS"
@@ -44380,7 +44380,7 @@
             "value" : "थप लेभल"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flere nivåer"
@@ -44847,7 +44847,7 @@
             "value" : "प्रिमियम लेभल"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premium-nivåer"
@@ -45314,7 +45314,7 @@
             "value" : "यहाँबाट सुरु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start her"
@@ -45781,7 +45781,7 @@
             "value" : "प्रिमियमले थप खोल"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lås opp mer med Premium"
@@ -46248,7 +46248,7 @@
             "value" : "धेरै"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Flere"
@@ -46715,7 +46715,7 @@
             "value" : "एक"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Én del"
@@ -47182,7 +47182,7 @@
             "value" : "मिश्रित"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blandet"
@@ -47649,7 +47649,7 @@
             "value" : "क्रम"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rekkefølge"
@@ -48116,7 +48116,7 @@
             "value" : "दशमलव"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Desimal"
@@ -48583,7 +48583,7 @@
             "value" : "पूर्ण"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Heltall"
@@ -49050,7 +49050,7 @@
             "value" : "अनियमित"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tilfeldig"
@@ -49517,7 +49517,7 @@
             "value" : "तिम्रो नाम"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Navnet ditt"
@@ -49984,7 +49984,7 @@
             "value" : "तिम्रो नाम के हो?"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hva heter du?"
@@ -50451,7 +50451,7 @@
             "value" : "%@: यो जनावर अनलक गर्न केहि थप झिँगाहरू कमाउनुहोस्! 🐼"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@: Tjen noen flere fluer for å låse opp dette dyret! 🐼"
@@ -51494,7 +51494,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -52885,7 +52885,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -54276,7 +54276,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -55091,7 +55091,7 @@
             "value" : "तपाईंका जनावरहरू पर्खिरहेका छन्। खेल्न फिर्ता आउनुहोस् र झिँगाहरू सङ्कलन गरिरहनुहोस्!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dyrene dine venter. Kom tilbake for å spille og fortsett å samle fluer!"
@@ -55558,7 +55558,7 @@
             "value" : "हामी तपाईंलाई सम्झन्छौं! 👋"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vi savner deg! 👋"
@@ -56601,7 +56601,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -57416,7 +57416,7 @@
             "value" : "दिन 3 बनाउनुहोस्! ⭐"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "La oss få dag 3 til å skje! ⭐"
@@ -57883,7 +57883,7 @@
             "value" : "जम्पिङ फक्स प्रिमियमले हरेक विषय र सबै 10 जनावरहरूको लागि %lld स्तरहरू समावेश गर्दछ। साहसिक कार्य जारी छ!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hungry Frog Premium inkluderer %lld nivåer for hvert emne og alle 10 dyrene. Eventyret fortsetter!"
@@ -58351,7 +58351,7 @@
             "value" : "थप स्तर र जनावरहरू अनलक गर्नुहोस्! 🌈"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lås opp flere nivåer og dyr! 🌈"
@@ -58818,7 +58818,7 @@
             "value" : "%lld दिन भयो। केही गणित अभ्यासहरू समाधान गरौं र थप झिँगाहरू कमाउनुहोस्!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Det har gått %lld dager. La oss løse noen matematikkøvelser og tjene flere fluer!"
@@ -59285,7 +59285,7 @@
             "value" : "फेरि खेल्न तयार हुनुहुन्छ? 🎮"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Klar til å spille igjen? 🎮"
@@ -60328,7 +60328,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -61719,7 +61719,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -63110,7 +63110,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -64501,7 +64501,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -65316,7 +65316,7 @@
             "value" : "विभिन्न मिश्रित हिसाब सँगै।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Forskjellige miksoppgaver sammen."
@@ -65783,7 +65783,7 @@
             "value" : "पहिल्यै राम्रो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Allerede ganske god"
@@ -66250,7 +66250,7 @@
             "value" : "क्रमका हिसाब अभ्यास गर।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Øv på oppgaver i rekkefølge."
@@ -66717,7 +66717,7 @@
             "value" : "भर्खर सुरु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nettopp begynt"
@@ -67184,7 +67184,7 @@
             "value" : "अनियमित क्रमका हिसाब।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Oppgaver i tilfeldig rekkefølge."
@@ -67651,7 +67651,7 @@
             "value" : "पहिल्यै केही अभ्यास"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Har øvd litt"
@@ -68118,7 +68118,7 @@
             "value" : "यसमा तिमी कति राम्रो छौ?"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hvor god er du allerede?"
@@ -68585,7 +68585,7 @@
             "value" : "सुरु गरौँ। तिम्रो नाम के हो?"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "La oss begynne. Hva heter du?"
@@ -69052,7 +69052,7 @@
             "value" : "हिसाब गर्नु यति रमाइलो कहिल्यै थिएन!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Regning har aldri vært så gøy!"
@@ -69519,7 +69519,7 @@
             "value" : "सुरु गर्न एउटा विषय छान।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Velg et emne å starte med."
@@ -69986,7 +69986,7 @@
             "value" : "तिमी के सिक्न चाहन्छौ?"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hva vil du lære?"
@@ -70453,7 +70453,7 @@
             "value" : "स्वीकृत"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Godkjent"
@@ -70920,7 +70920,7 @@
             "value" : "प्रयास: %1$lld मध्ये %2$lld"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Forsøk: %1$lld av %2$lld"
@@ -71963,7 +71963,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -72778,7 +72778,7 @@
             "value" : "थिच्नुहोस्: %lld"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hold: %lld"
@@ -73245,7 +73245,7 @@
             "value" : "वृत्त"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "sirkel"
@@ -73712,7 +73712,7 @@
             "value" : "हीरा"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "diamant"
@@ -74179,7 +74179,7 @@
             "value" : "मुटु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "hjerte"
@@ -74646,7 +74646,7 @@
             "value" : "षट्कोण"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "sekskant"
@@ -75113,7 +75113,7 @@
             "value" : "जोड चिन्ह"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "pluss"
@@ -75580,7 +75580,7 @@
             "value" : "वर्ग"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "firkant"
@@ -76047,7 +76047,7 @@
             "value" : "तारा"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "stjerne"
@@ -76514,7 +76514,7 @@
             "value" : "त्रिकोण"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "trekant"
@@ -76981,7 +76981,7 @@
             "value" : "साना खेलाडीको सुरक्षाका लागि, खरिदमा जानुअघि एक वयस्कले यो जाँच पूरा गर्नुपर्छ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "For å beskytte unge spillere må en voksen fullføre denne kontrollen før kjøpet kan fortsette."
@@ -78024,7 +78024,7 @@
             }
           }
         },
-        "no" : {
+        "nb" : {
           "variations" : {
             "plural" : {
               "one" : {
@@ -78839,7 +78839,7 @@
             "value" : "ट्याप: %1$lld मध्ये %2$lld"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trykk: %1$lld av %2$lld"
@@ -79306,7 +79306,7 @@
             "value" : "वयस्कको स्वीकृति चाहिन्छ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Godkjenning fra en voksen kreves"
@@ -79773,7 +79773,7 @@
             "value" : "%lld ट्रफीबाट उपलब्ध"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tilgjengelig fra %lld trofeer"
@@ -80241,7 +80241,7 @@
             "value" : "सुरुदेखि उपलब्ध"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tilgjengelig fra starten"
@@ -80708,7 +80708,7 @@
             "value" : "नयाँ पात्र खुल्यो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "NY FIGUR LÅST OPP"
@@ -81175,7 +81175,7 @@
             "value" : "तिमीले %lld झिँगा कमायौ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du har tjent %lld fluer"
@@ -81643,7 +81643,7 @@
             "value" : "Premium मा मात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eksklusiv med Premium"
@@ -82110,7 +82110,7 @@
             "value" : "प्रिमियममा सबै १० जनावरसँग स्वतन्त्र खेल।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Med Premium kan du spille fritt med alle de 10 dyrene."
@@ -82577,7 +82577,7 @@
             "value" : "सबै जनावर उपलब्ध"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tilgang til alle dyrene"
@@ -83044,7 +83044,7 @@
             "value" : "अभ्यासका लागि सधैं नयाँ हिसाब।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alltid nok nye oppgaver å øve på."
@@ -83511,7 +83511,7 @@
             "value" : "हरेक विषयमा ९९ लेभल"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "99 nivåer per emne"
@@ -83978,7 +83978,7 @@
             "value" : "बिनारोकावट खेल।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spill helt uten avbrytelser."
@@ -84445,7 +84445,7 @@
             "value" : "विज्ञापन छैन"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ingen reklame"
@@ -84912,7 +84912,7 @@
             "value" : "एकपटकको खरिद। सधैं तिम्रो।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Engangskjøp. Ditt for alltid."
@@ -85379,7 +85379,7 @@
             "value" : "खरिद पुनःस्थापना"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gjenopprett kjøp"
@@ -85846,7 +85846,7 @@
             "value" : "सुरु"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start"
@@ -86313,7 +86313,7 @@
             "value" : "अहिले स्टोर उपलब्ध छैन। पछि फेरि प्रयास गर्नुहोस्।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Butikken er ikke tilgjengelig nå. Prøv igjen senere."
@@ -86780,7 +86780,7 @@
             "value" : "प्रिमियम खोल"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lås opp Premium"
@@ -87247,7 +87247,7 @@
             "value" : "Premium ले खुल्यो"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Låst opp med Premium"
@@ -87714,7 +87714,7 @@
             "value" : "प्रिमियम खोल · %@"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lås opp Premium · %@"
@@ -88181,7 +88181,7 @@
             "value" : "लेभल पूरा!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nivå fullført!"
@@ -88648,7 +88648,7 @@
             "value" : "रोकिएको"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pause"
@@ -89115,7 +89115,7 @@
             "value" : "पात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Figur"
@@ -89582,7 +89582,7 @@
             "value" : "हरेक जनावरले पूरै खेलमा आफ्नै रङको थिम ल्याउँछ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hvert dyr gir hele spillet sitt eget fargetema."
@@ -90049,7 +90049,7 @@
             "value" : "आफ्नै: %lld मिनेट"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Egendefinert: %lld min"
@@ -90516,7 +90516,7 @@
             "value" : "दैनिक लक्ष्य"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Daglig mål"
@@ -90983,7 +90983,7 @@
             "value" : "लगातार खेल्ने लक्ष्य दिनको ५ मिनेटबाट सुरु हुन्छ। सक्रिय खेल समय मात्र गनिन्छ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rekkemålet starter på 5 minutter per dag. Bare aktiv spilletid teller."
@@ -91450,7 +91450,7 @@
             "value" : "संगीत"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Musikk"
@@ -91917,7 +91917,7 @@
             "value" : "खेल लक्ष्य"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spillemål"
@@ -92384,7 +92384,7 @@
             "value" : "प्रिमियम खुल्यो। धन्यवाद!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premium er låst opp. Takk!"
@@ -92851,7 +92851,7 @@
             "value" : "ध्वनि"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lyd"
@@ -93318,7 +93318,7 @@
             "value" : "संगीत र प्रभाव"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Musikk og lyder"
@@ -93785,7 +93785,7 @@
             "value" : "शान्त खेल्न ध्वनि बन्द गर। खेल उस्तै चल्छ।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Slå av lyden for å spille stille. Spillet fungerer akkurat likt."
@@ -94252,7 +94252,7 @@
             "value" : "सेटिङ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Innstillinger"
@@ -94719,7 +94719,7 @@
             "value" : "दिन १"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dag 1"
@@ -95186,7 +95186,7 @@
             "value" : "जोड"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Addisjon"
@@ -95653,7 +95653,7 @@
             "value" : "जोड मात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bare addisjon"
@@ -96120,7 +96120,7 @@
             "value" : "भिन्न"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Brøk"
@@ -96587,7 +96587,7 @@
             "value" : "भाग मात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bare divisjon"
@@ -97054,7 +97054,7 @@
             "value" : "सुपरमिक्स"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supermiks"
@@ -97521,7 +97521,7 @@
             "value" : "मिश्रित हिसाब"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blandede regnearter"
@@ -97988,7 +97988,7 @@
             "value" : "प्रतिशत"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prosent"
@@ -98455,7 +98455,7 @@
             "value" : "प्रतिशत मात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bare prosent"
@@ -98922,7 +98922,7 @@
             "value" : "घटाउ"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Subtraksjon"
@@ -99389,7 +99389,7 @@
             "value" : "घटाउ मात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bare subtraksjon"
@@ -99856,7 +99856,7 @@
             "value" : "पहाडा"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ganging"
@@ -100323,7 +100323,7 @@
             "value" : "गुणा मात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bare multiplikasjon"
@@ -100790,7 +100790,7 @@
             "value" : "तिमी खेलकै बीचमा छौ। पहिले सकाऊ, वा सुरु नगरेको लेभल छान, अनि ट्युटोरियल खेल।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Du er midt i et spill. Fullfør det, eller velg et nivå du ikke har startet ennå, for å spille veiledningen."
@@ -101257,7 +101257,7 @@
             "value" : "खेलको सुरुमा मात्र"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bare ved starten av et spill"
@@ -101724,7 +101724,7 @@
             "value" : "यहाँ तिम्रो अंक देखिन्छ!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Her ser du poengsummen din!"
@@ -102191,7 +102191,7 @@
             "value" : "माथि दायाँतिर हल गर्नुपर्ने हिसाब छ। सही उत्तर भएको झिँगामा थिच!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Øverst til høyre ser du oppgaven du skal løse. Trykk på fluen med riktig svar!"
@@ -102658,7 +102658,7 @@
             "value" : "हो, त्यो सही थियो! अब गलत झिँगामा थिच्दा के हुन्छ हेर।"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ja, det var riktig! Se nå hva som skjer når du trykker på feil flue."
@@ -103125,7 +103125,7 @@
             "value" : "लगातार पाँच सही उत्तर देऊ र बोनस पाऊ!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Få fem riktige svar på rad for å få en bonus!"
@@ -103592,7 +103592,7 @@
             "value" : "बोनस! अब दस सेकेन्डसम्म दोब्बर अंक पाउँछौ!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bonus! Nå får du doble poeng i ti sekunder!"
@@ -104059,7 +104059,7 @@
             "value" : "अब कसरी खेल्ने थाहा भयो। शुभकामना!"
           }
         },
-        "no" : {
+        "nb" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nå vet du hvordan det virker. Lykke til!"
