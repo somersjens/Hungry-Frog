@@ -59,6 +59,9 @@ private enum FlyConfig {
     /// pad instead of needing a size for each. Launch and gravity are scaled
     /// together, which lowers the arc without changing how long it takes.
     static let poopLifetime = 1.05
+    /// A quick wrong-answer sprite swap. Half a second is enough to read
+    /// alongside the burst without leaving the character frozen.
+    static let wrongReactionLifetime = 0.5
     static let poopDelays: [Double] = [0, 0.055, 0.11]
     static func poopLaunchSpeed(bodyWidth: CGFloat) -> CGFloat { bodyWidth * 1.47 }
     static func poopGravity(bodyWidth: CGFloat) -> CGFloat { bodyWidth * 3.92 }
@@ -608,6 +611,17 @@ private struct HeadMarks {
     var praise: HeadPraise?
 
     var isEmpty: Bool { poops.isEmpty && praise == nil }
+
+    /// The reaction arrives with the first dropping and softens off just before
+    /// its half-second layover ends. Deriving this from the burst keeps both
+    /// effects on the same simulation frame without introducing another timer.
+    var wrongReactionOpacity: Double {
+        guard let elapsed = poops.first?.elapsed,
+              elapsed < FlyConfig.wrongReactionLifetime else { return 0 }
+        let appear = min(1, elapsed / 0.04)
+        let disappear = min(1, (FlyConfig.wrongReactionLifetime - elapsed) / 0.09)
+        return max(0, min(appear, disappear))
+    }
 }
 
 @MainActor
@@ -1482,12 +1496,16 @@ struct FlyPlayfield: View {
                 // slide the painted lip out from under the ribbon's root on
                 // every frame. All of the motion in a strike belongs to the
                 // tongue; the animal it comes out of holds perfectly still.
-                character.playArtwork
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: stage.width, height: stage.height)
-                    .position(x: stage.midX, y: stage.midY)
-                    .allowsHitTesting(false)
+                if character.id == "frog" {
+                    FrogWrongAnswerArtwork(marks: engine.marks, stage: stage)
+                } else {
+                    character.playArtwork
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: stage.width, height: stage.height)
+                        .position(x: stage.midX, y: stage.midY)
+                        .allowsHitTesting(false)
+                }
 
                 // Drawn after the character: a tongue that emerges from behind
                 // the head reads as coming out of the back of the animal.
@@ -2063,6 +2081,31 @@ private struct TongueLayer: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .allowsHitTesting(false)
+    }
+}
+
+/// The approved wrong-answer eyes are a transparent cutout from the alternate
+/// painting. The original frog stays untouched underneath, so no generated
+/// pixels outside the two eye shapes can tint the playfield or the character.
+private struct FrogWrongAnswerArtwork: View {
+    @ObservedObject var marks: MarkChannel
+    let stage: CGRect
+
+    var body: some View {
+        let reactionOpacity = marks.value.wrongReactionOpacity
+        ZStack {
+            Image("side_1")
+                .resizable()
+                .scaledToFit()
+            Image("side_wrong_1")
+                .resizable()
+                .scaledToFit()
+                .opacity(reactionOpacity)
+        }
+        .frame(width: stage.width, height: stage.height)
+        .position(x: stage.midX, y: stage.midY)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
