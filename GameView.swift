@@ -565,6 +565,25 @@ private struct CountdownRing: View {
     }
 }
 
+#if TRAILER_EXPORT
+/// Compile-gated bridge to the production streak chip. A deterministic frame
+/// supplies the seconds left; the chip itself remains the live HUD view.
+struct TrailerDoublePointsChip: View {
+    let remaining: Double
+    let character: AnimalCharacter
+    let isPad: Bool
+
+    var body: some View {
+        DoublePointsChip(deadline: Date().addingTimeInterval(max(0, remaining)),
+                         token: 1,
+                         character: character,
+                         isPad: isPad,
+                         height: isPad ? 52 : 44)
+            .environment(\.locale, Locale(identifier: "en"))
+    }
+}
+#endif
+
 // MARK: - Level wallpaper
 
 /// The level's own quiet wallpaper: a staggered grid of the level's number and

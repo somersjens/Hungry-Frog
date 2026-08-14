@@ -2922,3 +2922,192 @@ private struct FlyCelebration: View {
         }
     }
 }
+
+#if TRAILER_EXPORT
+// MARK: - Deterministic trailer adapters
+//
+// These tiny adapters deliberately live beside the private production views
+// they expose. The App Store teaser is compiled only with TRAILER_EXPORT, so
+// none of this surface exists in a normal archive. More importantly, the
+// trailer renders the same tongue, pointer, food, reaction physics, question
+// card and completion artwork as a live level instead of maintaining promo
+// lookalikes in a second graphics stack.
+
+struct TrailerStageGeometry {
+    static func characterRect(isPad: Bool, in size: CGSize) -> CGRect {
+        FlyConfig.characterRect(isPad: isPad, in: size)
+    }
+
+    static func flySize(isPad: Bool) -> CGFloat {
+        FlyConfig.flySize(isPad: isPad)
+    }
+}
+
+struct TrailerFoodGlyph: View {
+    let characterID: String
+    let answer: String
+    let isPad: Bool
+
+    var body: some View {
+        let size = FlyConfig.flySize(isPad: isPad) * FlyConfig.foodVisualScale
+        FoodGlyphArtwork(foodImageName: FoodCatalog.imageName(for: characterID),
+                         text: answer,
+                         size: size)
+            .frame(width: size, height: size)
+    }
+}
+
+struct TrailerQuestionCard: View {
+    let prompt: String
+    let character: AnimalCharacter
+    let isPad: Bool
+    let size: CGSize
+
+    var body: some View {
+        ActiveQuestionView(prompt: prompt, character: character, isPad: isPad, size: size)
+    }
+}
+
+struct TrailerTutorialArrow: View {
+    @StateObject private var frames: SwarmChannel
+    let source: CGRect
+    let color: Color
+    let isPad: Bool
+
+    init(target: CGPoint, source: CGRect, color: Color, isPad: Bool, clock: Double) {
+        let channel = SwarmChannel()
+        channel.value = SwarmFrame(
+            clock: clock,
+            flies: [AnswerFly(roundID: UUID(),
+                              optionID: UUID(),
+                              text: "6",
+                              isCorrect: true,
+                              position: target,
+                              velocity: .zero,
+                              phase: 0,
+                              pattern: .wander,
+                              baseSpeed: 0)]
+        )
+        _frames = StateObject(wrappedValue: channel)
+        self.source = source
+        self.color = color
+        self.isPad = isPad
+    }
+
+    var body: some View {
+        TutorialArrowLayer(frames: frames,
+                           target: .correct,
+                           source: source,
+                           color: color,
+                           isPad: isPad)
+    }
+}
+
+struct TrailerTongueStrike: View {
+    let character: AnimalCharacter
+    let isPad: Bool
+    let stage: CGRect
+    let target: CGPoint
+    let answer: String
+    let elapsed: Double
+    let isCorrect: Bool
+
+    var body: some View {
+        let mouthPoint = point(character.mouth.anchor)
+        let mouthCenter = point(character.mouth.center)
+        let opening = CGRect(
+            x: mouthCenter.x - stage.width * character.mouth.opening.width * 0.5,
+            y: mouthCenter.y - stage.height * character.mouth.opening.height * 0.5,
+            width: stage.width * character.mouth.opening.width,
+            height: stage.height * character.mouth.opening.height
+        )
+        let strike = TongueCatch(flyID: UUID(),
+                                 roundID: UUID(),
+                                 optionID: UUID(),
+                                 text: answer,
+                                 isCorrect: isCorrect,
+                                 flyPhase: 0,
+                                 start: mouthPoint,
+                                 target: target,
+                                 elapsed: min(elapsed,
+                                              FlyConfig.extensionTime
+                                                + FlyConfig.contactTime
+                                                + FlyConfig.retractionTime),
+                                 didReportContact: elapsed >= FlyConfig.extensionTime,
+                                 wasAccepted: true)
+        TongueView(catchState: strike,
+                   foodImageName: FoodCatalog.imageName(for: character.id),
+                   isPad: isPad,
+                   headSize: stage.width * AnimalCharacter.playHeadWidthShare,
+                   mouthOpening: opening,
+                   mouth: character.mouth,
+                   reduceMotion: false)
+    }
+
+    private func point(_ unit: CGPoint) -> CGPoint {
+        CGPoint(x: stage.minX + stage.width * unit.x,
+                y: stage.minY + stage.height * unit.y)
+    }
+}
+
+struct TrailerWrongReaction: View {
+    @StateObject private var marks: MarkChannel
+    let stage: CGRect
+    let displayScale: CGFloat
+
+    init(stage: CGRect, elapsed: Double, displayScale: CGFloat) {
+        let channel = MarkChannel()
+        let body = stage.width
+        let launch = FlyConfig.poopLaunchSpeed(bodyWidth: body)
+        let gravity = FlyConfig.poopGravity(bodyWidth: body)
+        let drift = FlyConfig.poopDrift(bodyWidth: body)
+        let size = FlyConfig.poopSize(bodyWidth: body)
+        let fan: [(CGFloat, CGFloat, Double, CGFloat)] = [
+            (-1.00, 0.88, -168, 0.86),
+            (-0.12, 1.00,   96, 1.00),
+            ( 0.94, 0.91,  184, 0.79)
+        ]
+        channel.value = HeadMarks(
+            poops: zip(fan, FlyConfig.poopDelays).map { shape, delay in
+                PoopDrop(delay: delay,
+                         drift: drift * shape.0,
+                         launch: launch * shape.1,
+                         gravity: gravity,
+                         spin: shape.2,
+                         size: size * shape.3,
+                         elapsed: elapsed)
+            },
+            praise: nil
+        )
+        _marks = StateObject(wrappedValue: channel)
+        self.stage = stage
+        self.displayScale = displayScale
+    }
+
+    var body: some View {
+        let character = CharacterCatalog.character(id: "frog")
+        let head = point(CGPoint(x: character.mouth.center.x + FlyConfig.poopHeadOffset.width,
+                                 y: character.mouth.center.y + FlyConfig.poopHeadOffset.height))
+        let praise = point(CGPoint(x: character.mouth.center.x + FlyConfig.praiseRestOffset.width,
+                                   y: character.mouth.center.y + FlyConfig.praiseRestOffset.height))
+        ZStack {
+            FrogWrongAnswerArtwork(marks: marks, stage: stage)
+            HeadMarkLayer(marks: marks, head: head, praiseRest: praise, scale: displayScale)
+        }
+    }
+
+    private func point(_ unit: CGPoint) -> CGPoint {
+        CGPoint(x: stage.minX + stage.width * unit.x,
+                y: stage.minY + stage.height * unit.y)
+    }
+}
+
+struct TrailerCompletionFlies: View {
+    let clock: Double
+    let color: Color
+
+    var body: some View {
+        FlyCelebration(clock: clock, color: color)
+    }
+}
+#endif

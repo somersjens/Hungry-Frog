@@ -73,6 +73,7 @@
 		F9F3CBCDC239647255BAA080 /* CharacterScenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */; };
 		FA11F00131A1000000000001 /* FlyGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00231A1000000000001 /* FlyGame.swift */; };
 		FA11F00331A1000000000003 /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11F00431A1000000000004 /* Tutorial.swift */; };
+		FA22F00131A2000000000001 /* TrailerCompositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA22F00231A2000000000002 /* TrailerCompositionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -144,6 +145,7 @@
 		F9F3C9AC301F3CBE00464555 /* frog_music.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = frog_music.m4a; sourceTree = "<group>"; };
 		FA11F00231A1000000000001 /* FlyGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGame.swift; sourceTree = "<group>"; };
 		FA11F00431A1000000000004 /* Tutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
+		FA22F00231A2000000000002 /* TrailerCompositionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrailerCompositionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +162,7 @@
 		F9F3C5C1301E405E00464555 = {
 			isa = PBXGroup;
 			children = (
+				FA22F00331A2000000000003 /* Promo */,
 				F9F3C9AC301F3CBE00464555 /* frog_music.m4a */,
 				F9F3C5DA301E409F00464555 /* MenuMeadowBackground.swift */,
 				F9F31A46BC3BFE0358899C4B /* CharacterScenes.swift */,
@@ -245,6 +248,14 @@
 				F9F3C5EB301E409F00464555 /* SeededGenerator.swift */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		FA22F00331A2000000000003 /* Promo */ = {
+			isa = PBXGroup;
+			children = (
+				FA22F00231A2000000000002 /* TrailerCompositionView.swift */,
+			);
+			path = Promo;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -424,6 +435,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA22F00131A2000000000001 /* TrailerCompositionView.swift in Sources */,
 				F9F3C636301E409F00464555 /* PlaytimeTracker.swift in Sources */,
 				F9F3C637301E409F00464555 /* Notifications.swift in Sources */,
 				F9F3C638301E409F00464555 /* DecimalAnswer.swift in Sources */,
@@ -595,7 +607,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Number Reef.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 4283ACUG4Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -644,7 +656,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Number Reef.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 4283ACUG4Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;

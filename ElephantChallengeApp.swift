@@ -56,25 +56,16 @@ struct ElephantChallengeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                if onboardingComplete && !showsOnboardingReplay {
-                    HomeView {
-                        withAnimation(.easeInOut(duration: 0.35)) {
-                            showsOnboardingReplay = true
-                        }
-                    }
-                        // Both screens fade through each other rather than one
-                        // replacing the other, so the hand-over reads as a
-                        // single settling motion instead of a cut.
-                        .transition(.opacity.combined(with: .scale(scale: 1.015)))
+            Group {
+#if TRAILER_EXPORT
+                if TrailerExporter.isRequested {
+                    TrailerExportStatusView()
                 } else {
-                    OnboardingView {
-                        withAnimation(.easeInOut(duration: 0.35)) {
-                            showsOnboardingReplay = false
-                        }
-                    }
-                        .transition(.opacity.combined(with: .scale(scale: 0.99)))
+                    normalContent
                 }
+#else
+                normalContent
+#endif
             }
             .animation(.easeInOut(duration: 0.42), value: onboardingComplete)
             .animation(.easeInOut(duration: 0.42), value: showsOnboardingReplay)
@@ -99,6 +90,29 @@ struct ElephantChallengeApp: App {
                 .gameEnvironment()
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+            }
+        }
+    }
+
+    private var normalContent: some View {
+        ZStack {
+            if onboardingComplete && !showsOnboardingReplay {
+                HomeView {
+                    withAnimation(.easeInOut(duration: 0.35)) {
+                        showsOnboardingReplay = true
+                    }
+                }
+                    // Both screens fade through each other rather than one
+                    // replacing the other, so the hand-over reads as a
+                    // single settling motion instead of a cut.
+                    .transition(.opacity.combined(with: .scale(scale: 1.015)))
+            } else {
+                OnboardingView {
+                    withAnimation(.easeInOut(duration: 0.35)) {
+                        showsOnboardingReplay = false
+                    }
+                }
+                    .transition(.opacity.combined(with: .scale(scale: 0.99)))
             }
         }
     }
