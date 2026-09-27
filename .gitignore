@@ -1,0 +1,21 @@
+# App Store preview videos and raw captures stay on this Mac so they can
+# still be uploaded. They are too large for Git.
+*.mp4
+*.mov
+*.m4v
+
+# Local Xcode and promo build output.
+.build/
+.build-*/
+DerivedData/
+promo/DerivedData/
+promo/DerivedData-*/
+promo/.derived/
+promo/.derived-*/
+.derived-*/
+.codex-derived-data/
+.codex-derived-data-*/
+.codex-*-derived/
+.codex-swift-module-cache/
+
+*.mp4.sb-*

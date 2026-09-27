@@ -1,0 +1,8 @@
+{
+  "duration" : 20,
+  "exports" : [
+    "frog-app-store-teaser-1920x886.mp4",
+    "frog-app-store-teaser-1600x1200.mp4"
+  ],
+  "frameRate" : 30
+}

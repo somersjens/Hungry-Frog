@@ -1,0 +1,10 @@
+{
+  "completedAt" : "2026-08-13T20:32:20Z",
+  "duration" : 22,
+  "fps" : 30,
+  "layout" : "nativeLandscapeGameplay",
+  "outputs" : [
+    "app-store-teaser-1920x886",
+    "app-store-teaser-1600x1200"
+  ]
+}
